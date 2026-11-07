@@ -1,16 +1,44 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
+import { startCloud, AuthScreen, isGuestChosen, chooseGuest } from "./cloud.jsx";
 window.React = React;
-// Stand-in for the prototype sandbox's window.storage, backed by this browser's localStorage
-if (!window.storage) {
+
+// Default storage: this browser's localStorage (guests, and the claude.ai version).
+function localStorageBackend() {
   const ls = () => { try { return window.localStorage; } catch { return null; } };
-  window.storage = {
+  return {
     get: async (k) => { const s = ls(); const v = s ? s.getItem("mysous:" + k) : null; if (v == null) throw new Error("missing"); return { key: k, value: v }; },
     set: async (k, v) => { const s = ls(); if (s) s.setItem("mysous:" + k, v); return { key: k, value: v }; },
     delete: async (k) => { const s = ls(); if (s) s.removeItem("mysous:" + k); return { key: k, deleted: true }; },
     list: async () => ({ keys: [] }),
   };
 }
-const start = () => createRoot(document.getElementById("root")).render(React.createElement(App));
-start();
+
+const root = createRoot(document.getElementById("root"));
+const showApp = () => root.render(React.createElement(App));
+
+(async () => {
+  let cloud = null;
+  try { cloud = await startCloud(); } catch { cloud = null; }
+
+  if (!cloud) {
+    if (!window.storage) window.storage = localStorageBackend();
+    showApp();
+    return;
+  }
+
+  window.mysousCloud = cloud;
+  if (cloud.signedIn) {
+    window.storage = cloud.storage;
+    showApp();
+  } else if (isGuestChosen()) {
+    window.storage = localStorageBackend();
+    showApp();
+  } else {
+    root.render(React.createElement(AuthScreen, {
+      sb: cloud.sb,
+      onGuest: () => { chooseGuest(); window.storage = localStorageBackend(); showApp(); },
+    }));
+  }
+})();

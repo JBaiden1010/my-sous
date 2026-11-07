@@ -266,6 +266,16 @@ const TRANSLATIONS = {
   errorTitle: { en: "Something went wrong on this screen.", es: "Algo salió mal en esta pantalla.", fr: "Un problème est survenu sur cet écran.", pt: "Algo deu errado nesta tela.", hi: "इस स्क्रीन पर कुछ गड़बड़ हो गई।", zh: "此页面出现了问题。", ar: "حدث خطأ في هذه الشاشة." },
   errorBody: { en: "Your saved kitchen, recipes and history are safe.", es: "Tu cocina, recetas e historial guardados están a salvo.", fr: "Votre cuisine, vos recettes et votre historique sont en sécurité.", pt: "Sua cozinha, receitas e histórico salvos estão seguros.", hi: "आपकी सहेजी गई रसोई, रेसिपी और इतिहास सुरक्षित हैं।", zh: "你保存的厨房、菜谱和历史记录都安全。", ar: "مطبخك ووصفاتك وسجلك المحفوظ بأمان." },
   errorGoHome: { en: "Go to Home", es: "Ir al inicio", fr: "Aller à l'accueil", pt: "Ir para o início", hi: "होम पर जाएँ", zh: "返回首页", ar: "الذهاب إلى الرئيسية" },
+  accountLabel: { en: "Account", es: "Cuenta", fr: "Compte", pt: "Conta", hi: "खाता", zh: "账户", ar: "الحساب" },
+  guestLabel: { en: "Guest", es: "Invitado", fr: "Invité", pt: "Convidado", hi: "मेहमान", zh: "访客", ar: "ضيف" },
+  accountSavedNote: { en: "Your kitchen, cookbook and history are saved to your account.", es: "Tu cocina, recetario e historial se guardan en tu cuenta.", fr: "Votre cuisine, vos recettes et votre historique sont enregistrés dans votre compte.", pt: "Sua cozinha, receitas e histórico ficam salvos na sua conta.", hi: "आपकी रसोई, कुकबुक और इतिहास आपके खाते में सेव हैं।", zh: "你的厨房、食谱本和历史记录已保存到账户。", ar: "مطبخك ووصفاتك وسجلك محفوظة في حسابك." },
+  guestSavedNote: { en: "Saved on this device only. Sign in to keep it everywhere.", es: "Guardado solo en este dispositivo. Inicia sesión para tenerlo en todas partes.", fr: "Enregistré sur cet appareil uniquement. Connectez-vous pour le retrouver partout.", pt: "Salvo só neste dispositivo. Entre para ter em todo lugar.", hi: "सिर्फ़ इस डिवाइस पर सेव है। हर जगह रखने के लिए साइन इन करें।", zh: "仅保存在本设备上。登录后可在任何设备使用。", ar: "محفوظ على هذا الجهاز فقط. سجّل الدخول للاحتفاظ به في كل مكان." },
+  signInLabel: { en: "Sign in", es: "Iniciar sesión", fr: "Se connecter", pt: "Entrar", hi: "साइन इन", zh: "登录", ar: "تسجيل الدخول" },
+  signOutLabel: { en: "Sign out", es: "Cerrar sesión", fr: "Se déconnecter", pt: "Sair", hi: "साइन आउट", zh: "退出登录", ar: "تسجيل الخروج" },
+  communitySignIn: { en: "Sign in to post, rate recipes and share tutorials.", es: "Inicia sesión para publicar, calificar recetas y compartir tutoriales.", fr: "Connectez-vous pour publier, noter des recettes et partager des tutoriels.", pt: "Entre para publicar, avaliar receitas e compartilhar tutoriais.", hi: "पोस्ट करने, रेसिपी रेट करने और ट्यूटोरियल साझा करने के लिए साइन इन करें।", zh: "登录后即可发帖、评分和分享教程。", ar: "سجّل الدخول للنشر وتقييم الوصفات ومشاركة الدروس." },
+  reportLabel: { en: "Report", es: "Reportar", fr: "Signaler", pt: "Denunciar", hi: "रिपोर्ट करें", zh: "举报", ar: "إبلاغ" },
+  reportedThanks: { en: "Reported. Thanks", es: "Reportado. Gracias", fr: "Signalé. Merci", pt: "Denunciado. Obrigado", hi: "रिपोर्ट हो गया। धन्यवाद", zh: "已举报，谢谢", ar: "تم الإبلاغ. شكرًا" },
+  reportedLabel: { en: "Reported", es: "Reportado", fr: "Signalé", pt: "Denunciado", hi: "रिपोर्ट किया गया", zh: "被举报", ar: "مُبلَّغ عنه" },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -7157,7 +7167,7 @@ export default function App() {
   }
 
   async function shareRecipeToCommunity(recipe) {
-    if (!community.canWrite) { setToast(t("communityReadOnlyShort")); setTimeout(() => setToast(null), 2600); return; }
+    if (!community.canWrite) { setToast(t(community.canSignIn ? "communitySignIn" : "communityReadOnlyShort")); setTimeout(() => setToast(null), 2600); return; }
     const { name, emoji, time, cuisine, categories, mealTime, equipment, ingredients, steps, flavorBoosts, macros } = recipe;
     const ok = await community.addPost({ kind: "recipe", text: recipe.authorNote ? String(recipe.authorNote).slice(0, 2000) : "", recipe: { name: recipeName(recipe, language) || name, emoji, time, cuisine, categories, mealTime, equipment, ingredients, steps, flavorBoosts, macros } });
     setToast(t(ok ? "toastSharedCommunity" : "saveFailed"));
@@ -7589,6 +7599,26 @@ function OnboardingScreen({ onComplete, onChangeLanguage }) {
   );
 }
 
+function AccountCard() {
+  const { t } = useContext(LanguageContext);
+  const cloud = typeof window !== "undefined" ? window.mysousCloud : null;
+  if (!cloud) return null;
+  return (
+    <>
+      <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("accountLabel")}</div>
+      <div style={{ ...styles.historyCard, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 180px", minWidth: 0 }}>
+          <div style={{ ...styles.recipeName, overflowWrap: "anywhere" }} dir="ltr">{cloud.signedIn ? cloud.email : t("guestLabel")}</div>
+          <div style={{ ...styles.recipeMeta, marginTop: 2 }}>{t(cloud.signedIn ? "accountSavedNote" : "guestSavedNote")}</div>
+        </div>
+        <button onClick={() => (cloud.signedIn ? cloud.signOut() : cloud.signIn())} style={{ ...styles.resetButton, marginTop: 0 }}>
+          {t(cloud.signedIn ? "signOutLabel" : "signInLabel")}
+        </button>
+      </div>
+    </>
+  );
+}
+
 function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCategories, toggleCategory, onResetKitchen }) {
   const { t: tr, language } = useContext(LanguageContext);
   const [name, setName] = useState(profile.name);
@@ -7619,6 +7649,7 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
         <span style={{ marginInlineStart: 6, color: COLORS.inkMuted, fontSize: 13 }}>{tr("backLabel")}</span>
       </button>
       <h1 style={{ ...styles.h1, marginTop: 6 }}>{tr("settingsTitle")}</h1>
+      <AccountCard />
 
       <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{tr("profileLabel")}</div>
       <ProfileFields
@@ -8880,7 +8911,8 @@ function useCommunity() {
     let cancelled = false;
     let timer = null;
     (async () => {
-      const [db, user, assets] = await Promise.all([getCapability("db"), getCapability("user"), getCapability("assets")]);
+      const cloud = typeof window !== "undefined" ? window.mysousCloud : null;
+      const [db, user, assets] = cloud ? [cloud.db, cloud.user, cloud.assets] : await Promise.all([getCapability("db"), getCapability("user"), getCapability("assets")]);
       if (cancelled) return;
       let store = localCommunityStore();
       let patch = { mode: "local", myId: "me", canWrite: true, isAdmin: true, canUpload: false };
@@ -8888,11 +8920,12 @@ function useCommunity() {
         store = db;
         const me = user ? await user.me() : { id: null, canEdit: false };
         const can = user ? await user.can("data.write") : null;
-        patch = { mode: "shared", myId: me.id, canWrite: !!me.id && can !== false, isAdmin: !!me.canEdit, canUpload: !!assets && !!me.id && can !== false };
+        patch = { mode: cloud ? "cloud" : "shared", myId: me.id, canWrite: !!me.id && can !== false, isAdmin: !!me.canEdit, canUpload: !!assets && !!me.id && can !== false };
       }
       if (cancelled) return;
       api.current = { store, user, assets };
       setState((s) => ({ ...s, ...patch }));
+      if (cloud && patch.isAdmin) cloud.reports().then((list) => setState((s) => ({ ...s, reports: list }))).catch(() => {});
       timer = setTimeout(() => setState((s) => (s.ready ? s : { ...s, stale: true, ready: true })), 10000);
       unsub = store.collection("community").onSnapshot(
         (snap) => {
@@ -8954,7 +8987,10 @@ function useCommunity() {
     const post = (docsRef.current[authorId]?.posts || []).find((p) => p.id === postId);
     if (post && post.videoId && authorId === s.myId && api.current.assets) api.current.assets.delete(post.videoId).catch(() => {});
     if (authorId === s.myId) return mine((d) => { d.posts = d.posts.filter((p) => p.id !== postId); return d; });
-    if (s.isAdmin) return writeDoc(authorId, (d) => { d.posts = d.posts.filter((p) => p.id !== postId); return d; });
+    if (s.isAdmin) {
+      if (typeof window !== "undefined" && window.mysousCloud) window.mysousCloud.clearReports(authorId, postId).catch(() => {});
+      return writeDoc(authorId, (d) => { d.posts = d.posts.filter((p) => p.id !== postId); return d; });
+    }
     return Promise.resolve(false);
   }
 
@@ -8999,8 +9035,13 @@ function useCommunity() {
   const nameOf = (uid) => (uid === state.myId ? null : (names[uid] && names[uid].name) || "");
   const avatarOf = (uid) => (names[uid] && names[uid].avatarUrl) || null;
 
+  const cloud = typeof window !== "undefined" ? window.mysousCloud : null;
+  const reportCount = (authorId, postId) => (state.reports || []).filter((r) => r.author_id === authorId && r.post_id === postId).length;
+  async function reportPost(authorId, postId) { return cloud ? cloud.report(authorId, postId) : false; }
+  const videoSrc = (id) => (cloud ? cloud.videoSrc(id) : /^[0-9a-f]{32}$/i.test(String(id)) ? "/_blob/" + id : null);
+
   return {
-    ...state, posts, ratingFor, myRating, isHelpfulByMe, nameOf, avatarOf,
+    ...state, posts, ratingFor, reportCount, reportPost, videoSrc, canSignIn: !!(cloud && cloud.isGuest), signIn: () => cloud && cloud.signIn(), myRating, isHelpfulByMe, nameOf, avatarOf,
     addPost, removePost, toggleHelpful, rate, uploadVideo,
     clearNotice: () => setState((s) => ({ ...s, notice: null })),
   };
@@ -9039,12 +9080,12 @@ const safeLink = (url) => {
   }
 };
 
-function CommunityVideo({ id }) {
+function CommunityVideo({ src }) {
   const { t } = useContext(LanguageContext);
   const [failed, setFailed] = useState(false);
-  if (!/^[0-9a-f]{32}$/i.test(String(id))) return null;
+  if (!src) return null;
   if (failed) return <div style={{ ...styles.recipeMeta, marginTop: 8 }}>{t("videoUnavailable")}</div>;
-  return <video controls preload="metadata" playsInline src={"/_blob/" + id} onError={() => setFailed(true)} style={{ width: "100%", maxHeight: 360, borderRadius: 12, marginTop: 10, background: "#000" }} />;
+  return <video controls preload="metadata" playsInline src={src} onError={() => setFailed(true)} style={{ width: "100%", maxHeight: 360, borderRadius: 12, marginTop: 10, background: "#000" }} />;
 }
 
 function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe, onBack }) {
@@ -9061,6 +9102,7 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("newest");
   const [savedIds, setSavedIds] = useState({});
+  const [reported, setReported] = useState({});
   const fileRef = useRef(null);
 
   const recipeOptions = recipes
@@ -9119,7 +9161,7 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
       <h1 style={{ ...styles.h1, marginTop: 6 }}>{t("communityLabel")}</h1>
       <p style={styles.subtext}>{t("communityHeaderSub")}</p>
 
-      {c.mode === "local" && <div style={styles.communityNote}>{t("communityLocalNote")}</div>}
+      {c.mode === "local" && !c.canSignIn && <div style={styles.communityNote}>{t("communityLocalNote")}</div>}
       {c.stale && <div style={styles.communityNote}>{t("communityStaleNote")}</div>}
       {c.notice && (
         <div style={{ ...styles.communityNote, background: COLORS.accentSofter, color: COLORS.accentText }}>
@@ -9177,6 +9219,11 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
 
           {hint && <div style={{ ...styles.recipeMeta, color: COLORS.accentText, marginTop: 8 }}>{t(hint)}</div>}
           <button onClick={submit} disabled={uploadState === "uploading"} style={{ ...styles.primaryButton, marginTop: 12 }}>{t("postButton")}</button>
+        </div>
+      ) : c.canSignIn ? (
+        <div style={styles.communityNote}>
+          {t("communitySignIn")}{" "}
+          <button onClick={c.signIn} style={{ ...styles.linkButton, fontWeight: 700, textDecoration: "underline" }}>{t("signInLabel")}</button>
         </div>
       ) : (
         <div style={styles.communityNote}>{t("communityReadOnly")}</div>
@@ -9246,7 +9293,7 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
                 ▶ {safeLink(p.link)}
               </a>
             )}
-            {p.videoId && <CommunityVideo id={p.videoId} />}
+            {p.videoId && <CommunityVideo src={c.videoSrc(p.videoId)} />}
 
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 8 }}>
               <button onClick={() => c.toggleHelpful(p.authorId, p.id)} disabled={!c.canWrite || mineP} style={{ ...styles.likeButton, marginTop: 0, opacity: !c.canWrite || mineP ? 0.7 : 1 }} aria-pressed={helpfulMine}>
@@ -9255,6 +9302,14 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
               </button>
               {(mineP || c.isAdmin) && c.canWrite && (
                 <button onClick={() => c.removePost(p.authorId, p.id)} style={{ ...styles.linkButton, color: COLORS.inkMuted, fontSize: 12 }}>{t("deleteLabel")}</button>
+              )}
+              {c.mode === "cloud" && c.canWrite && !mineP && !c.isAdmin && (
+                <button onClick={async () => { if (await c.reportPost(p.authorId, p.id)) setReported((r) => ({ ...r, [sharedKey]: true })); }} disabled={!!reported[sharedKey]} style={{ ...styles.linkButton, color: COLORS.inkMuted, fontSize: 12 }}>
+                  {reported[sharedKey] ? t("reportedThanks") : t("reportLabel")}
+                </button>
+              )}
+              {c.isAdmin && c.reportCount(p.authorId, p.id) > 0 && (
+                <span style={{ ...styles.mealTimeBadge, background: COLORS.accentSoft, color: COLORS.accentText }}>⚑ {t("reportedLabel")} · {c.reportCount(p.authorId, p.id)}</span>
               )}
             </div>
           </div>
