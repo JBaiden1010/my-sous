@@ -36,6 +36,7 @@ const AUTH_TR = {
   failed: { en: "Couldn't send the link. Wait a minute and try again.", es: "No se pudo enviar el enlace. Espera un minuto e inténtalo otra vez.", fr: "Impossible d'envoyer le lien. Attendez une minute et réessayez.", pt: "Não foi possível enviar o link. Aguarde um minuto e tente de novo.", hi: "लिंक नहीं भेजा जा सका। एक मिनट रुककर फिर कोशिश करें।", zh: "无法发送链接，请稍等一分钟再试。", ar: "تعذّر إرسال الرابط. انتظر دقيقة وحاول مرة أخرى." },
   or: { en: "or", es: "o", fr: "ou", pt: "ou", hi: "या", zh: "或", ar: "أو" },
   guest: { en: "Continue as guest", es: "Continuar como invitado", fr: "Continuer en invité", pt: "Continuar como convidado", hi: "मेहमान के रूप में जारी रखें", zh: "以访客身份继续", ar: "المتابعة كضيف" },
+  privacy: { en: "Your kitchen and personal details stay private. Only what you post in the Community is public. No ads, and your data is never sold.", es: "Tu cocina y tus datos personales son privados. Solo lo que publicas en la Comunidad es público. Sin anuncios y nunca vendemos tus datos.", fr: "Votre cuisine et vos informations personnelles restent privées. Seul ce que vous publiez dans la Communauté est public. Pas de pub, et vos données ne sont jamais vendues.", pt: "Sua cozinha e seus dados pessoais ficam privados. Só o que você publica na Comunidade é público. Sem anúncios, e seus dados nunca são vendidos.", hi: "आपकी रसोई और निजी जानकारी निजी रहती है। सिर्फ़ कम्युनिटी में की गई पोस्ट सार्वजनिक होती हैं। कोई विज्ञापन नहीं, और आपका डेटा कभी बेचा नहीं जाता।", zh: "你的厨房和个人信息保持私密，只有你在社区发布的内容是公开的。没有广告，数据绝不出售。", ar: "يبقى مطبخك وبياناتك الشخصية خاصة. فقط ما تنشره في المجتمع يكون علنيًا. لا إعلانات، ولا تُباع بياناتك أبدًا." },
   guestNote: { en: "As a guest, everything stays on this device. You can sign in later from Settings.", es: "Como invitado, todo se queda en este dispositivo. Puedes iniciar sesión después en Ajustes.", fr: "En invité, tout reste sur cet appareil. Vous pourrez vous connecter plus tard dans les Paramètres.", pt: "Como convidado, tudo fica neste dispositivo. Você pode entrar depois em Configurações.", hi: "मेहमान के रूप में सब कुछ इसी डिवाइस पर रहता है। आप बाद में सेटिंग्स से साइन इन कर सकते हैं।", zh: "访客模式下，所有内容只保存在本设备上。之后可以在设置里登录。", ar: "كضيف، يبقى كل شيء على هذا الجهاز. يمكنك تسجيل الدخول لاحقًا من الإعدادات." },
 };
 const LANGS = ["en", "es", "fr", "pt", "hi", "zh", "ar"];
@@ -101,6 +102,7 @@ export function AuthScreen({ sb, onGuest }) {
 
         <button onClick={onGuest} style={{ ...button, background: "none", border: "none", color: "#4F6449", marginTop: 14 }}>{t("guest")}</button>
         <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "4px 0 0", lineHeight: 1.45 }}>{t("guestNote")}</p>
+        <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "14px 0 0", lineHeight: 1.45, borderTop: `1px solid ${C.line}`, paddingTop: 12 }}>🔒 {t("privacy")}</p>
       </div>
     </div>
   );
@@ -202,6 +204,22 @@ export async function startCloud() {
     storage,
     signIn() { lsDel(GUEST_FLAG); window.location.reload(); },
     async signOut() { await sb.auth.signOut(); lsDel(GUEST_FLAG); window.location.reload(); },
+    async deleteAccount() {
+      if (!myId) return false;
+      try {
+        const { data: files } = await sb.storage.from("tutorials").list(myId, { limit: 1000 });
+        if (files && files.length) await sb.storage.from("tutorials").remove(files.map((f) => `${myId}/${f.name}`));
+        const { error } = await sb.rpc("delete_my_account");
+        if (error) return false;
+        await sb.auth.signOut();
+        for (const k of APP_KEYS) lsDel("mysous:" + k);
+        lsDel(GUEST_FLAG);
+        window.location.reload();
+        return true;
+      } catch {
+        return false;
+      }
+    },
     db: communityStore(sb, myId),
     user: {
       me: async () => ({ id: myId, name: "", canEdit: isAdmin, isOwner: isAdmin }),

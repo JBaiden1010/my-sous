@@ -276,6 +276,19 @@ const TRANSLATIONS = {
   reportLabel: { en: "Report", es: "Reportar", fr: "Signaler", pt: "Denunciar", hi: "रिपोर्ट करें", zh: "举报", ar: "إبلاغ" },
   reportedThanks: { en: "Reported. Thanks", es: "Reportado. Gracias", fr: "Signalé. Merci", pt: "Denunciado. Obrigado", hi: "रिपोर्ट हो गया। धन्यवाद", zh: "已举报，谢谢", ar: "تم الإبلاغ. شكرًا" },
   reportedLabel: { en: "Reported", es: "Reportado", fr: "Signalé", pt: "Denunciado", hi: "रिपोर्ट किया गया", zh: "被举报", ar: "مُبلَّغ عنه" },
+  privacyBodyNote: { en: "Private to you. Age, height and weight are only used to estimate your nutrition targets and are never shown to other cooks. Leave them blank if you prefer.", es: "Solo para ti. La edad, la altura y el peso solo se usan para estimar tus metas de nutrición y nunca se muestran a otros cocineros. Puedes dejarlos en blanco.", fr: "Visible par vous seul. L'âge, la taille et le poids servent uniquement à estimer vos objectifs nutritionnels et ne sont jamais montrés aux autres cuisiniers. Vous pouvez les laisser vides.", pt: "Só você vê. Idade, altura e peso servem apenas para estimar suas metas de nutrição e nunca são mostrados a outros cozinheiros. Pode deixar em branco.", hi: "सिर्फ़ आपके लिए। उम्र, लंबाई और वज़न का इस्तेमाल सिर्फ़ आपके पोषण लक्ष्य का अनुमान लगाने के लिए होता है और ये दूसरे रसोइयों को कभी नहीं दिखते। चाहें तो इन्हें खाली छोड़ दें।", zh: "仅你可见。年龄、身高和体重只用于估算你的营养目标，绝不会展示给其他厨师。也可以不填。", ar: "خاص بك. يُستخدم العمر والطول والوزن فقط لتقدير أهدافك الغذائية ولا تظهر أبدًا للطهاة الآخرين. يمكنك تركها فارغة." },
+  privacyLabel: { en: "Privacy", es: "Privacidad", fr: "Confidentialité", pt: "Privacidade", hi: "गोपनीयता", zh: "隐私", ar: "الخصوصية" },
+  privacyPoint1: { en: "Your kitchen, cookbook, history, shopping list and body details are private. Only you can see them.", es: "Tu cocina, recetario, historial, lista de compras y datos corporales son privados. Solo tú puedes verlos.", fr: "Votre cuisine, vos recettes, votre historique, votre liste de courses et vos mensurations sont privés. Vous seul pouvez les voir.", pt: "Sua cozinha, receitas, histórico, lista de compras e dados do corpo são privados. Só você pode vê-los.", hi: "आपकी रसोई, कुकबुक, इतिहास, शॉपिंग लिस्ट और शरीर की जानकारी निजी है। इन्हें सिर्फ़ आप देख सकते हैं।", zh: "你的厨房、食谱本、历史记录、购物清单和身体数据都是私密的，只有你能看到。", ar: "مطبخك ووصفاتك وسجلك وقائمة مشترياتك وبيانات جسمك خاصة. أنت فقط من يمكنه رؤيتها." },
+  privacyPoint2: { en: "What you post in the Community (tips, ratings, videos, shared recipes) is public, with your display name. Your email is never shown.", es: "Lo que publicas en la Comunidad (consejos, calificaciones, videos, recetas) es público, con tu nombre. Tu correo nunca se muestra.", fr: "Ce que vous publiez dans la Communauté (astuces, notes, vidéos, recettes) est public, avec votre nom. Votre e-mail n'est jamais affiché.", pt: "O que você publica na Comunidade (dicas, avaliações, vídeos, receitas) é público, com seu nome. Seu e-mail nunca aparece.", hi: "कम्युनिटी में आप जो पोस्ट करते हैं (टिप्स, रेटिंग, वीडियो, रेसिपी) वह आपके नाम के साथ सार्वजनिक होता है। आपका ईमेल कभी नहीं दिखता।", zh: "你在社区发布的内容（技巧、评分、视频、食谱）会以你的显示名公开，邮箱永远不会显示。", ar: "ما تنشره في المجتمع (نصائح وتقييمات وفيديوهات ووصفات) يكون علنيًا باسمك الظاهر. لا يظهر بريدك أبدًا." },
+  privacyPoint3: { en: "My Sous doesn't sell your data or show ads. It's only used to run the app.", es: "My Sous no vende tus datos ni muestra anuncios. Solo se usan para que la app funcione.", fr: "My Sous ne vend pas vos données et n'affiche pas de publicités. Elles servent uniquement au fonctionnement de l'app.", pt: "O My Sous não vende seus dados nem mostra anúncios. Eles só servem para o app funcionar.", hi: "My Sous आपका डेटा नहीं बेचता और विज्ञापन नहीं दिखाता। इसका इस्तेमाल सिर्फ़ ऐप चलाने के लिए होता है।", zh: "My Sous 不出售你的数据，也不展示广告，数据只用于运行应用。", ar: "لا يبيع My Sous بياناتك ولا يعرض إعلانات. تُستخدم فقط لتشغيل التطبيق." },
+  privacyPoint4Account: { en: "Your data is stored securely with Supabase in Canada. You can delete your account and everything in it at any time.", es: "Tus datos se guardan de forma segura con Supabase en Canadá. Puedes eliminar tu cuenta y todo su contenido cuando quieras.", fr: "Vos données sont stockées en sécurité chez Supabase, au Canada. Vous pouvez supprimer votre compte et tout son contenu à tout moment.", pt: "Seus dados ficam guardados com segurança no Supabase, no Canadá. Você pode excluir sua conta e tudo nela quando quiser.", hi: "आपका डेटा कनाडा में Supabase के साथ सुरक्षित रखा जाता है। आप कभी भी अपना खाता और उसका सारा डेटा हटा सकते हैं।", zh: "你的数据安全存储在加拿大的 Supabase 上，你可以随时删除账户及其中的所有内容。", ar: "تُخزَّن بياناتك بأمان لدى Supabase في كندا. يمكنك حذف حسابك وكل ما فيه في أي وقت." },
+  privacyPoint4Guest: { en: "As a guest, your data stays in this browser. Clearing your browser data removes it.", es: "Como invitado, tus datos se quedan en este navegador. Si borras los datos del navegador, se eliminan.", fr: "En invité, vos données restent dans ce navigateur. Effacer les données du navigateur les supprime.", pt: "Como convidado, seus dados ficam neste navegador. Limpar os dados do navegador os apaga.", hi: "मेहमान के रूप में आपका डेटा इसी ब्राउज़र में रहता है। ब्राउज़र डेटा साफ़ करने पर यह हट जाता है।", zh: "访客模式下，数据保存在本浏览器中，清除浏览器数据即会删除。", ar: "كضيف، تبقى بياناتك في هذا المتصفح. مسح بيانات المتصفح يحذفها." },
+  deleteAccountLabel: { en: "Delete my account", es: "Eliminar mi cuenta", fr: "Supprimer mon compte", pt: "Excluir minha conta", hi: "मेरा खाता हटाएं", zh: "删除我的账户", ar: "حذف حسابي" },
+  deleteAccountConfirm: { en: "This permanently deletes your account, your saved kitchen, cookbook and history, and everything you posted in the Community. It can't be undone.", es: "Esto elimina para siempre tu cuenta, tu cocina, recetario e historial, y todo lo que publicaste en la Comunidad. No se puede deshacer.", fr: "Cela supprime définitivement votre compte, votre cuisine, vos recettes, votre historique et tout ce que vous avez publié dans la Communauté. C'est irréversible.", pt: "Isso exclui para sempre sua conta, sua cozinha, receitas e histórico, e tudo o que você publicou na Comunidade. Não dá para desfazer.", hi: "इससे आपका खाता, सेव की गई रसोई, कुकबुक, इतिहास और कम्युनिटी में की गई सारी पोस्ट हमेशा के लिए हट जाएंगी। इसे वापस नहीं किया जा सकता।", zh: "这会永久删除你的账户、保存的厨房、食谱本、历史记录，以及你在社区发布的所有内容，且无法恢复。", ar: "سيؤدي هذا إلى حذف حسابك ومطبخك ووصفاتك وسجلك وكل ما نشرته في المجتمع نهائيًا. لا يمكن التراجع." },
+  deleteAccountYes: { en: "Yes, delete everything", es: "Sí, eliminar todo", fr: "Oui, tout supprimer", pt: "Sim, excluir tudo", hi: "हां, सब हटाएं", zh: "是的，全部删除", ar: "نعم، احذف كل شيء" },
+  cancelLabel: { en: "Cancel", es: "Cancelar", fr: "Annuler", pt: "Cancelar", hi: "रद्द करें", zh: "取消", ar: "إلغاء" },
+  deletingLabel: { en: "Deleting…", es: "Eliminando…", fr: "Suppression…", pt: "Excluindo…", hi: "हटाया जा रहा है…", zh: "正在删除…", ar: "جارٍ الحذف…" },
+  deleteAccountFailed: { en: "Couldn't delete your account. Check your connection and try again.", es: "No se pudo eliminar tu cuenta. Revisa tu conexión e inténtalo de nuevo.", fr: "Impossible de supprimer votre compte. Vérifiez votre connexion et réessayez.", pt: "Não foi possível excluir sua conta. Verifique a conexão e tente de novo.", hi: "खाता नहीं हटाया जा सका। अपना कनेक्शन जांचें और फिर कोशिश करें।", zh: "无法删除账户，请检查网络后重试。", ar: "تعذّر حذف حسابك. تحقق من الاتصال وحاول مرة أخرى." },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -7518,13 +7531,13 @@ function ProfileFields({
 
       <div style={styles.rowPair}>
         <div style={{ flex: 1 }}>
-          <div style={styles.sectionLabel}>{t("ageLabel")}</div>
+          <div style={styles.sectionLabel}>{t("ageLabel")} ({t("optionalTag")})</div>
           <input value={age} onChange={(e) => setAge(e.target.value)} placeholder="20" inputMode="numeric" style={styles.textInput} />
         </div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 18 }}>
-        <div style={styles.sectionLabel}>{t("heightLabel")}</div>
+        <div style={styles.sectionLabel}>{t("heightLabel")} ({t("optionalTag")})</div>
         <UnitToggle options={["cm", "ft"]} value={heightUnit} onChange={setHeightUnit} />
       </div>
       {heightUnit === "cm" ? (
@@ -7539,12 +7552,16 @@ function ProfileFields({
       )}
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16 }}>
-        <div style={styles.sectionLabel}>{t("weightLabel")}</div>
+        <div style={styles.sectionLabel}>{t("weightLabel")} ({t("optionalTag")})</div>
         <UnitToggle options={["kg", "lb"]} value={weightUnit} onChange={setWeightUnit} />
       </div>
       <input value={weight} onChange={(e) => setWeight(e.target.value)} placeholder={weightUnit === "kg" ? "65" : "143"} inputMode="numeric" style={styles.textInput} />
 
       <p style={{ ...styles.basicsHint, marginTop: 14 }}>{t("calorieDisclaimer")}</p>
+      <div style={{ ...styles.communityNote, display: "flex", gap: 8, alignItems: "flex-start" }}>
+        <span aria-hidden="true">🔒</span>
+        <span>{t("privacyBodyNote")}</span>
+      </div>
 
       <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("cookingGoalLabel")} ({t("optionalTag")})</div>
       <div style={styles.chipWrap}>
@@ -7596,6 +7613,48 @@ function OnboardingScreen({ onComplete, onChangeLanguage }) {
         {t("letsCook")}
       </button>
     </div>
+  );
+}
+
+function PrivacyCard() {
+  const { t } = useContext(LanguageContext);
+  const cloud = typeof window !== "undefined" ? window.mysousCloud : null;
+  const [step, setStep] = useState("idle"); // idle | confirm | deleting | error
+  return (
+    <>
+      <div style={{ ...styles.sectionLabel, marginTop: 24 }}>{t("privacyLabel")}</div>
+      <div style={styles.historyCard}>
+        <ul style={{ margin: 0, paddingInlineStart: 18, color: COLORS.ink, fontSize: 13.5, lineHeight: 1.55 }}>
+          <li>{t("privacyPoint1")}</li>
+          <li>{t("privacyPoint2")}</li>
+          <li>{t("privacyPoint3")}</li>
+          <li>{t(cloud && cloud.signedIn ? "privacyPoint4Account" : "privacyPoint4Guest")}</li>
+        </ul>
+        {cloud && cloud.signedIn && (
+          <div style={{ marginTop: 12 }}>
+            {step === "confirm" ? (
+              <div style={{ ...styles.communityNote, background: COLORS.accentSofter, color: COLORS.accentText, marginTop: 0 }}>
+                <div>{t("deleteAccountConfirm")}</div>
+                <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+                  <button
+                    onClick={async () => { setStep("deleting"); const ok = await cloud.deleteAccount(); if (!ok) setStep("error"); }}
+                    style={{ ...styles.resetButton, marginTop: 0, background: COLORS.accentText, color: "#fff", borderColor: COLORS.accentText }}
+                  >
+                    {t("deleteAccountYes")}
+                  </button>
+                  <button onClick={() => setStep("idle")} style={{ ...styles.resetButton, marginTop: 0 }}>{t("cancelLabel")}</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setStep("confirm")} disabled={step === "deleting"} style={{ ...styles.linkButton, color: COLORS.accentText, fontWeight: 600 }}>
+                {step === "deleting" ? t("deletingLabel") : t("deleteAccountLabel")}
+              </button>
+            )}
+            {step === "error" && <div style={{ ...styles.recipeMeta, color: COLORS.accentText, marginTop: 6 }}>{t("deleteAccountFailed")}</div>}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -7699,6 +7758,7 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
       </button>
 
       <button onClick={handleSaveProfile} style={styles.primaryButton}>{tr("saveProfile")}</button>
+      <PrivacyCard />
     </div>
   );
 }
