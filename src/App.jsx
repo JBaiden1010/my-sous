@@ -29,7 +29,10 @@ import {
   Sun,
   Moon,
   MessageSquare,
+  Target,
 } from "./lucide-shim.js";
+import { ACTIVITY as NUTRI_ACTIVITY, GOALS as NUTRI_GOALS, SEXES as NUTRI_SEXES, estimateGoals, bodyFromProfile, SOURCES as NUTRI_SOURCES } from "./nutrition.js";
+import { NUTRI_TR } from "./nutrition-tr.js";
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
@@ -38,6 +41,8 @@ import { convertUnits } from "./units.js";
 import { ALLERGENS, allergensFor, isBuiltInAllergen } from "./allergens.js";
 
 const AllergyContext = createContext([]);
+// Saved daily nutrition goals (optional), so recipe screens can show "x% of your day".
+const GoalsContext = createContext(null);
 
 // The one address for feedback, used everywhere in the app.
 export const FEEDBACK_EMAIL = "mysous.feedback@gmail.com";
@@ -7529,7 +7534,7 @@ export default function App() {
   }
 
   function updateProfile(data) {
-    setProfile(data);
+    setProfile((prev) => ({ ...prev, ...data }));
     setToast(t("toastProfileUpdated"));
     setTimeout(() => setToast(null), 1800);
     setScreen(prevScreen);
@@ -7615,7 +7620,7 @@ export default function App() {
   return (
     <LanguageContext.Provider value={{ language, t }}>
     <CommunityContext.Provider value={{ ratingFor: community.ratingFor, myRating: community.myRating, rate: community.rate }}>
-    <AllergyContext.Provider value={profile.allergies || []}>
+    <AllergyContext.Provider value={profile.allergies || []}><GoalsContext.Provider value={profile.nutritionGoals || null}>
     <div style={outerStyle} className="ms-root ms-desktop" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <style>{FONT_IMPORT}</style>
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
@@ -7783,6 +7788,9 @@ export default function App() {
           {screen === "feedback" && (
             <FeedbackScreen onBack={() => setScreen(prevScreen === "feedback" ? "more" : prevScreen)} />
           )}
+          {screen === "nutrition" && (
+            <NutritionGoalsScreen profile={profile} onSaveProfile={(patch) => setProfile((prev) => ({ ...prev, ...patch }))} onBack={() => setScreen(prevScreen === "nutrition" ? "more" : prevScreen)} />
+          )}
           {screen === "glossary" && (
             <NutritionGlossaryScreen onBack={() => setScreen(prevScreen)} />
           )}
@@ -7815,7 +7823,7 @@ export default function App() {
         )}
       </div>
     </div>
-    </AllergyContext.Provider>
+    </GoalsContext.Provider></AllergyContext.Provider>
     </CommunityContext.Provider>
     </LanguageContext.Provider>
   );
@@ -7992,6 +8000,7 @@ function OnboardingScreen({ onComplete, onChangeLanguage, units, onUnits }) {
           </div>
         </>
       )}
+      <p style={{ ...styles.basicsHint, marginTop: 16, display: "flex", gap: 6 }}><Target size={14} color={COLORS.primaryText} style={{ marginTop: 2 }} /><span>{nt("setupHint", language)}</span></p>
       <button onClick={() => onComplete({ ...profileData, language })} style={styles.primaryButton}>
         {t("letsCook")}
       </button>
@@ -8592,7 +8601,12 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
       return r.name.toLowerCase().includes(q) || recipeName(r, language).toLowerCase().includes(q);
     })
     .map((r) => ({ recipe: r, info: matchInfo(r) }))
-    .sort((a, b) => a.recipe.ingredients.length - b.recipe.ingredients.length);
+    // Fewest ingredients first; for the same count, ready-to-cook first, then fewest missing, then A–Z.
+    .sort((a, b) =>
+      (a.recipe.ingredients.length - b.recipe.ingredients.length) ||
+      (b.info.makeable - a.info.makeable) ||
+      ((a.info.missingIngredients.length + a.info.missingEquipment.length) - (b.info.missingIngredients.length + b.info.missingEquipment.length)) ||
+      recipeName(a.recipe, language).localeCompare(recipeName(b.recipe, language), language));
 
   // Several ingredients: "All of these" needs every one, "Any of these" needs at
   // least one. Ready-to-cook first, then the most matches, then the fewest missing.
@@ -8942,11 +8956,14 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
       </div>
 
       <div style={styles.macroRow}>
-        <span style={styles.macroChip}>{scale(recipe.macros.calories)} {t("caloriesWord").toLowerCase()}</span>
-        <span style={styles.macroChip}>{scale(recipe.macros.protein)}g {t("proteinWord").toLowerCase()}</span>
-        <span style={styles.macroChip}>{scale(recipe.macros.carbs)}g {t("carbsWord").toLowerCase()}</span>
-        <span style={styles.macroChip}>{scale(recipe.macros.fat)}g {t("fatWord").toLowerCase()}</span>
+        <span style={{ ...styles.recipeMeta, alignSelf: "center" }}>{nt("perServing", language)}:</span>
+        <span style={styles.macroChip}>{recipe.macros.calories} {t("caloriesWord").toLowerCase()}</span>
+        <span style={styles.macroChip}>{recipe.macros.protein}g {t("proteinWord").toLowerCase()}</span>
+        <span style={styles.macroChip}>{recipe.macros.carbs}g {t("carbsWord").toLowerCase()}</span>
+        <span style={styles.macroChip}>{recipe.macros.fat}g {t("fatWord").toLowerCase()}</span>
+        <DayShare calories={recipe.macros.calories} />
       </div>
+      {servings !== 1 && <div style={{ ...styles.recipeMeta, whiteSpace: "normal", marginTop: 4 }}>{nt("wholeMeal", language).replace("{s}", servings).replace("{c}", scale(recipe.macros.calories)).replace("{p}", scale(recipe.macros.protein))}</div>}
       <div style={styles.progressTrack}><div style={{ ...styles.progressFill, width: `${((stepIndex + 1) / steps.length) * 100}%` }} /></div>
       <div style={styles.stepCounter}>{t("stepOfLabel")} {stepIndex + 1} / {steps.length}</div>
 
@@ -9024,12 +9041,16 @@ function CompleteScreen({ recipe, servings, onDone }) {
       <h1 style={styles.h1}>{t("niceWorkTitle")}</h1>
       <p style={styles.subtext}>{t("youJustMade")} {recipeName(recipe, language)}.</p>
 
-      <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("nutritionPerServing")} · {servings} {t("servingsLabel").toLowerCase()}</div>
+      <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("nutritionPerServing")}</div>
       <div style={styles.macroGrid}>
-        <div style={styles.macroCell}><div style={styles.macroCellValue}>{scale(recipe.macros.calories)}</div><div style={styles.macroCellLabel}>{t("caloriesWord")}</div></div>
-        <div style={styles.macroCell}><div style={styles.macroCellValue}>{scale(recipe.macros.protein)}g</div><div style={styles.macroCellLabel}>{t("proteinWord")}</div></div>
-        <div style={styles.macroCell}><div style={styles.macroCellValue}>{scale(recipe.macros.carbs)}g</div><div style={styles.macroCellLabel}>{t("carbsWord")}</div></div>
-        <div style={styles.macroCell}><div style={styles.macroCellValue}>{scale(recipe.macros.fat)}g</div><div style={styles.macroCellLabel}>{t("fatWord")}</div></div>
+        <div style={styles.macroCell}><div style={styles.macroCellValue}>{recipe.macros.calories}</div><div style={styles.macroCellLabel}>{t("caloriesWord")}</div></div>
+        <div style={styles.macroCell}><div style={styles.macroCellValue}>{recipe.macros.protein}g</div><div style={styles.macroCellLabel}>{t("proteinWord")}</div></div>
+        <div style={styles.macroCell}><div style={styles.macroCellValue}>{recipe.macros.carbs}g</div><div style={styles.macroCellLabel}>{t("carbsWord")}</div></div>
+        <div style={styles.macroCell}><div style={styles.macroCellValue}>{recipe.macros.fat}g</div><div style={styles.macroCellLabel}>{t("fatWord")}</div></div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginTop: 8 }}>
+        <span style={{ ...styles.recipeMeta, whiteSpace: "normal" }}>{nt("wholeMeal", language).replace("{s}", servings).replace("{c}", scale(recipe.macros.calories)).replace("{p}", scale(recipe.macros.protein))}</span>
+        <DayShare calories={recipe.macros.calories} />
       </div>
 
       <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("wantMoreFlavor")}</div>
@@ -9437,6 +9458,7 @@ function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount, rec
     { icon: BookOpen, label: t("cookbookLabel"), sub: favoritesCount > 0 ? `${favoritesCount} ${pl(favoritesCount, PL.savedRecipe, language)}` : t("cookbookSub"), action: () => onOpen("cookbook") },
     { icon: Users, label: t("communityLabel"), sub: t("communitySub"), action: () => onOpen("community") },
     { icon: ShoppingCart, label: t("shoppingLabel"), sub: shoppingCount > 0 ? `${shoppingCount} ${pl(shoppingCount, PL.listItem, language)}` : t("shoppingSub"), action: () => onOpen("shopping") },
+    { icon: Target, label: nt("navLabel", language), sub: nt("navSub", language), action: () => onOpen("nutrition") },
     { icon: BookOpen, label: t("glossaryLabel"), sub: t("glossarySub"), action: () => onOpen("glossary") },
     { icon: MessageSquare, label: t("feedbackLabel"), sub: t("feedbackSub"), action: () => onOpen("feedback") },
     { icon: SettingsIcon, label: t("settingsTitle"), sub: t("settingsSub"), action: onOpenSettings },
@@ -9794,6 +9816,160 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
       {checkedCount > 0 && (
         <button onClick={onAddToKitchen} style={styles.primaryButton}>{t("addLabel")} {checkedCount} {t("checkedToKitchenLabel")}</button>
       )}
+    </div>
+  );
+}
+
+const nt = (k, language) => (NUTRI_TR[k] && (NUTRI_TR[k][language] || NUTRI_TR[k].en)) || k;
+
+// "18% of your daily calories", only when the cook saved nutrition goals.
+function DayShare({ calories, style }) {
+  const goals = useContext(GoalsContext);
+  const { language } = useContext(LanguageContext);
+  const c = Number(calories);
+  if (!goals || !goals.calories || !c) return null;
+  const p = Math.max(1, Math.round((c / goals.calories) * 100));
+  return <span style={{ ...styles.macroChip, background: COLORS.sageSofter, color: COLORS.primaryText, borderColor: COLORS.line, ...style }}><Target size={11} color={COLORS.primaryText} style={{ marginInlineEnd: 4 }} />{nt("ofYourDay", language).replace("{p}", p)}</span>;
+}
+
+function NutritionGoalsScreen({ profile, onSaveProfile, onBack }) {
+  const { t, language } = useContext(LanguageContext);
+  const n = (k) => nt(k, language);
+  const saved = profile.nutritionGoals || null;
+  const [age, setAge] = useState(profile.age || "");
+  const [heightUnit, setHeightUnit] = useState(profile.heightUnit || "cm");
+  const [height, setHeight] = useState(profile.height || "");
+  const [heightFt, setHeightFt] = useState(profile.heightFt || "");
+  const [heightIn, setHeightIn] = useState(profile.heightIn || "");
+  const [weightUnit, setWeightUnit] = useState(profile.weightUnit || "kg");
+  const [weight, setWeight] = useState(profile.weight || "");
+  const [sex, setSex] = useState(saved?.sex || profile.sex || "unspecified");
+  const [activity, setActivity] = useState(saved?.activity || (NUTRI_ACTIVITY.some((a) => a.id === profile.activityLevel) ? profile.activityLevel : "light"));
+  const [goal, setGoal] = useState(saved?.goal || (NUTRI_GOALS.some((g) => g.id === profile.weightGoal) ? profile.weightGoal : "maintain"));
+  const [bodyFat, setBodyFat] = useState(saved?.bodyFat || "");
+  const [justSaved, setJustSaved] = useState(false);
+
+  const body = bodyFromProfile({ age, heightUnit, height, heightFt, heightIn, weightUnit, weight });
+  const est = estimateGoals({ ...body, sex, activity, goal, bodyFat });
+  const touch = (fn) => (v) => { fn(v); setJustSaved(false); };
+
+  function save() {
+    if (est.error) return;
+    onSaveProfile({
+      age, heightUnit, height, heightFt, heightIn, weightUnit, weight, sex, activityLevel: activity, weightGoal: goal,
+      nutritionGoals: { sex, activity, goal, bodyFat, calories: est.calories, protein: est.protein, carbs: est.carbs, fat: est.fat, fiber: est.fibre, savedAt: Date.now() },
+    });
+    setJustSaved(true);
+  }
+  function clear() { onSaveProfile({ nutritionGoals: null }); setJustSaved(false); }
+
+  const chip = (on) => ({ ...styles.equipChip, ...(on ? styles.equipChipActive : {}) });
+  const fmt = (x) => x.toLocaleString(language === "ar" ? "ar" : undefined);
+  const Macro = ({ label, value, unit, sub }) => (
+    <div style={{ ...styles.macroCell, flex: "1 1 120px", textAlign: "start", padding: 12 }}>
+      <div style={styles.macroCellLabel}>{label}</div>
+      <div style={{ ...styles.macroCellValue, fontSize: 20 }}>{value}<span style={{ fontSize: 13, fontWeight: 500, marginInlineStart: 3 }}>{unit}</span></div>
+      {sub && <div style={{ ...styles.recipeMeta, whiteSpace: "normal", marginTop: 2 }}>{sub}</div>}
+    </div>
+  );
+
+  return (
+    <div style={styles.screenPad}>
+      <button onClick={onBack} style={styles.backRow}>
+        <ArrowLeft className="ms-flip" size={16} color={COLORS.inkMuted} />
+        <span style={{ marginInlineStart: 6, color: COLORS.inkMuted, fontSize: 13 }}>{t("backLabel")}</span>
+      </button>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 8, padding: "3px 10px", borderRadius: 20, background: COLORS.sageSofter, color: COLORS.primaryText, fontSize: 11.5, fontWeight: 700 }}>✨ {n("optional")}</span>
+      <h1 style={{ ...styles.h1, marginTop: 8 }}>{n("navLabel")}</h1>
+      <p style={styles.subtext}>{n("intro")}</p>
+
+      <div className="ms-nutri-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20, alignItems: "start", marginTop: 8 }}>
+        <div>
+          <div style={{ ...styles.sectionLabel, marginTop: 10 }}>{n("aboutYou")}</div>
+          <div style={styles.rowPair}>
+            <div style={{ flex: 1 }}>
+              <div style={styles.sectionLabel}>{t("ageLabel")}</div>
+              <input value={age} onChange={(e) => touch(setAge)(e.target.value)} placeholder="20" inputMode="numeric" aria-label={t("ageLabel")} style={styles.textInput} />
+            </div>
+            <div style={{ flex: 1.4 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={styles.sectionLabel}>{t("weightLabel")}</div>
+                <UnitToggle options={["kg", "lb"]} value={weightUnit} onChange={touch(setWeightUnit)} />
+              </div>
+              <input value={weight} onChange={(e) => touch(setWeight)(e.target.value)} placeholder={weightUnit === "kg" ? "65" : "143"} inputMode="decimal" aria-label={t("weightLabel")} style={styles.textInput} />
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12 }}>
+            <div style={styles.sectionLabel}>{t("heightLabel")}</div>
+            <UnitToggle options={["cm", "ft"]} value={heightUnit} onChange={touch(setHeightUnit)} />
+          </div>
+          {heightUnit === "cm" ? (
+            <input value={height} onChange={(e) => touch(setHeight)(e.target.value)} placeholder="170" inputMode="decimal" aria-label={t("heightLabel")} style={styles.textInput} />
+          ) : (
+            <div style={{ display: "flex", gap: 8 }}>
+              <input value={heightFt} onChange={(e) => touch(setHeightFt)(e.target.value)} placeholder="5" inputMode="numeric" aria-label={`${t("heightLabel")} ft`} style={{ ...styles.textInput, flex: 1 }} />
+              <span style={{ alignSelf: "center", color: COLORS.inkMuted, fontSize: 13 }}>ft</span>
+              <input value={heightIn} onChange={(e) => touch(setHeightIn)(e.target.value)} placeholder="7" inputMode="numeric" aria-label={`${t("heightLabel")} in`} style={{ ...styles.textInput, flex: 1 }} />
+              <span style={{ alignSelf: "center", color: COLORS.inkMuted, fontSize: 13 }}>in</span>
+            </div>
+          )}
+
+          <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{n("sexLabel")}</div>
+          <div role="radiogroup" aria-label={n("sexLabel")} style={styles.chipWrap}>
+            {NUTRI_SEXES.map((id) => <button key={id} role="radio" aria-checked={sex === id} onClick={() => touch(setSex)(id)} style={chip(sex === id)}>{n(id)}</button>)}
+          </div>
+
+          <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{n("activityLabel")}</div>
+          <div role="radiogroup" aria-label={n("activityLabel")} style={{ display: "grid", gap: 6 }}>
+            {NUTRI_ACTIVITY.map((a) => <button key={a.id} role="radio" aria-checked={activity === a.id} onClick={() => touch(setActivity)(a.id)} style={{ ...chip(activity === a.id), justifyContent: "flex-start", textAlign: "start", borderRadius: 12 }}>{n(a.id)}</button>)}
+          </div>
+
+          <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{n("goalLabel")}</div>
+          <div role="radiogroup" aria-label={n("goalLabel")} style={styles.chipWrap}>
+            {NUTRI_GOALS.map((g) => <button key={g.id} role="radio" aria-checked={goal === g.id} onClick={() => touch(setGoal)(g.id)} style={chip(goal === g.id)}>{n(g.id)}</button>)}
+          </div>
+
+          <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{n("bodyFatLabel")}</div>
+          <input value={bodyFat} onChange={(e) => touch(setBodyFat)(e.target.value)} placeholder="20" inputMode="decimal" aria-label={n("bodyFatLabel")} style={{ ...styles.textInput, maxWidth: 140 }} />
+        </div>
+
+        <div className="ms-nutri-result" style={{ ...styles.historyCard, padding: 18, marginTop: 10, position: "sticky", top: 12 }} aria-live="polite">
+          <div style={styles.sectionLabel}>{n("resultTitle")}</div>
+          {est.error ? (
+            <p style={{ ...styles.subtext, marginTop: 6 }}>{n(est.error)}</p>
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap", marginTop: 4 }}>
+                <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 40, fontWeight: 700, color: COLORS.ink, lineHeight: 1.1 }}>{fmt(est.calories)}</span>
+                <span style={{ color: COLORS.inkMuted, fontSize: 14 }}>{n("perDay")}</span>
+              </div>
+              {goal !== "maintain" && <p style={{ ...styles.recipeMeta, whiteSpace: "normal", margin: "4px 0 0" }}>{n("maintenanceLine").replace("{n}", fmt(est.maintenance))}</p>}
+              {est.floored && <p style={{ ...styles.communityNote, background: COLORS.accentSofter, color: COLORS.accentText, marginTop: 8 }}>{n("flooredNote").replace("{n}", fmt(est.calories))}</p>}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+                <Macro label={t("proteinWord")} value={est.protein} unit="g" sub={n("rangeLine").replace("{a}", est.ranges.protein[0]).replace("{b}", est.ranges.protein[1])} />
+                <Macro label={t("carbsWord")} value={est.carbs} unit="g" sub={n("rangeLine").replace("{a}", est.ranges.carbs[0]).replace("{b}", est.ranges.carbs[1])} />
+                <Macro label={t("fatWord")} value={est.fat} unit="g" sub={n("rangeLine").replace("{a}", est.ranges.fat[0]).replace("{b}", est.ranges.fat[1])} />
+                <Macro label={n("fiber")} value={est.fibre} unit="g" sub={n("fiberLine")} />
+                <Macro label={n("water")} value={est.water} unit="L" sub={n("waterLine")} />
+              </div>
+              <p style={{ ...styles.recipeMeta, whiteSpace: "normal", marginTop: 10 }}>{n(est.formula)}</p>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12, alignItems: "center" }}>
+                <button onClick={save} style={{ ...styles.primaryButton, marginTop: 0, flex: "1 1 160px" }}>{n("save")}</button>
+                {saved && <button onClick={clear} style={{ ...styles.resetButton, marginTop: 0 }}>{n("clear")}</button>}
+              </div>
+              {justSaved && <p role="status" style={{ ...styles.communityNote, marginTop: 10 }}>✓ {n("saved")}</p>}
+            </>
+          )}
+          <p style={{ ...styles.basicsHint, marginTop: 12 }}>{t("calorieDisclaimer")}</p>
+        </div>
+      </div>
+
+      <details style={{ marginTop: 18 }}>
+        <summary style={{ ...styles.linkButton, cursor: "pointer", fontWeight: 600 }}>{n("sourcesTitle")}</summary>
+        <ul style={{ margin: "8px 0 0", paddingInlineStart: 18, fontSize: 13, lineHeight: 1.6 }}>
+          {NUTRI_SOURCES.map(([label, url]) => <li key={url}><a href={url} target="_blank" rel="noopener noreferrer" dir="ltr" style={{ color: COLORS.primaryText }}>{label}</a></li>)}
+        </ul>
+      </details>
     </div>
   );
 }

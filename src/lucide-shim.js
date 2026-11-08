@@ -8,6 +8,7 @@ const ICONS = {
   Refrigerator: [["rect", { x: 5, y: 2, width: 14, height: 20, rx: 2 }], ["path", { d: "M5 10h14" }], ["path", { d: "M9 5v2" }], ["path", { d: "M9 13v3" }]],
   ChefHat: [["path", { d: "M17 21a1 1 0 0 0 1-1v-5.35c0-.46.32-.84.75-1.03A4 4 0 0 0 17 6a4 4 0 0 0-.86.09 5 5 0 0 0-8.28 0A4 4 0 0 0 7 6a4 4 0 0 0-1.75 7.62c.43.19.75.57.75 1.03V20a1 1 0 0 0 1 1Z" }], ["path", { d: "M6 17h12" }]],
   Users: [["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" }], ["circle", { cx: 9, cy: 7, r: 4 }], ["path", { d: "M22 21v-2a4 4 0 0 0-3-3.87" }], ["path", { d: "M16 3.13a4 4 0 0 1 0 7.75" }]],
+  Target: [["circle", { cx: 12, cy: 12, r: 10 }], ["circle", { cx: 12, cy: 12, r: 6 }], ["circle", { cx: 12, cy: 12, r: 2 }]],
   Clock: [["circle", { cx: 12, cy: 12, r: 10 }], ["path", { d: "M12 6v6l4 2" }]],
   Plus: [["path", { d: "M5 12h14" }], ["path", { d: "M12 5v14" }]],
   X: [["path", { d: "M18 6 6 18" }], ["path", { d: "m6 6 12 12" }]],
@@ -62,6 +63,7 @@ export const Home = mk("Home");
 export const Refrigerator = mk("Refrigerator");
 export const ChefHat = mk("ChefHat");
 export const Users = mk("Users");
+export const Target = mk("Target");
 export const Clock = mk("Clock");
 export const Plus = mk("Plus");
 export const X = mk("X");
