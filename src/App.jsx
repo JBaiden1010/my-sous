@@ -6875,9 +6875,13 @@ export default function App() {
   const [profile, setProfile] = useState({ name: "", age: "", height: "", weight: "", weightGoal: "", cookingGoal: "", activityLevel: "" });
   const [language, setLanguage] = useState(() => {
     const supported = LANGUAGES.map((l) => l.id);
+    let picked = null;
+    try { picked = window.localStorage.getItem("mysous:lang"); } catch { /* storage blocked */ }
+    if (supported.includes(picked)) return picked;
     const nav = (typeof navigator !== "undefined" && (navigator.language || "")).slice(0, 2).toLowerCase();
     return supported.includes(nav) ? nav : "en";
   });
+  useEffect(() => { try { window.localStorage.setItem("mysous:lang", language); } catch { /* storage blocked */ } }, [language]);
   function t(key) {
     return TRANSLATIONS[key]?.[language] ?? TRANSLATIONS[key]?.en ?? key;
   }

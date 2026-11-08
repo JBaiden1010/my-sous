@@ -47,6 +47,8 @@ const AUTH_TR = {
 const LANGS = ["en", "es", "fr", "pt", "hi", "zh", "ar"];
 
 export function startingLanguage() {
+  const picked = lsGet("mysous:lang");
+  if (LANGS.includes(picked)) return picked;
   try {
     const p = JSON.parse(lsGet("mysous:sous_profile") || "{}");
     const saved = p.language || (p.profile && p.profile.language);
@@ -55,6 +57,33 @@ export function startingLanguage() {
   const nav = ((typeof navigator !== "undefined" && navigator.language) || "").slice(0, 2).toLowerCase();
   return LANGS.includes(nav) ? nav : "en";
 }
+
+const LANG_LABELS = [["en", "English"], ["es", "Español"], ["fr", "Français"], ["pt", "Português"], ["hi", "हिन्दी"], ["zh", "中文"], ["ar", "العربية"]];
+
+const INTRO = [
+  {
+    emoji: "🥕",
+    title: { en: "Cook with what you have", es: "Cocina con lo que tienes", fr: "Cuisinez avec ce que vous avez", pt: "Cozinhe com o que você tem", hi: "जो है उसी से पकाएं", zh: "用现有食材做饭", ar: "اطبخ بما لديك" },
+    body: { en: "Tell My Sous what's in your kitchen and it shows meals you can make right now, plus the ones you're one or two items away from.", es: "Dile a My Sous qué hay en tu cocina y te mostrará comidas que puedes hacer ahora, y las que te faltan uno o dos ingredientes.", fr: "Dites à My Sous ce qu'il y a dans votre cuisine : il vous montre les plats possibles tout de suite, et ceux à un ou deux ingrédients près.", pt: "Diga ao My Sous o que há na sua cozinha e ele mostra as refeições que você pode fazer agora, e as que faltam um ou dois itens.", hi: "My Sous को बताएं कि आपकी रसोई में क्या है, और यह दिखाएगा कि आप अभी क्या बना सकते हैं, और किनके लिए बस एक-दो चीज़ें कम हैं।", zh: "告诉 My Sous 你厨房里有什么，它会显示你现在就能做的菜，以及只差一两样食材的菜。", ar: "أخبر My Sous بما في مطبخك وسيعرض لك الوجبات التي يمكنك تحضيرها الآن، وتلك التي ينقصها مكوّن أو اثنان." },
+  },
+  {
+    emoji: "👨‍🍳",
+    title: { en: "Step by step, no guessing", es: "Paso a paso, sin adivinar", fr: "Étape par étape, sans deviner", pt: "Passo a passo, sem adivinhar", hi: "कदम-दर-कदम, बिना अंदाज़े के", zh: "一步一步，不用猜", ar: "خطوة بخطوة، بلا تخمين" },
+    body: { en: "Every step tells you how much, how long, and what it should look like when it's done. Change the servings and the amounts update.", es: "Cada paso te dice cuánto, cuánto tiempo y cómo debe verse cuando está listo. Cambia las porciones y las cantidades se ajustan.", fr: "Chaque étape indique combien, combien de temps, et à quoi cela doit ressembler une fois prêt. Changez les portions, les quantités s'adaptent.", pt: "Cada passo diz quanto, por quanto tempo e como deve ficar quando estiver pronto. Mude as porções e as quantidades se ajustam.", hi: "हर कदम बताता है कितना, कितनी देर, और तैयार होने पर कैसा दिखना चाहिए। सर्विंग बदलें तो मात्रा अपने आप बदल जाती है।", zh: "每一步都告诉你用量、时间，以及做好时应该是什么样子。修改份数，用量会自动调整。", ar: "كل خطوة تخبرك بالكمية والمدة وكيف يجب أن يبدو الطبق عند اكتماله. غيّر عدد الحصص وتتغير الكميات." },
+  },
+  {
+    emoji: "💬",
+    title: { en: "Learn from other cooks", es: "Aprende de otros cocineros", fr: "Apprenez des autres cuisiniers", pt: "Aprenda com outros cozinheiros", hi: "दूसरे रसोइयों से सीखें", zh: "向其他厨师学习", ar: "تعلّم من طهاة آخرين" },
+    body: { en: "Share tips, rate recipes, suggest improvements and post short tutorials in the Community.", es: "Comparte consejos, califica recetas, sugiere mejoras y publica tutoriales cortos en la Comunidad.", fr: "Partagez des astuces, notez des recettes, proposez des améliorations et publiez de courts tutoriels dans la Communauté.", pt: "Compartilhe dicas, avalie receitas, sugira melhorias e publique tutoriais curtos na Comunidade.", hi: "कम्युनिटी में टिप्स साझा करें, रेसिपी रेट करें, सुधार सुझाएं और छोटे ट्यूटोरियल पोस्ट करें।", zh: "在社区分享技巧、给食谱评分、提出改进建议、发布短教程。", ar: "شارك النصائح وقيّم الوصفات واقترح تحسينات وانشر دروسًا قصيرة في المجتمع." },
+  },
+];
+const INTRO_UI = {
+  next: { en: "Next", es: "Siguiente", fr: "Suivant", pt: "Próximo", hi: "आगे", zh: "下一步", ar: "التالي" },
+  back: { en: "Back", es: "Atrás", fr: "Retour", pt: "Voltar", hi: "पीछे", zh: "返回", ar: "رجوع" },
+  skip: { en: "Skip", es: "Omitir", fr: "Passer", pt: "Pular", hi: "छोड़ें", zh: "跳过", ar: "تخطي" },
+  start: { en: "Get started", es: "Empezar", fr: "Commencer", pt: "Começar", hi: "शुरू करें", zh: "开始", ar: "ابدأ" },
+  language: { en: "Language", es: "Idioma", fr: "Langue", pt: "Idioma", hi: "भाषा", zh: "语言", ar: "اللغة" },
+};
 
 const C = { paper: "#F8F5EF", card: "#FFFFFF", ink: "#33352F", muted: "#6A6C63", line: "#E4E0D6", primary: "#71866A", sageSofter: "#EBF0E6", accentText: "#9A5232" };
 
@@ -87,8 +116,12 @@ const MonitorIcon = () => (
 );
 
 export function AuthScreen({ sb, onGuest }) {
-  const lang = startingLanguage();
-  const t = (k) => (AUTH_TR[k] || VIEW_TR[k])[lang] || (AUTH_TR[k] || VIEW_TR[k]).en;
+  const [lang, setLang] = useState(startingLanguage);
+  const t = (k) => { const e = AUTH_TR[k] || VIEW_TR[k] || INTRO_UI[k]; return e[lang] || e.en; };
+  // First visit: a short tour of the app, then the "Save your kitchen" choice.
+  const [slide, setSlide] = useState(() => (lsGet("mysous:introSeen") === "1" ? INTRO.length : 0));
+  const finishIntro = () => { lsSet("mysous:introSeen", "1"); setSlide(INTRO.length); };
+  const pickLang = (l) => { setLang(l); lsSet("mysous:lang", l); };
   const [view, setView] = useState(startingView);
   const [providers, setProviders] = useState(null);
   const [busy, setBusy] = useState(null);
@@ -110,7 +143,37 @@ export function AuthScreen({ sb, onGuest }) {
   const button = { width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, boxSizing: "border-box" };
   const toggleBtn = (active) => ({ display: "flex", alignItems: "center", gap: 5, border: "none", borderRadius: 8, padding: "5px 8px", cursor: "pointer", fontSize: 11.5, fontFamily: "inherit", background: active ? C.card : "transparent", color: active ? C.ink : C.muted, fontWeight: active ? 600 : 400, boxShadow: active ? "0 1px 2px rgba(51,53,47,0.08)" : "none" });
 
-  const content = (
+  const chip = (active) => ({ padding: "6px 11px", borderRadius: 20, border: `1px solid ${active ? C.primary : C.line}`, background: active ? "#DCE5D5" : C.card, color: active ? "#4F6449" : C.muted, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", fontWeight: active ? 600 : 400 });
+  const intro = slide < INTRO.length ? (
+    <div style={{ width: "100%", maxWidth: 380, margin: "0 auto", display: "flex", flexDirection: "column", minHeight: "100%" }}>
+      {slide === 0 && (
+        <div style={{ marginBottom: 18 }}>
+          <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: 0.5, textTransform: "uppercase", color: C.muted, marginBottom: 8 }}>{t("language")}</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {LANG_LABELS.map(([id, label]) => (
+              <button key={id} onClick={() => pickLang(id)} aria-pressed={lang === id} style={chip(lang === id)}>{label}</button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div style={{ fontSize: 64, lineHeight: 1, margin: "18px 0 18px" }} aria-hidden="true">{INTRO[slide].emoji}</div>
+      <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, margin: "0 0 10px", lineHeight: 1.2 }}>{INTRO[slide].title[lang] || INTRO[slide].title.en}</h1>
+      <p style={{ color: C.muted, fontSize: 15, lineHeight: 1.55, margin: 0 }}>{INTRO[slide].body[lang] || INTRO[slide].body.en}</p>
+
+      <div style={{ display: "flex", gap: 6, justifyContent: "center", margin: "28px 0 18px" }} aria-label={`${slide + 1} / ${INTRO.length}`}>
+        {INTRO.map((_, i) => <span key={i} style={{ width: i === slide ? 20 : 7, height: 7, borderRadius: 4, background: i === slide ? C.primary : C.line, transition: "width .2s" }} />)}
+      </div>
+      <button onClick={() => (slide === INTRO.length - 1 ? finishIntro() : setSlide(slide + 1))} style={{ ...button, background: C.primary, color: "#fff", border: "none" }}>
+        {slide === INTRO.length - 1 ? t("start") : t("next")}
+      </button>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10 }}>
+        <button onClick={() => setSlide(Math.max(0, slide - 1))} disabled={slide === 0} style={{ background: "none", border: "none", color: slide === 0 ? "transparent" : C.muted, fontSize: 13.5, cursor: slide === 0 ? "default" : "pointer", fontFamily: "inherit", padding: 6 }}>{t("back")}</button>
+        <button onClick={finishIntro} style={{ background: "none", border: "none", color: C.muted, fontSize: 13.5, cursor: "pointer", fontFamily: "inherit", padding: 6 }}>{t("skip")}</button>
+      </div>
+    </div>
+  ) : null;
+
+  const content = intro || (
     <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
       <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, margin: "6px 0 8px", lineHeight: 1.2 }}>{t("title")}</h1>
       <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5, margin: "0 0 22px" }}>{t("sub")}</p>
