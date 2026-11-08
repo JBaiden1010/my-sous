@@ -390,6 +390,31 @@ const TRANSLATIONS = {
   addStoreLabel: { en: "Add store", es: "Añadir tienda", fr: "Ajouter", pt: "Adicionar loja", hi: "स्टोर जोड़ें", zh: "添加商店", ar: "أضف متجرًا" },
   storeNeedName: { en: "Add the store's name.", es: "Escribe el nombre de la tienda.", fr: "Indiquez le nom du magasin.", pt: "Digite o nome da loja.", hi: "स्टोर का नाम लिखें।", zh: "请填写商店名称。", ar: "اكتب اسم المتجر." },
   storeNeedSite: { en: "Add the store's website, like farmboy.ca.", es: "Escribe el sitio web de la tienda.", fr: "Indiquez le site web du magasin.", pt: "Digite o site da loja.", hi: "स्टोर की वेबसाइट लिखें।", zh: "请填写商店网址。", ar: "اكتب موقع المتجر." },
+  starterToolsLabel: { en: "Handy tools for a starter kitchen", es: "Utensilios útiles para empezar", fr: "Ustensiles utiles pour débuter", pt: "Utensílios úteis para começar", hi: "शुरुआती रसोई के काम के औज़ार", zh: "新手厨房实用工具", ar: "أدوات مفيدة لمطبخ المبتدئين" },
+  starterToolsSub: { en: "The basics most recipes here assume. Tap a store to compare prices.", es: "Lo básico que suponen la mayoría de recetas. Toca una tienda para comparar precios.", fr: "L'essentiel que supposent la plupart des recettes. Touchez un magasin pour comparer les prix.", pt: "O básico que a maioria das receitas pressupõe. Toque numa loja para comparar preços.", hi: "ज़्यादातर रेसिपी के लिए ज़रूरी बुनियादी चीज़ें। दाम देखने के लिए स्टोर पर टैप करें।", zh: "这里大多数食谱都会用到的基础工具。点商店比较价格。", ar: "الأساسيات التي تفترضها معظم الوصفات هنا. اضغط على متجر لمقارنة الأسعار." },
+  showMoreTools: { en: "Show {n} more tools", es: "Ver {n} utensilios más", fr: "Voir {n} ustensiles de plus", pt: "Ver mais {n} utensílios", hi: "{n} और औज़ार दिखाएं", zh: "再显示 {n} 种工具", ar: "عرض {n} أدوات أخرى" },
+  showFewerTools: { en: "Show fewer", es: "Ver menos", fr: "Voir moins", pt: "Ver menos", hi: "कम दिखाएं", zh: "收起", ar: "عرض أقل" },
+  tool_knife: { en: "Chef's knife", es: "Cuchillo de chef", fr: "Couteau de chef", pt: "Faca de chef", hi: "शेफ़ नाइफ़", zh: "主厨刀", ar: "سكين الطاهي" },
+  tool_board: { en: "Cutting board", es: "Tabla de cortar", fr: "Planche à découper", pt: "Tábua de corte", hi: "कटिंग बोर्ड", zh: "砧板", ar: "لوح تقطيع" },
+  tool_measuring: { en: "Measuring cups & spoons", es: "Tazas y cucharas medidoras", fr: "Tasses et cuillères à mesurer", pt: "Xícaras e colheres medidoras", hi: "माप वाले कप और चम्मच", zh: "量杯和量勺", ar: "أكواب وملاعق قياس" },
+  tool_pan: { en: "Non-stick frying pan", es: "Sartén antiadherente", fr: "Poêle antiadhésive", pt: "Frigideira antiaderente", hi: "नॉन-स्टिक फ्राइंग पैन", zh: "不粘煎锅", ar: "مقلاة غير لاصقة" },
+  tool_pot: { en: "Saucepan with lid", es: "Cazo con tapa", fr: "Casserole avec couvercle", pt: "Panela com tampa", hi: "ढक्कन वाला सॉसपैन", zh: "带盖小锅", ar: "قدر صغير بغطاء" },
+  tool_sheet: { en: "Baking sheet", es: "Bandeja de horno", fr: "Plaque de cuisson", pt: "Assadeira", hi: "बेकिंग ट्रे", zh: "烤盘", ar: "صينية خبز" },
+  tool_spatula: { en: "Silicone spatula", es: "Espátula de silicona", fr: "Spatule en silicone", pt: "Espátula de silicone", hi: "सिलिकॉन स्पैचुला", zh: "硅胶铲", ar: "ملعقة سيليكون" },
+  tool_whisk: { en: "Whisk", es: "Batidor", fr: "Fouet", pt: "Batedor", hi: "व्हिस्क", zh: "打蛋器", ar: "مخفقة" },
+  tool_bowls: { en: "Mixing bowls", es: "Bols para mezclar", fr: "Saladiers", pt: "Tigelas", hi: "मिक्सिंग बाउल", zh: "搅拌碗", ar: "أوعية خلط" },
+  tool_colander: { en: "Colander / strainer", es: "Colador", fr: "Passoire", pt: "Escorredor", hi: "छलनी", zh: "滤水篮", ar: "مصفاة" },
+  tool_thermometer: { en: "Meat thermometer", es: "Termómetro de cocina", fr: "Thermomètre de cuisson", pt: "Termômetro culinário", hi: "मीट थर्मामीटर", zh: "肉类温度计", ar: "ميزان حرارة للحم" },
+  tool_blender: { en: "Blender", es: "Licuadora", fr: "Mixeur", pt: "Liquidificador", hi: "ब्लेंडर", zh: "搅拌机", ar: "خلاط" },
+  tool_ricecooker: { en: "Rice cooker", es: "Arrocera", fr: "Cuiseur à riz", pt: "Panela de arroz", hi: "राइस कुकर", zh: "电饭煲", ar: "طباخة أرز" },
+  tool_containers: { en: "Meal prep containers", es: "Recipientes para comida", fr: "Boîtes de conservation", pt: "Potes para marmita", hi: "मील प्रेप कंटेनर", zh: "备餐饭盒", ar: "علب لتحضير الوجبات" },
+  recipePhotoLabel: { en: "Photo", es: "Foto", fr: "Photo", pt: "Foto", hi: "फ़ोटो", zh: "照片", ar: "صورة" },
+  addPhoto: { en: "Add a photo", es: "Añadir foto", fr: "Ajouter une photo", pt: "Adicionar foto", hi: "फ़ोटो जोड़ें", zh: "添加照片", ar: "أضف صورة" },
+  changePhoto: { en: "Change photo", es: "Cambiar foto", fr: "Changer la photo", pt: "Trocar foto", hi: "फ़ोटो बदलें", zh: "更换照片", ar: "تغيير الصورة" },
+  photoError: { en: "That file isn't a photo we can use. Try a JPG or PNG.", es: "Ese archivo no es una foto válida. Prueba con JPG o PNG.", fr: "Ce fichier n'est pas une photo utilisable. Essayez un JPG ou un PNG.", pt: "Esse arquivo não é uma foto válida. Tente JPG ou PNG.", hi: "यह फ़ाइल इस्तेमाल लायक फ़ोटो नहीं है। JPG या PNG आज़माएं।", zh: "无法使用这个文件，请试试 JPG 或 PNG 图片。", ar: "هذا الملف ليس صورة صالحة. جرّب JPG أو PNG." },
+  timerWillShow: { en: "A {t} timer button will show on this step.", es: "Este paso mostrará un temporizador de {t}.", fr: "Une minuterie de {t} apparaîtra à cette étape.", pt: "Esta etapa terá um timer de {t}.", hi: "इस स्टेप पर {t} का टाइमर बटन दिखेगा।", zh: "这一步会显示 {t} 的计时器按钮。", ar: "سيظهر زر مؤقت {t} في هذه الخطوة." },
+  timerHint: { en: "Include a time (like 10 min) and this step gets a timer button.", es: "Incluye un tiempo (ej. 10 min) y este paso tendrá temporizador.", fr: "Indiquez une durée (ex. 10 min) et cette étape aura une minuterie.", pt: "Inclua um tempo (ex. 10 min) e esta etapa terá um timer.", hi: "समय लिखें (जैसे 10 min), तो इस स्टेप पर टाइमर बटन आएगा।", zh: "写上时间（如 10 min），这一步就会有计时器按钮。", ar: "اكتب وقتًا (مثل 10 min) وستحصل هذه الخطوة على زر مؤقت." },
+  alsoPlaceholder: { en: "Anything else to check? (like a smell or sound)", es: "¿Algo más que revisar? (un olor o sonido)", fr: "Autre chose à vérifier ? (une odeur, un son)", pt: "Mais algo para conferir? (um cheiro ou som)", hi: "और कुछ जांचना है? (जैसे खुशबू या आवाज़)", zh: "还有什么要注意？（比如气味或声音）", ar: "شيء آخر للتحقق؟ (مثل رائحة أو صوت)" },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -3434,6 +3459,7 @@ const SECONDARY_SIGNAL_TR = {
 function secondarySignal(recipe, stepIndex, language) {
   const step = recipe?.steps?.[stepIndex];
   if (!step) return null;
+  if (typeof step.also === "string" && step.also.trim()) return step.also.trim(); // written by the cook
   const text = `${step.instruction} ${step.measure}`.toLowerCase();
   let category = "general";
   if (/air fry/.test(text)) category = "airfry";
@@ -3655,12 +3681,106 @@ const COUNTRY_OPTIONS = [
   { id: "de", label: "🇩🇪 Germany" },
   { id: "fr", label: "🇫🇷 France" },
 ];
-const STORES_EQUIPMENT = [
-  { name: "Walmart", search: (q) => `https://www.walmart.ca/en/search?q=${encodeURIComponent(q)}` },
-  { name: "Amazon", search: (q) => `https://www.amazon.ca/s?k=${encodeURIComponent(q)}` },
-  { name: "Canadian Tire", search: () => `https://www.canadiantire.ca` },
-  { name: "Costco", search: () => `https://www.costco.ca` },
-  { name: "IKEA", search: () => `https://www.ikea.com/ca/en/` },
+// Where to buy kitchen tools, by country (same country picker as groceries).
+const STORES_EQUIPMENT_BY_COUNTRY = {
+  ca: [
+    { name: "Walmart", search: (q) => `https://www.walmart.ca/en/search?q=${encodeURIComponent(q)}` },
+    { name: "Amazon", search: (q) => `https://www.amazon.ca/s?k=${encodeURIComponent(q)}` },
+    { name: "Canadian Tire", search: siteSearch("canadiantire.ca") },
+    { name: "Costco", search: siteSearch("costco.ca") },
+    { name: "Best Buy", search: (q) => `https://www.bestbuy.ca/en-ca/search?search=${encodeURIComponent(q)}` },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/ca/en/search/?q=${encodeURIComponent(q)}` },
+    { name: "HomeSense", search: siteSearch("homesense.ca") },
+    { name: "Dollarama", search: siteSearch("dollarama.com") },
+  ],
+  us: [
+    { name: "Walmart", search: (q) => `https://www.walmart.com/search?q=${encodeURIComponent(q)}` },
+    { name: "Amazon", search: (q) => `https://www.amazon.com/s?k=${encodeURIComponent(q)}` },
+    { name: "Target", search: (q) => `https://www.target.com/s?searchTerm=${encodeURIComponent(q)}` },
+    { name: "Best Buy", search: (q) => `https://www.bestbuy.com/site/searchpage.jsp?st=${encodeURIComponent(q)}` },
+    { name: "Costco", search: (q) => `https://www.costco.com/CatalogSearch?keyword=${encodeURIComponent(q)}` },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/us/en/search/?q=${encodeURIComponent(q)}` },
+    { name: "HomeGoods", search: siteSearch("homegoods.com") },
+  ],
+  au: [
+    { name: "Kmart", search: siteSearch("kmart.com.au") },
+    { name: "Big W", search: siteSearch("bigw.com.au") },
+    { name: "Target", search: siteSearch("target.com.au") },
+    { name: "JB Hi-Fi", search: siteSearch("jbhifi.com.au") },
+    { name: "Amazon", search: (q) => `https://www.amazon.com.au/s?k=${encodeURIComponent(q)}` },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/au/en/search/?q=${encodeURIComponent(q)}` },
+  ],
+  mx: [
+    { name: "Walmart", search: (q) => `https://www.walmart.com.mx/busqueda?q=${encodeURIComponent(q)}` },
+    { name: "Amazon", search: (q) => `https://www.amazon.com.mx/s?k=${encodeURIComponent(q)}` },
+    { name: "Liverpool", search: siteSearch("liverpool.com.mx") },
+    { name: "Mercado Libre", search: siteSearch("mercadolibre.com.mx") },
+    { name: "Coppel", search: siteSearch("coppel.com") },
+    { name: "Costco", search: siteSearch("costco.com.mx") },
+  ],
+  gb: [
+    { name: "Argos", search: (q) => `https://www.argos.co.uk/search/${encodeURIComponent(q)}/` },
+    { name: "Amazon", search: (q) => `https://www.amazon.co.uk/s?k=${encodeURIComponent(q)}` },
+    { name: "John Lewis", search: siteSearch("johnlewis.com") },
+    { name: "Currys", search: siteSearch("currys.co.uk") },
+    { name: "Dunelm", search: siteSearch("dunelm.com") },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/gb/en/search/?q=${encodeURIComponent(q)}` },
+  ],
+  ie: [
+    { name: "Argos", search: siteSearch("argos.ie") },
+    { name: "Harvey Norman", search: siteSearch("harveynorman.ie") },
+    { name: "Currys", search: siteSearch("currys.ie") },
+    { name: "Amazon", search: (q) => `https://www.amazon.co.uk/s?k=${encodeURIComponent(q)}` },
+    { name: "Dunnes Stores", search: siteSearch("dunnesstores.com") },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/ie/en/search/?q=${encodeURIComponent(q)}` },
+  ],
+  nz: [
+    { name: "The Warehouse", search: siteSearch("thewarehouse.co.nz") },
+    { name: "Kmart", search: siteSearch("kmart.co.nz") },
+    { name: "Briscoes", search: siteSearch("briscoes.co.nz") },
+    { name: "Noel Leeming", search: siteSearch("noelleeming.co.nz") },
+    { name: "Harvey Norman", search: siteSearch("harveynorman.co.nz") },
+  ],
+  in: [
+    { name: "Amazon", search: (q) => `https://www.amazon.in/s?k=${encodeURIComponent(q)}` },
+    { name: "Flipkart", search: (q) => `https://www.flipkart.com/search?q=${encodeURIComponent(q)}` },
+    { name: "Croma", search: siteSearch("croma.com") },
+    { name: "Reliance Digital", search: siteSearch("reliancedigital.in") },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/in/en/search/?q=${encodeURIComponent(q)}` },
+  ],
+  de: [
+    { name: "Amazon", search: (q) => `https://www.amazon.de/s?k=${encodeURIComponent(q)}` },
+    { name: "MediaMarkt", search: siteSearch("mediamarkt.de") },
+    { name: "Otto", search: siteSearch("otto.de") },
+    { name: "Saturn", search: siteSearch("saturn.de") },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/de/de/search/?q=${encodeURIComponent(q)}` },
+  ],
+  fr: [
+    { name: "Amazon", search: (q) => `https://www.amazon.fr/s?k=${encodeURIComponent(q)}` },
+    { name: "Darty", search: siteSearch("darty.com") },
+    { name: "Fnac", search: siteSearch("fnac.com") },
+    { name: "Boulanger", search: siteSearch("boulanger.com") },
+    { name: "IKEA", search: (q) => `https://www.ikea.com/fr/fr/search/?q=${encodeURIComponent(q)}` },
+  ],
+};
+const STORES_EQUIPMENT = STORES_EQUIPMENT_BY_COUNTRY.ca;
+
+// Handy tools for a beginner's kitchen, beyond the big equipment.
+const STARTER_TOOLS = [
+  { id: "knife", emoji: "🔪", search: "chef's knife" },
+  { id: "board", emoji: "🪵", search: "cutting board" },
+  { id: "measuring", emoji: "🥄", search: "measuring cups and spoons" },
+  { id: "pan", emoji: "🍳", search: "non-stick frying pan" },
+  { id: "pot", emoji: "🍲", search: "saucepan with lid" },
+  { id: "sheet", emoji: "🧇", search: "baking sheet" },
+  { id: "spatula", emoji: "🥢", search: "silicone spatula" },
+  { id: "whisk", emoji: "🥣", search: "whisk" },
+  { id: "bowls", emoji: "🫙", search: "mixing bowls" },
+  { id: "colander", emoji: "🧺", search: "colander strainer" },
+  { id: "thermometer", emoji: "🌡️", search: "meat thermometer" },
+  { id: "blender", emoji: "🥤", search: "blender" },
+  { id: "ricecooker", emoji: "🍚", search: "rice cooker" },
+  { id: "containers", emoji: "📦", search: "meal prep containers" },
 ];
 
 // Builds the actual search term: runs the item name through the same
@@ -7263,10 +7383,11 @@ export default function App() {
       mealTime: Array.isArray(shared.mealTime) ? shared.mealTime.map(String).slice(0, 6) : [],
       equipment: Array.isArray(shared.equipment) ? shared.equipment.map(String).slice(0, 12) : [],
       ingredients: Array.isArray(shared.ingredients) ? shared.ingredients.map(String).slice(0, 40) : [],
-      steps: Array.isArray(shared.steps) ? shared.steps.slice(0, 40).map((st) => ({ instruction: String(st?.instruction || ""), measure: String(st?.measure || ""), visual: String(st?.visual || "") })) : [],
+      steps: Array.isArray(shared.steps) ? shared.steps.slice(0, 40).map((st) => ({ instruction: String(st?.instruction || ""), measure: String(st?.measure || ""), visual: String(st?.visual || ""), ...(st?.also ? { also: String(st.also).slice(0, 300) } : {}) })) : [],
       flavorBoosts: Array.isArray(shared.flavorBoosts) ? shared.flavorBoosts.map(String).slice(0, 12) : [],
       macros: { calories: Number(shared.macros?.calories) || 0, protein: Number(shared.macros?.protein) || 0, carbs: Number(shared.macros?.carbs) || 0, fat: Number(shared.macros?.fat) || 0 },
       color: DEFAULT_RECIPE_COLOR,
+      ...(isPhotoData(shared.photo) && shared.photo.length < 120000 ? { photo: shared.photo } : {}),
     };
     setUserRecipes((prev) => [...prev, { ...clean, id: `shared-${Date.now()}`, isUserRecipe: true }]);
     setToast(t("toastSavedCookbook"));
@@ -7332,7 +7453,8 @@ export default function App() {
   async function shareRecipeToCommunity(recipe) {
     if (!community.canWrite) { setToast(t(community.canSignIn ? "communitySignIn" : "communityReadOnlyShort")); setTimeout(() => setToast(null), 2600); return; }
     const { name, emoji, time, cuisine, categories, mealTime, equipment, ingredients, steps, flavorBoosts, macros } = recipe;
-    const ok = await community.addPost({ kind: "recipe", text: recipe.authorNote ? String(recipe.authorNote).slice(0, 2000) : "", recipe: { name: recipeName(recipe, language) || name, emoji, time, cuisine, categories, mealTime, equipment, ingredients, steps, flavorBoosts, macros } });
+    const photo = isPhotoData(recipe.photo) && recipe.photo.length < 120000 ? recipe.photo : undefined; // keeps the post small
+    const ok = await community.addPost({ kind: "recipe", text: recipe.authorNote ? String(recipe.authorNote).slice(0, 2000) : "", recipe: { name: recipeName(recipe, language) || name, emoji, time, cuisine, categories, mealTime, equipment, ingredients, steps, flavorBoosts, macros, ...(photo ? { photo } : {}) } });
     setToast(t(ok ? "toastSharedCommunity" : "saveFailed"));
     setTimeout(() => setToast(null), 1800);
   }
@@ -8110,8 +8232,30 @@ function KitchenScreen({
   );
 }
 
+const isPhotoData = (x) => typeof x === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(x) && x.length < 400000;
+
+// Shrinks a picked photo to at most 640px and saves it as a JPEG, so it fits
+// in the browser's storage and in the person's account.
+function photoToDataUrl(file, max = 640) {
+  return new Promise((resolve, reject) => {
+    if (!file || !/^image\//.test(file.type)) { reject(new Error("not_image")); return; }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL("image/jpeg", 0.72));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("bad_image")); };
+    img.src = url;
+  });
+}
+
 function RecipeImage({ recipe, height }) {
-  const photo = RECIPE_IMAGES[recipe.remixOf || recipe.id];
+  const photo = isPhotoData(recipe.photo) ? recipe.photo : RECIPE_IMAGES[recipe.remixOf || recipe.id];
   if (photo) {
     return (
       <div
@@ -8746,6 +8890,16 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
   const [flavorBoostsList, setFlavorBoostsList] = useState(editingRecipe?.flavorBoosts || []);
   const [flavorDraft, setFlavorDraft] = useState("");
   const [personalNote, setPersonalNote] = useState(editingRecipe?.authorNote || "");
+  const [photo, setPhoto] = useState(isPhotoData(editingRecipe?.photo) ? editingRecipe.photo : null);
+  const [photoState, setPhotoState] = useState("idle");
+  const photoInput = useRef(null);
+  async function pickPhoto(e) {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    setPhotoState("working");
+    try { setPhoto(await photoToDataUrl(file)); setPhotoState("idle"); } catch { setPhotoState("error"); }
+  }
 
   function toggleIn(list, setList, id) {
     setList(list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
@@ -8794,6 +8948,7 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
       flavorBoosts: flavorBoostsList,
       steps: stepsList.filter((s) => s.instruction.trim()),
       authorNote: personalNote.trim(),
+      ...(photo ? { photo } : {}),
     });
   }
 
@@ -8813,6 +8968,23 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
 
       <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("recipeNameLabel")}</div>
       <input value={name} onChange={(e) => setName(e.target.value)} style={styles.textInput} />
+
+      <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("recipePhotoLabel")} ({t("optionalTag")})</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        {photo ? (
+          <div role="img" aria-label={t("recipePhotoLabel")} style={{ width: 96, height: 96, borderRadius: 14, backgroundImage: `url(${photo})`, backgroundSize: "cover", backgroundPosition: "center", border: `1px solid ${COLORS.line}` }} />
+        ) : (
+          <div aria-hidden="true" style={{ width: 96, height: 96, borderRadius: 14, border: `1px dashed ${COLORS.line}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, background: COLORS.paper }}>{emoji || "🍽️"}</div>
+        )}
+        <input ref={photoInput} type="file" accept="image/*" onChange={pickPhoto} style={{ display: "none" }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <button onClick={() => photoInput.current && photoInput.current.click()} disabled={photoState === "working"} style={{ ...styles.resetButton, marginTop: 0 }}>
+            📷 {photoState === "working" ? t("uploadingLabel") : photo ? t("changePhoto") : t("addPhoto")}
+          </button>
+          {photo && <button onClick={() => setPhoto(null)} style={{ ...styles.linkButton, fontSize: 12.5 }}>{t("removeLabel")}</button>}
+          {photoState === "error" && <span style={{ ...styles.recipeMeta, color: COLORS.accentText }}>{t("photoError")}</span>}
+        </div>
+      </div>
 
       <div style={styles.rowPair}>
         <div style={{ flex: 1 }}>
@@ -8888,9 +9060,18 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
               <button onClick={() => removeStepRow(i)} aria-label={`${t("aRemove")}: ${t("stepOfLabel")} ${i + 1}`} style={styles.chipX}><X size={13} color={COLORS.inkMuted} /></button>
             )}
           </div>
-          <input value={s.instruction} onChange={(e) => updateStep(i, "instruction", e.target.value)} placeholder={t("instructionPlaceholder")} style={{ ...styles.textInput, marginBottom: 6 }} />
-          <input value={s.measure} onChange={(e) => updateStep(i, "measure", e.target.value)} placeholder={t("measurePlaceholder")} style={{ ...styles.textInput, fontSize: 12.5, marginBottom: 6 }} />
-          <input value={s.visual} onChange={(e) => updateStep(i, "visual", e.target.value)} placeholder={t("visualPlaceholder")} style={{ ...styles.textInput, fontSize: 12.5 }} />
+          <input value={s.instruction} onChange={(e) => updateStep(i, "instruction", e.target.value)} placeholder={t("instructionPlaceholder")} aria-label={t("instructionPlaceholder")} style={{ ...styles.textInput, marginBottom: 8 }} />
+          <label style={styles.stepFieldLabel}><Clock size={13} color={COLORS.accent} /> {t("timeMeasureLabel")}</label>
+          <input value={s.measure} onChange={(e) => updateStep(i, "measure", e.target.value)} placeholder={t("measurePlaceholder")} style={{ ...styles.textInput, fontSize: 13, marginBottom: 4 }} />
+          {stepTimerSeconds(s.measure) > 0 ? (
+            <div style={{ ...styles.recipeMeta, color: COLORS.primaryText, marginBottom: 8, whiteSpace: "normal" }}>⏱ {t("timerWillShow").replace("{t}", stepTimerSeconds(s.measure) >= 60 ? `${Math.round(stepTimerSeconds(s.measure) / 60)} min` : `${stepTimerSeconds(s.measure)} s`)}</div>
+          ) : (
+            <div style={{ ...styles.recipeMeta, marginBottom: 8, whiteSpace: "normal" }}>{t("timerHint")}</div>
+          )}
+          <label style={styles.stepFieldLabel}><Utensils size={13} color={COLORS.accent} /> {t("visualCueLabel")}</label>
+          <input value={s.visual} onChange={(e) => updateStep(i, "visual", e.target.value)} placeholder={t("visualPlaceholder")} style={{ ...styles.textInput, fontSize: 13, marginBottom: 8 }} />
+          <label style={styles.stepFieldLabel}><Eye size={13} color={COLORS.accent} /> {t("alsoCheckLabel")} ({t("optionalTag")})</label>
+          <input value={s.also || ""} onChange={(e) => updateStep(i, "also", e.target.value)} placeholder={t("alsoPlaceholder")} style={{ ...styles.textInput, fontSize: 13 }} />
         </div>
       ))}
       <button onClick={addStepRow} style={{ ...styles.resetButton, marginTop: 10 }}>{t("addStepLabel")}</button>
@@ -9264,6 +9445,8 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
   const checkedCount = shoppingList.filter((s) => s.checked).length;
   const missingEquipment = equipmentList.filter((eq) => !equipment[eq.id]);
   const ingredientStores = [...customStoreLinks(customStores), ...(STORES_INGREDIENTS_BY_COUNTRY[ingredientCountry] ?? STORES_INGREDIENTS_BY_COUNTRY.ca)];
+  const toolStores = STORES_EQUIPMENT_BY_COUNTRY[ingredientCountry] ?? STORES_EQUIPMENT_BY_COUNTRY.ca;
+  const [showAllTools, setShowAllTools] = useState(false);
   const countryLabel = (COUNTRY_OPTIONS.find((c) => c.id === ingredientCountry)?.label || "").replace(/^\S+\s/, "");
 
   const StoreLinks = ({ term, stores }) => (
@@ -9296,7 +9479,7 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
               return (
                 <div key={eq.id} style={styles.buyRow}>
                   <span style={styles.recipeName}>{label}</span>
-                  <StoreLinks term={buildSearchTerm(eq.label)} stores={STORES_EQUIPMENT} />
+                  <StoreLinks term={buildSearchTerm(eq.label)} stores={toolStores} />
                 </div>
               );
             })}
@@ -9332,6 +9515,20 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
         </form>
         {storeHint && <div style={{ ...styles.recipeMeta, color: COLORS.accentText, marginTop: 6, whiteSpace: "normal" }}>{t(storeHint)}</div>}
       </div>
+
+      <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("starterToolsLabel")}</div>
+      <p style={{ ...styles.basicsHint, marginTop: 0 }}>{t("starterToolsSub")}</p>
+      <div style={{ marginTop: 4 }}>
+        {(showAllTools ? STARTER_TOOLS : STARTER_TOOLS.slice(0, 6)).map((tool) => (
+          <div key={tool.id} style={styles.buyRow}>
+            <span style={styles.recipeName}><span aria-hidden="true">{tool.emoji}</span> {t("tool_" + tool.id)}</span>
+            <StoreLinks term={tool.search} stores={toolStores} />
+          </div>
+        ))}
+      </div>
+      <button onClick={() => setShowAllTools((v) => !v)} aria-expanded={showAllTools} style={{ ...styles.linkButton, fontWeight: 600, marginTop: 8 }}>
+        {showAllTools ? t("showFewerTools") : t("showMoreTools").replace("{n}", STARTER_TOOLS.length - 6)}
+      </button>
 
       {suggestions.length > 0 && (
         <>
@@ -10004,6 +10201,7 @@ const styles = {
   exitButton: { display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px 9px 12px", marginBottom: 10, borderRadius: 22, border: `1px solid ${COLORS.line}`, background: COLORS.card, color: COLORS.ink, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif", minHeight: 44 },
   allergyChip: { marginTop: 8, display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 600, color: COLORS.accentText, background: COLORS.accentSofter, border: `1px solid ${COLORS.accentSoft}`, borderRadius: 8, padding: "3px 9px" },
   allergyBanner: { marginTop: 10, fontSize: 13.5, fontWeight: 600, lineHeight: 1.45, color: COLORS.accentText, background: COLORS.accentSofter, border: `1px solid ${COLORS.accentSoft}`, borderRadius: 12, padding: "10px 12px" },
+  stepFieldLabel: { display: "flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", color: COLORS.inkMuted, marginBottom: 4 },
   cookToolButton: { display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 20, border: `1px solid ${COLORS.line}`, background: COLORS.sageSofter, color: COLORS.primaryText, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif" },
   timerBar: { position: "sticky", top: 0, zIndex: 3, display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", marginBottom: 12, borderRadius: 14, background: COLORS.sage, color: COLORS.primaryText, boxShadow: "0 2px 10px var(--ms-shadow)" },
   timerBarDone: { background: COLORS.accent, color: COLORS.onInk },
