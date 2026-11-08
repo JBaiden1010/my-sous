@@ -334,14 +334,7 @@ const TRANSLATIONS = {
   timerResume: { en: "Resume", es: "Seguir", fr: "Reprendre", pt: "Continuar", hi: "जारी रखें", zh: "继续", ar: "استئناف" },
   timerStop: { en: "Stop", es: "Detener", fr: "Arrêter", pt: "Parar", hi: "बंद करें", zh: "停止", ar: "إيقاف" },
   timerDone: { en: "Time's up! Check it", es: "¡Tiempo! Revísalo", fr: "C'est l'heure ! Vérifiez", pt: "Tempo esgotado! Confira", hi: "समय पूरा! देख लें", zh: "时间到！看看状态", ar: "انتهى الوقت! تحقّق" },
-  readAloud: { en: "Read step aloud", es: "Leer paso en voz alta", fr: "Lire l'étape à voix haute", pt: "Ler etapa em voz alta", hi: "स्टेप पढ़कर सुनाएं", zh: "朗读这一步", ar: "اقرأ الخطوة بصوت عالٍ" },
-  stopReading: { en: "Stop reading", es: "Dejar de leer", fr: "Arrêter la lecture", pt: "Parar leitura", hi: "पढ़ना बंद करें", zh: "停止朗读", ar: "أوقف القراءة" },
   screenOnNote: { en: "Your screen stays on while you cook.", es: "Tu pantalla se mantiene encendida mientras cocinas.", fr: "Votre écran reste allumé pendant que vous cuisinez.", pt: "Sua tela fica ligada enquanto você cozinha.", hi: "खाना बनाते समय आपकी स्क्रीन चालू रहेगी।", zh: "做饭时屏幕会保持常亮。", ar: "تبقى شاشتك مضاءة أثناء الطبخ." },
-  speakStep: { en: "Step {n} of {total}.", es: "Paso {n} de {total}.", fr: "Étape {n} sur {total}.", pt: "Etapa {n} de {total}.", hi: "{total} में से स्टेप {n}।", zh: "第 {n} 步，共 {total} 步。", ar: "الخطوة {n} من {total}." },
-  speakAmount: { en: "Time and amount:", es: "Tiempo y cantidad:", fr: "Temps et quantité :", pt: "Tempo e quantidade:", hi: "समय और मात्रा:", zh: "时间和用量：", ar: "الوقت والكمية:" },
-  speakLook: { en: "It should look like this:", es: "Debe verse así:", fr: "Voici à quoi cela doit ressembler :", pt: "Deve ficar assim:", hi: "यह ऐसा दिखना चाहिए:", zh: "应该是这个样子：", ar: "يجب أن يبدو هكذا:" },
-  speakAlso: { en: "Also check:", es: "Revisa también:", fr: "Vérifiez aussi :", pt: "Confira também:", hi: "यह भी जांचें:", zh: "另外检查：", ar: "تحقق أيضًا:" },
-  speakLast: { en: "That's the last step.", es: "Ese es el último paso.", fr: "C'est la dernière étape.", pt: "Essa é a última etapa.", hi: "यह आखिरी स्टेप है।", zh: "这是最后一步。", ar: "هذه هي الخطوة الأخيرة." },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -8352,36 +8345,6 @@ function useWakeLock(active) {
   return on;
 }
 
-// Turns kitchen shorthand into words that sound natural when spoken
-// ("~15 min" -> "about 15 minutes", "1 cup + 2 cups" -> "1 cup plus 2 cups").
-const SPEAK_WORDS = {
-  en: { about: "about", plus: "plus", to: "to", min: "minutes", sec: "seconds", hr: "hours", deg: "degrees" },
-  es: { about: "unos", plus: "más", to: "a", min: "minutos", sec: "segundos", hr: "horas", deg: "grados" },
-  fr: { about: "environ", plus: "plus", to: "à", min: "minutes", sec: "secondes", hr: "heures", deg: "degrés" },
-  pt: { about: "cerca de", plus: "mais", to: "a", min: "minutos", sec: "segundos", hr: "horas", deg: "graus" },
-  hi: { about: "लगभग", plus: "और", to: "से", min: "मिनट", sec: "सेकंड", hr: "घंटे", deg: "डिग्री" },
-  zh: { about: "大约", plus: "加", to: "到", min: "分钟", sec: "秒", hr: "小时", deg: "度" },
-  ar: { about: "حوالي", plus: "زائد", to: "إلى", min: "دقائق", sec: "ثوانٍ", hr: "ساعات", deg: "درجة" },
-};
-function speakable(text, language) {
-  const w = SPEAK_WORDS[language] || SPEAK_WORDS.en;
-  return String(text || "")
-    .replace(/~\s*/g, `${w.about} `)
-    .replace(/(\d)\s*[–-]\s*(\d)/g, `$1 ${w.to} $2`)
-    .replace(/\s\+\s/g, ` ${w.plus} `)
-    .replace(/°\s*([CF])\b/g, ` ${w.deg} $1`)
-    .replace(/(\d)\s*(?:mins?|minutes?)\b/gi, `$1 ${w.min}`)
-    .replace(/(\d)\s*(?:secs?|seconds?)\b/gi, `$1 ${w.sec}`)
-    .replace(/(\d)\s*(?:hrs?|hours?)\b/gi, `$1 ${w.hr}`)
-    .replace(/\s*—\s*/g, ", ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[.!?]*$/, ".");
-}
-
-const SPEECH_LANG = { en: "en-US", es: "es-ES", fr: "fr-FR", pt: "pt-BR", hi: "hi-IN", zh: "zh-CN", ar: "ar-SA" };
-const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function";
-
 function StepTimer({ seconds, label, timer, setTimer }) {
   const { t } = useContext(LanguageContext);
   if (!seconds) return null;
@@ -8430,18 +8393,15 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const steps = recipeSteps(recipe, language);
   const step = steps[stepIndex];
   const [timer, setTimer] = useState(null);
-  const [speaking, setSpeaking] = useState(false);
   const [showIngredients, setShowIngredients] = useState(true);
   const [gotIt, setGotIt] = useState({});
   const screenOn = useWakeLock(true);
-  useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);
-  useEffect(() => { if (canSpeak()) window.speechSynthesis.cancel(); setSpeaking(false); }, [stepIndex]);
   if (!step) {
     return (
       <div style={styles.screenPad}>
-        <button onClick={onBack} style={styles.backRow}>
-          <ArrowLeft className="ms-flip" size={16} color={COLORS.inkMuted} />
-          <span style={{ marginInlineStart: 6, color: COLORS.inkMuted, fontSize: 13 }}>{t("exitLabel")}</span>
+        <button onClick={onBack} style={styles.exitButton}>
+          <ArrowLeft className="ms-flip" size={20} color={COLORS.ink} />
+          <span>{t("exitLabel")}</span>
         </button>
         <h1 style={{ ...styles.h1, marginTop: 10 }}>{recipeName(recipe, language)}</h1>
         <p style={styles.subtext}>{t("noStepsYet")}</p>
@@ -8455,41 +8415,12 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const measureText = scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio);
   const timerSecs = stepTimerSeconds(recipe.steps[stepIndex]?.measure || step.measure);
 
-  // Reads the step as a few short sentences, with a natural pause between
-  // each part: the step number, what to do, the time/amount, what it should
-  // look like, and anything else to check.
-  function readStep() {
-    if (!canSpeak()) return;
-    const synth = window.speechSynthesis;
-    if (speaking) { synth.cancel(); setSpeaking(false); return; }
-    const also = secondarySignal(recipe, stepIndex, language);
-    const hasAmount = measureText && measureText !== "N/A";
-    const parts = [
-      t("speakStep").replace("{n}", stepIndex + 1).replace("{total}", steps.length),
-      speakable(step.instruction, language),
-      hasAmount ? `${t("speakAmount")} ${speakable(measureText, language)}` : null,
-      step.visual ? `${t("speakLook")} ${speakable(step.visual, language)}` : null,
-      also ? `${t("speakAlso")} ${speakable(also, language)}` : null,
-      isLast ? t("speakLast") : null,
-    ].filter(Boolean);
-    synth.cancel();
-    parts.forEach((text, i) => {
-      const u = new window.SpeechSynthesisUtterance(text);
-      u.lang = SPEECH_LANG[language] || "en-US";
-      u.rate = 0.95;
-      if (i === parts.length - 1) u.onend = () => setSpeaking(false);
-      u.onerror = () => setSpeaking(false);
-      synth.speak(u);
-    });
-    setSpeaking(true);
-  }
-
   return (
     <div style={styles.screenPad}>
       <TimerBar timer={timer} setTimer={setTimer} />
-      <button onClick={onBack} style={styles.backRow}>
-        <ArrowLeft className="ms-flip" size={16} color={COLORS.inkMuted} />
-        <span style={{ marginInlineStart: 6, color: COLORS.inkMuted, fontSize: 13 }}>{t("exitLabel")}</span>
+      <button onClick={onBack} style={styles.exitButton}>
+        <ArrowLeft className="ms-flip" size={20} color={COLORS.ink} />
+        <span>{t("exitLabel")}</span>
       </button>
 
       <RecipeImage recipe={recipe} height={130} />
@@ -8539,11 +8470,6 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
         <StepTimer seconds={timerSecs} label={`${recipe.id}:${stepIndex}`} timer={timer} setTimer={setTimer} />
-        {canSpeak() && (
-          <button onClick={readStep} aria-pressed={speaking} style={styles.cookToolButton}>
-            <span aria-hidden="true">{speaking ? "■" : "🔊"}</span> {t(speaking ? "stopReading" : "readAloud")}
-          </button>
-        )}
       </div>
 
       <div style={styles.milestoneCard}>
@@ -9878,6 +9804,7 @@ const styles = {
   tabBar: { display: "flex", borderTop: `1px solid ${COLORS.line}`, padding: "10px 6px 14px", background: COLORS.card, position: "relative", zIndex: 1 },
   tabButton: { flex: 1, background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", padding: "4px 0" },
   tabLabel: { fontSize: 10.5 },
+  exitButton: { display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px 9px 12px", marginBottom: 10, borderRadius: 22, border: `1px solid ${COLORS.line}`, background: COLORS.card, color: COLORS.ink, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif", minHeight: 44 },
   cookToolButton: { display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 20, border: `1px solid ${COLORS.line}`, background: COLORS.sageSofter, color: COLORS.primaryText, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif" },
   timerBar: { position: "sticky", top: 0, zIndex: 3, display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", marginBottom: 12, borderRadius: 14, background: COLORS.sage, color: COLORS.primaryText, boxShadow: "0 2px 10px var(--ms-shadow)" },
   timerBarDone: { background: COLORS.accent, color: COLORS.onInk },
