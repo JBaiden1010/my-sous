@@ -11,6 +11,7 @@
 import React, { useState } from "react";
 import { loadAppearance, saveAppearance, resolvedTheme } from "./appearance.js";
 import { LOGO_96, LOGO_256 } from "./brand.js";
+import { RECIPE_IMAGES } from "./recipe-images.js";
 
 export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
 // Publishable (anon) key: safe to ship in the page; row-level security in the
@@ -65,16 +66,19 @@ const LANG_LABELS = [["en", "English"], ["es", "Español"], ["fr", "Français"],
 const INTRO = [
   {
     emoji: "🥕",
+    logo: true,
     title: { en: "Cook with what you have", es: "Cocina con lo que tienes", fr: "Cuisinez avec ce que vous avez", pt: "Cozinhe com o que você tem", hi: "जो है उसी से पकाएं", zh: "用现有食材做饭", ar: "اطبخ بما لديك" },
     body: { en: "Tell My Sous what's in your kitchen and it shows meals you can make right now, plus the ones you're one or two items away from.", es: "Dile a My Sous qué hay en tu cocina y te mostrará comidas que puedes hacer ahora, y las que te faltan uno o dos ingredientes.", fr: "Dites à My Sous ce qu'il y a dans votre cuisine : il vous montre les plats possibles tout de suite, et ceux à un ou deux ingrédients près.", pt: "Diga ao My Sous o que há na sua cozinha e ele mostra as refeições que você pode fazer agora, e as que faltam um ou dois itens.", hi: "My Sous को बताएं कि आपकी रसोई में क्या है, और यह दिखाएगा कि आप अभी क्या बना सकते हैं, और किनके लिए बस एक-दो चीज़ें कम हैं।", zh: "告诉 My Sous 你厨房里有什么，它会显示你现在就能做的菜，以及只差一两样食材的菜。", ar: "أخبر My Sous بما في مطبخك وسيعرض لك الوجبات التي يمكنك تحضيرها الآن، وتلك التي ينقصها مكوّن أو اثنان." },
   },
   {
     emoji: "👨‍🍳",
+    meals: ["shakshuka", "chicken-stir-fry", "pancakes", "jollof-rice"],
     title: { en: "Step by step, no guessing", es: "Paso a paso, sin adivinar", fr: "Étape par étape, sans deviner", pt: "Passo a passo, sem adivinhar", hi: "कदम-दर-कदम, बिना अंदाज़े के", zh: "一步一步，不用猜", ar: "خطوة بخطوة، بلا تخمين" },
     body: { en: "Every step tells you how much, how long, and what it should look like when it's done. Change the servings and the amounts update.", es: "Cada paso te dice cuánto, cuánto tiempo y cómo debe verse cuando está listo. Cambia las porciones y las cantidades se ajustan.", fr: "Chaque étape indique combien, combien de temps, et à quoi cela doit ressembler une fois prêt. Changez les portions, les quantités s'adaptent.", pt: "Cada passo diz quanto, por quanto tempo e como deve ficar quando estiver pronto. Mude as porções e as quantidades se ajustam.", hi: "हर कदम बताता है कितना, कितनी देर, और तैयार होने पर कैसा दिखना चाहिए। सर्विंग बदलें तो मात्रा अपने आप बदल जाती है।", zh: "每一步都告诉你用量、时间，以及做好时应该是什么样子。修改份数，用量会自动调整。", ar: "كل خطوة تخبرك بالكمية والمدة وكيف يجب أن يبدو الطبق عند اكتماله. غيّر عدد الحصص وتتغير الكميات." },
   },
   {
     emoji: "💬",
+    meals: ["pad-thai", "bibimbap", "spanish-paella", "chicken-tikka-masala"],
     title: { en: "Learn from other cooks", es: "Aprende de otros cocineros", fr: "Apprenez des autres cuisiniers", pt: "Aprenda com outros cozinheiros", hi: "दूसरे रसोइयों से सीखें", zh: "向其他厨师学习", ar: "تعلّم من طهاة آخرين" },
     body: { en: "Share tips, rate recipes, suggest improvements and post short tutorials in the Community.", es: "Comparte consejos, califica recetas, sugiere mejoras y publica tutoriales cortos en la Comunidad.", fr: "Partagez des astuces, notez des recettes, proposez des améliorations et publiez de courts tutoriels dans la Communauté.", pt: "Compartilhe dicas, avalie receitas, sugira melhorias e publique tutoriais curtos na Comunidade.", hi: "कम्युनिटी में टिप्स साझा करें, रेसिपी रेट करें, सुधार सुझाएं और छोटे ट्यूटोरियल पोस्ट करें।", zh: "在社区分享技巧、给食谱评分、提出改进建议、发布短教程。", ar: "شارك النصائح وقيّم الوصفات واقترح تحسينات وانشر دروسًا قصيرة في المجتمع." },
   },
@@ -193,7 +197,7 @@ export function AuthScreen({ sb, onGuest }) {
   return (
     <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className="ms-root ms-desktop ms-auth"
       style={{ position: "relative", minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
-      <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split > div:first-child > div:first-child { font-size: 56px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
+      <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split .ms-auth-logo { width: 120px !important; height: 120px !important; border-radius: 28px !important; } .ms-auth-split .ms-auth-meals { max-width: 260px !important; gap: 8px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
       <div className="ms-auth-frame" style={{
         position: "relative", zIndex: 1,
         width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,
@@ -202,8 +206,8 @@ export function AuthScreen({ sb, onGuest }) {
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px 24px" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src={LOGO_96} alt="" width={32} height={32} style={{ borderRadius: 8, display: "block" }} />
-            <span style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</span>
+            <img src={LOGO_96} alt="" width={44} height={44} style={{ borderRadius: 11, display: "block" }} />
+            <span style={{ fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 700 }}>My Sous</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button onClick={toggleTheme} aria-label={dark ? "Light mode" : "Dark mode"} title={dark ? "Light mode" : "Dark mode"} style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.line}`, background: C.paper, color: C.muted, cursor: "pointer", fontSize: 15, lineHeight: 1 }}>{dark ? "☀" : "☾"}</button>
@@ -213,10 +217,14 @@ export function AuthScreen({ sb, onGuest }) {
         {desktop ? (
           <div style={{ flex: 1, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }} className="ms-auth-split">
             <div aria-hidden="true" style={{ background: C.sageSofter, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 18, padding: 32 }}>
-              {slide < INTRO.length ? (
-                <div style={{ fontSize: 120, lineHeight: 1 }}>{INTRO[slide].emoji}</div>
+              {slide < INTRO.length && INTRO[slide].meals ? (
+                <div className="ms-auth-meals" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, width: "100%", maxWidth: 340 }}>
+                  {INTRO[slide].meals.filter((id) => RECIPE_IMAGES[id]).map((id, i) => (
+                    <img key={id} src={RECIPE_IMAGES[id]} alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 18, display: "block", boxShadow: "0 8px 20px rgba(31,58,14,0.18)", transform: `rotate(${[-2, 1.5, 1.5, -2][i]}deg)` }} />
+                  ))}
+                </div>
               ) : (
-                <img src={LOGO_256} alt="" width={180} height={180} style={{ borderRadius: 40, display: "block", boxShadow: "0 12px 30px rgba(31,58,14,0.25)" }} />
+                <img className="ms-auth-logo" src={LOGO_256} alt="" width={180} height={180} style={{ borderRadius: 40, display: "block", boxShadow: "0 12px 30px rgba(31,58,14,0.25)" }} />
               )}
               <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: C.sageText, textAlign: "center", maxWidth: 320, lineHeight: 1.35 }}>My Sous</div>
             </div>
