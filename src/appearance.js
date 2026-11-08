@@ -1,9 +1,9 @@
 // Appearance and accessibility settings: light/dark mode, text size, a more
-// readable font, higher contrast, reduced motion and the photo background.
+// readable font, higher contrast, and reduced motion.
 // Settings live in this browser (localStorage "mysous:appearance") and are
 // applied as attributes on <html>, which the stylesheet below reads.
 
-export const APPEARANCE_DEFAULTS = { theme: "system", textSize: "default", readableFont: false, highContrast: false, reduceMotion: false, photoBackground: true };
+export const APPEARANCE_DEFAULTS = { theme: "system", textSize: "default", readableFont: false, highContrast: false, reduceMotion: false };
 const KEY = "mysous:appearance";
 
 export function loadAppearance() {
@@ -21,7 +21,6 @@ export function applyAppearance(a) {
   h.dataset.msFont = a.readableFont ? "readable" : "default";
   h.dataset.msContrast = a.highContrast ? "high" : "normal";
   h.dataset.msMotion = a.reduceMotion ? "reduce" : "normal";
-  h.dataset.msPhotos = a.photoBackground ? "on" : "off";
   h.style.colorScheme = h.dataset.msTheme;
 }
 
@@ -45,16 +44,16 @@ export const APPEARANCE_CSS = `
   --ms-paper: #F8F5EF; --ms-card: #FFFFFF; --ms-ink: #33352F; --ms-ink-muted: #6A6C63; --ms-line: #E4E0D6;
   --ms-primary: #71866A; --ms-primary-text: #4F6449; --ms-sage: #DCE5D5; --ms-sage-softer: #EBF0E6;
   --ms-accent: #C87955; --ms-accent-text: #9A5232; --ms-accent-soft: #F0DACE; --ms-accent-softer: #F8ECE5;
-  --ms-on-ink: #FFFFFF; --ms-photo-opacity: 0.11; --ms-shadow: rgba(51,53,47,0.10);
+  --ms-on-ink: #FFFFFF; --ms-shadow: rgba(51,53,47,0.10);
 }
 :root[data-ms-theme="dark"] {
   --ms-paper: #171915; --ms-card: #22251F; --ms-ink: #ECEAE3; --ms-ink-muted: #A9AB9F; --ms-line: #3A3E35;
   --ms-primary: #6B8163; --ms-primary-text: #B7CBAE; --ms-sage: #34402F; --ms-sage-softer: #2A3226;
   --ms-accent: #D88A66; --ms-accent-text: #EDB08F; --ms-accent-soft: #4D3427; --ms-accent-softer: #3A2A22;
-  --ms-on-ink: #171915; --ms-photo-opacity: 0.16; --ms-shadow: rgba(0,0,0,0.45);
+  --ms-on-ink: #171915; --ms-shadow: rgba(0,0,0,0.45);
 }
-:root[data-ms-contrast="high"] { --ms-ink: #1E1F1B; --ms-ink-muted: #3F413A; --ms-line: #8F8A7E; --ms-primary: #55684F; --ms-primary-text: #33432F; --ms-accent-text: #7A3D20; --ms-photo-opacity: 0.06; }
-:root[data-ms-theme="dark"][data-ms-contrast="high"] { --ms-ink: #FFFFFF; --ms-ink-muted: #D6D8CE; --ms-line: #7A8070; --ms-primary-text: #D3E6C9; --ms-accent-text: #FFC9AA; --ms-photo-opacity: 0.08; }
+:root[data-ms-contrast="high"] { --ms-ink: #1E1F1B; --ms-ink-muted: #3F413A; --ms-line: #8F8A7E; --ms-primary: #55684F; --ms-primary-text: #33432F; --ms-accent-text: #7A3D20; }
+:root[data-ms-theme="dark"][data-ms-contrast="high"] { --ms-ink: #FFFFFF; --ms-ink-muted: #D6D8CE; --ms-line: #7A8070; --ms-primary-text: #D3E6C9; --ms-accent-text: #FFC9AA; }
 html, body { background: var(--ms-paper); color: var(--ms-ink); }
 
 /* Text size: scales the content area and the tab bar */
@@ -75,13 +74,6 @@ html, body { background: var(--ms-paper); color: var(--ms-ink); }
 .ms-skip { position: absolute; left: 12px; top: -60px; z-index: 50; background: var(--ms-ink); color: var(--ms-on-ink); padding: 8px 14px; border-radius: 10px; font-size: 14px; text-decoration: none; }
 .ms-skip:focus { top: 12px; }
 
-/* Photo background */
-:root[data-ms-photos="off"] .ms-photos { display: none; }
-.ms-photos { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-.ms-photos-grid { position: absolute; inset: -160px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); grid-auto-rows: 150px; gap: 14px; transform: rotate(-6deg); opacity: var(--ms-photo-opacity); }
-.ms-photos-grid > div { background-size: cover; background-position: center; border-radius: 18px; }
-.ms-photos-outer { position: fixed; }
-.ms-photos-outer .ms-photos-grid { opacity: calc(var(--ms-photo-opacity) * 2.2); filter: saturate(1.1); }
 `;
 
 export function injectAppearanceCss() {

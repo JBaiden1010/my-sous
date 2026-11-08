@@ -9,7 +9,6 @@
 // Without the library (the claude.ai version, tests) none of this runs and
 // the app behaves exactly as before.
 import React, { useState } from "react";
-import { PhotoBackdrop } from "./photos.jsx";
 import { loadAppearance, saveAppearance, resolvedTheme } from "./appearance.js";
 
 export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
@@ -208,7 +207,6 @@ export function AuthScreen({ sb, onGuest }) {
     <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className={desktop ? "ms-root ms-desktop" : "ms-root ms-phone"}
       style={{ position: "relative", minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
       <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split > div:first-child > div:first-child { font-size: 64px !important; } }"}</style>
-      <PhotoBackdrop outer />
       <div style={{
         position: "relative", zIndex: 1,
         width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,

@@ -31,7 +31,7 @@ import {
 } from "./lucide-shim.js";
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
-import { PhotoBackdrop, pickRecipeIds } from "./photos.jsx";
+import { pickRecipeIds } from "./photos.jsx";
 import { build } from "./world/build.js";
 import { AFRICAN } from "./world/african.js";
 import { BRAZILIAN } from "./world/brazilian.js";
@@ -325,12 +325,18 @@ const TRANSLATIONS = {
   contrastSub: { en: "Darker text and stronger outlines.", es: "Texto más oscuro y bordes más marcados.", fr: "Texte plus foncé et contours plus nets.", pt: "Texto mais escuro e contornos mais fortes.", hi: "गहरा टेक्स्ट और साफ़ किनारे।", zh: "文字更深、边框更明显。", ar: "نص أغمق وحدود أوضح." },
   reduceMotionLabel: { en: "Reduce motion", es: "Reducir movimiento", fr: "Réduire les animations", pt: "Reduzir movimento", hi: "कम एनिमेशन", zh: "减少动态效果", ar: "تقليل الحركة" },
   reduceMotionSub: { en: "Turns off animations and sliding effects.", es: "Desactiva animaciones y efectos de deslizamiento.", fr: "Désactive les animations et les effets de glissement.", pt: "Desativa animações e efeitos de deslizar.", hi: "एनिमेशन और स्लाइड इफ़ेक्ट बंद करता है।", zh: "关闭动画和滑动效果。", ar: "يوقف الرسوم المتحركة وتأثيرات الانزلاق." },
-  photoBgLabel: { en: "Photo background", es: "Fondo con fotos", fr: "Fond en photos", pt: "Fundo com fotos", hi: "फ़ोटो बैकग्राउंड", zh: "照片背景", ar: "خلفية بالصور" },
-  photoBgSub: { en: "Faded recipe photos behind the app. Turn off for a plain background.", es: "Fotos de recetas suaves detrás de la app. Desactívalo para un fondo liso.", fr: "Photos de recettes estompées derrière l'app. Désactivez pour un fond uni.", pt: "Fotos de receitas suaves atrás do app. Desative para um fundo liso.", hi: "ऐप के पीछे हल्की रेसिपी फ़ोटो। सादा बैकग्राउंड के लिए बंद करें।", zh: "应用背后淡淡的菜品照片。关闭后为纯色背景。", ar: "صور وصفات باهتة خلف التطبيق. أوقفها لخلفية سادة." },
   getInspired: { en: "Get inspired", es: "Inspírate", fr: "Laissez-vous inspirer", pt: "Inspire-se", hi: "प्रेरणा लें", zh: "找找灵感", ar: "استلهم" },
   getInspiredSub: { en: "A few recipes to try next.", es: "Algunas recetas para probar.", fr: "Quelques recettes à essayer.", pt: "Algumas receitas para experimentar.", hi: "आगे आज़माने के लिए कुछ रेसिपी।", zh: "接下来可以试试这些菜。", ar: "بعض الوصفات لتجربتها." },
   shuffleLabel: { en: "Shuffle", es: "Mezclar", fr: "Mélanger", pt: "Embaralhar", hi: "बदलें", zh: "换一批", ar: "تبديل" },
   skipToContent: { en: "Skip to content", es: "Ir al contenido", fr: "Aller au contenu", pt: "Pular para o conteúdo", hi: "सामग्री पर जाएं", zh: "跳到内容", ar: "انتقل إلى المحتوى" },
+  timerStart: { en: "Start {t} timer", es: "Iniciar temporizador de {t}", fr: "Lancer une minuterie de {t}", pt: "Iniciar timer de {t}", hi: "{t} का टाइमर शुरू करें", zh: "开始 {t} 计时", ar: "ابدأ مؤقت {t}" },
+  timerPause: { en: "Pause", es: "Pausa", fr: "Pause", pt: "Pausar", hi: "रोकें", zh: "暂停", ar: "إيقاف مؤقت" },
+  timerResume: { en: "Resume", es: "Seguir", fr: "Reprendre", pt: "Continuar", hi: "जारी रखें", zh: "继续", ar: "استئناف" },
+  timerStop: { en: "Stop", es: "Detener", fr: "Arrêter", pt: "Parar", hi: "बंद करें", zh: "停止", ar: "إيقاف" },
+  timerDone: { en: "Time's up! Check it", es: "¡Tiempo! Revísalo", fr: "C'est l'heure ! Vérifiez", pt: "Tempo esgotado! Confira", hi: "समय पूरा! देख लें", zh: "时间到！看看状态", ar: "انتهى الوقت! تحقّق" },
+  readAloud: { en: "Read step aloud", es: "Leer paso en voz alta", fr: "Lire l'étape à voix haute", pt: "Ler etapa em voz alta", hi: "स्टेप पढ़कर सुनाएं", zh: "朗读这一步", ar: "اقرأ الخطوة بصوت عالٍ" },
+  stopReading: { en: "Stop reading", es: "Dejar de leer", fr: "Arrêter la lecture", pt: "Parar leitura", hi: "पढ़ना बंद करें", zh: "停止朗读", ar: "أوقف القراءة" },
+  screenOnNote: { en: "Your screen stays on while you cook.", es: "Tu pantalla se mantiene encendida mientras cocinas.", fr: "Votre écran reste allumé pendant que vous cuisinez.", pt: "Sua tela fica ligada enquanto você cozinha.", hi: "खाना बनाते समय आपकी स्क्रीन चालू रहेगी।", zh: "做饭时屏幕会保持常亮。", ar: "تبقى شاشتك مضاءة أثناء الطبخ." },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -7335,7 +7341,6 @@ export default function App() {
       <LanguageContext.Provider value={{ language, t }}>
       <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
         <style>{FONT_IMPORT}</style>
-        <PhotoBackdrop outer />
         <div style={frameStyle}>
           <div className="ms-header" style={styles.statusRow}>
             <span style={styles.brand}>My&nbsp;Sous</span>
@@ -7355,7 +7360,6 @@ export default function App() {
       <LanguageContext.Provider value={{ language, t }}>
       <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
         <style>{FONT_IMPORT}</style>
-        <PhotoBackdrop outer />
         <div style={frameStyle}>
           <div className="ms-header" style={styles.statusRow}>
             <span style={styles.brand}>My&nbsp;Sous</span>
@@ -7382,9 +7386,7 @@ export default function App() {
     <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <style>{FONT_IMPORT}</style>
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
-      <PhotoBackdrop outer />
       <div style={frameStyle}>
-        <PhotoBackdrop />
         <div className="ms-header" style={styles.statusRow}>
           <span style={styles.brand}>My&nbsp;Sous</span>
           <span style={styles.brandSub}>prototype</span>
@@ -7738,7 +7740,6 @@ function AppearanceCard({ appearance: a, onChange }) {
         <SwitchRow label={t("readableFontLabel")} sub={t("readableFontSub")} checked={a.readableFont} onChange={(v) => onChange({ readableFont: v })} />
         <SwitchRow label={t("contrastLabel")} sub={t("contrastSub")} checked={a.highContrast} onChange={(v) => onChange({ highContrast: v })} />
         <SwitchRow label={t("reduceMotionLabel")} sub={t("reduceMotionSub")} checked={a.reduceMotion} onChange={(v) => onChange({ reduceMotion: v })} />
-        <SwitchRow label={t("photoBgLabel")} sub={t("photoBgSub")} checked={a.photoBackground} onChange={(v) => onChange({ photoBackground: v })} />
       </div>
     </>
   );
@@ -8296,10 +8297,113 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
   );
 }
 
+
+// Minutes or seconds mentioned in a step's English amount ("~15 min", "10–12 min",
+// "45 sec, stir, then 30 sec more", "1 hr"). The first (shortest) time is used,
+// so the cook checks the visual cue before going longer.
+function stepTimerSeconds(measure) {
+  const m = String(measure || "").match(/(\d+(?:\.\d+)?)\s*(?:[–-]\s*\d+(?:\.\d+)?\s*)?(sec|secs|second|seconds|min|mins|minute|minutes|hr|hrs|hour|hours)\b/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const unit = m[2].toLowerCase();
+  const secs = unit.startsWith("s") ? n : unit.startsWith("h") ? n * 3600 : n * 60;
+  return secs >= 10 && secs <= 6 * 3600 ? Math.round(secs) : 0;
+}
+const fmtClock = (secs) => {
+  const s = Math.max(0, Math.ceil(secs));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
+  return h ? `${h}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}` : `${m}:${String(r).padStart(2, "0")}`;
+};
+
+function beep() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    const ctx = new Ctx();
+    [0, 0.35, 0.7].forEach((at) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + at);
+      g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + at + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + at + 0.25);
+      o.start(ctx.currentTime + at); o.stop(ctx.currentTime + at + 0.3);
+    });
+    setTimeout(() => ctx.close(), 1500);
+  } catch { /* no audio */ }
+  try { navigator.vibrate && navigator.vibrate([200, 120, 200]); } catch { /* no vibration */ }
+}
+
+// Keeps the screen from dimming while a recipe is open (where supported).
+function useWakeLock(active) {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (!active || typeof navigator === "undefined" || !navigator.wakeLock) return;
+    let lock = null; let cancelled = false;
+    const get = async () => { try { lock = await navigator.wakeLock.request("screen"); if (!cancelled) setOn(true); lock.addEventListener("release", () => !cancelled && setOn(false)); } catch { setOn(false); } };
+    get();
+    const onVis = () => { if (document.visibilityState === "visible") get(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { cancelled = true; document.removeEventListener("visibilitychange", onVis); if (lock) lock.release().catch(() => {}); };
+  }, [active]);
+  return on;
+}
+
+const SPEECH_LANG = { en: "en-US", es: "es-ES", fr: "fr-FR", pt: "pt-BR", hi: "hi-IN", zh: "zh-CN", ar: "ar-SA" };
+const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function";
+
+function StepTimer({ seconds, label, timer, setTimer }) {
+  const { t } = useContext(LanguageContext);
+  if (!seconds) return null;
+  const mine = timer && timer.label === label;
+  const mins = seconds >= 60 ? `${Math.round(seconds / 60)} min` : `${seconds} s`;
+  if (!mine) {
+    return (
+      <button onClick={() => setTimer({ label, total: seconds, endsAt: Date.now() + seconds * 1000, paused: null, done: false })} style={styles.cookToolButton}>
+        <Clock size={15} color={COLORS.primaryText} /> {t("timerStart").replace("{t}", mins)}
+      </button>
+    );
+  }
+  return null;
+}
+
+function TimerBar({ timer, setTimer }) {
+  const { t } = useContext(LanguageContext);
+  const [, tick] = useState(0);
+  useEffect(() => {
+    if (!timer || timer.paused != null || timer.done) return;
+    const id = setInterval(() => {
+      tick((n) => n + 1);
+      if (Date.now() >= timer.endsAt) { beep(); setTimer((tm) => (tm ? { ...tm, done: true } : tm)); }
+    }, 250);
+    return () => clearInterval(id);
+  }, [timer, setTimer]);
+  if (!timer) return null;
+  const left = timer.done ? 0 : timer.paused != null ? timer.paused : (timer.endsAt - Date.now()) / 1000;
+  return (
+    <div role="timer" aria-live={timer.done ? "assertive" : "off"} style={{ ...styles.timerBar, ...(timer.done ? styles.timerBarDone : {}) }}>
+      <Clock size={16} color={timer.done ? COLORS.onInk : COLORS.primaryText} />
+      <span style={{ fontWeight: 700, fontVariantNumeric: "tabular-nums", fontSize: 18 }}>{timer.done ? t("timerDone") : fmtClock(left)}</span>
+      <span style={{ flex: 1 }} />
+      {!timer.done && (timer.paused != null ? (
+        <button onClick={() => setTimer({ ...timer, endsAt: Date.now() + timer.paused * 1000, paused: null })} style={styles.timerBtn}>{t("timerResume")}</button>
+      ) : (
+        <button onClick={() => setTimer({ ...timer, paused: Math.max(0, (timer.endsAt - Date.now()) / 1000) })} style={styles.timerBtn}>{t("timerPause")}</button>
+      ))}
+      <button onClick={() => setTimer(null)} style={styles.timerBtn}>{timer.done ? t("dismissLabel") : t("timerStop")}</button>
+    </div>
+  );
+}
+
 function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings, onBack }) {
   const { t, language } = useContext(LanguageContext);
   const steps = recipeSteps(recipe, language);
   const step = steps[stepIndex];
+  const [timer, setTimer] = useState(null);
+  const [speaking, setSpeaking] = useState(false);
+  const [showIngredients, setShowIngredients] = useState(false);
+  const [gotIt, setGotIt] = useState({});
+  const screenOn = useWakeLock(true);
+  useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);
+  useEffect(() => { if (canSpeak()) window.speechSynthesis.cancel(); setSpeaking(false); }, [stepIndex]);
   if (!step) {
     return (
       <div style={styles.screenPad}>
@@ -8316,8 +8420,22 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const isFirst = stepIndex === 0;
   const ratio = servings / 2;
   const scale = (v) => Math.round(v * ratio);
+  const measureText = scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio);
+  const timerSecs = stepTimerSeconds(recipe.steps[stepIndex]?.measure || step.measure);
+
+  function readStep() {
+    if (!canSpeak()) return;
+    const synth = window.speechSynthesis;
+    if (speaking) { synth.cancel(); setSpeaking(false); return; }
+    const u = new window.SpeechSynthesisUtterance([step.instruction, measureText, step.visual].filter(Boolean).join(". "));
+    u.lang = SPEECH_LANG[language] || "en-US";
+    u.onend = u.onerror = () => setSpeaking(false);
+    synth.cancel(); synth.speak(u); setSpeaking(true);
+  }
+
   return (
     <div style={styles.screenPad}>
+      <TimerBar timer={timer} setTimer={setTimer} />
       <button onClick={onBack} style={styles.backRow}>
         <ArrowLeft className="ms-flip" size={16} color={COLORS.inkMuted} />
         <span style={{ marginInlineStart: 6, color: COLORS.inkMuted, fontSize: 13 }}>{t("exitLabel")}</span>
@@ -8350,14 +8468,39 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
       <div style={styles.progressTrack}><div style={{ ...styles.progressFill, width: `${((stepIndex + 1) / steps.length) * 100}%` }} /></div>
       <div style={styles.stepCounter}>{t("stepOfLabel")} {stepIndex + 1} / {steps.length}</div>
 
+      <button onClick={() => setShowIngredients((v) => !v)} aria-expanded={showIngredients} style={{ ...styles.linkButton, fontWeight: 600, marginTop: 10 }}>
+        {showIngredients ? "▾" : "▸"} {t("ingredientsSectionLabel")} ({recipe.ingredients.length})
+      </button>
+      {showIngredients && (
+        <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "grid", gap: 6 }}>
+          {recipe.ingredients.map((ing) => (
+            <li key={ing}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, cursor: "pointer", color: gotIt[ing] ? COLORS.inkMuted : COLORS.ink, textDecoration: gotIt[ing] ? "line-through" : "none" }}>
+                <input type="checkbox" checked={!!gotIt[ing]} onChange={() => setGotIt((g) => ({ ...g, [ing]: !g[ing] }))} style={{ width: 18, height: 18, accentColor: "var(--ms-primary)" }} />
+                {ingredientLabel(ing, language)}
+              </label>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <div style={styles.stepInstruction}>{step.instruction}</div>
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
+        <StepTimer seconds={timerSecs} label={`${recipe.id}:${stepIndex}`} timer={timer} setTimer={setTimer} />
+        {canSpeak() && (
+          <button onClick={readStep} aria-pressed={speaking} style={styles.cookToolButton}>
+            <span aria-hidden="true">{speaking ? "■" : "🔊"}</span> {t(speaking ? "stopReading" : "readAloud")}
+          </button>
+        )}
+      </div>
 
       <div style={styles.milestoneCard}>
         <div style={styles.milestoneRow}>
           <Clock size={16} color={COLORS.accent} />
           <div style={{ marginInlineStart: 10 }}>
             <div style={styles.milestoneLabel}>{t("timeMeasureLabel")}</div>
-            <div style={styles.milestoneValue}>{scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio)}</div>
+            <div style={styles.milestoneValue}>{measureText}</div>
           </div>
         </div>
         <div style={styles.milestoneDivider} />
@@ -8388,6 +8531,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
         )}
         <button onClick={onNext} style={{ ...styles.primaryButton, marginTop: 0, flex: 1 }}>{isLast ? t("finishCookingLabel") : t("nextStepLabel")}</button>
       </div>
+      {screenOn && <p style={{ ...styles.basicsHint, textAlign: "center", marginTop: 12 }}>☀ {t("screenOnNote")}</p>}
     </div>
   );
 }
@@ -9683,6 +9827,10 @@ const styles = {
   tabBar: { display: "flex", borderTop: `1px solid ${COLORS.line}`, padding: "10px 6px 14px", background: COLORS.card, position: "relative", zIndex: 1 },
   tabButton: { flex: 1, background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", padding: "4px 0" },
   tabLabel: { fontSize: 10.5 },
+  cookToolButton: { display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 20, border: `1px solid ${COLORS.line}`, background: COLORS.sageSofter, color: COLORS.primaryText, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif" },
+  timerBar: { position: "sticky", top: 0, zIndex: 3, display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", marginBottom: 12, borderRadius: 14, background: COLORS.sage, color: COLORS.primaryText, boxShadow: "0 2px 10px var(--ms-shadow)" },
+  timerBarDone: { background: COLORS.accent, color: COLORS.onInk },
+  timerBtn: { border: "none", background: "rgba(255,255,255,0.55)", color: "inherit", borderRadius: 16, padding: "6px 11px", fontSize: 12.5, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif" },
   toast: { position: "absolute", bottom: 90, left: "50%", transform: "translateX(-50%)", background: COLORS.ink, color: COLORS.onInk, padding: "10px 16px", borderRadius: 10, fontSize: 12.5, whiteSpace: "nowrap", boxShadow: "0 8px 20px rgba(0,0,0,0.2)" },
   homeSnapshotRow: { display: "flex", gap: 8, marginTop: 16 },
   homeSnapshotCard: { flex: 1, background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 12, padding: "10px 4px", textAlign: "center", cursor: "pointer", fontFamily: "'Inter', sans-serif" },
