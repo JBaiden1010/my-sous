@@ -1,3 +1,4 @@
+/*! My Sous © 2026 Jeremy Baiden. All rights reserved. Unauthorized copying, modification or distribution of this code, design, logo or content is prohibited. */
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";

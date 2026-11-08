@@ -2,6 +2,8 @@
   "name": "my-sous",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
+  "author": "Jeremy Baiden",
   "description": "My Sous: an AI cooking companion for students and beginners",
   "scripts": {
     "dev": "esbuild src/main.jsx --bundle --format=iife --jsx=automatic --loader:.js=jsx --define:process.env.NODE_ENV=\\\"development\\\" --outfile=www/app.js --servedir=www",

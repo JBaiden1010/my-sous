@@ -33,7 +33,7 @@ import {
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
-import { LOGO_96, LOGO_256 } from "./brand.js";
+import { LOGO_96, LOGO_256, COPYRIGHT } from "./brand.js";
 import { convertUnits } from "./units.js";
 import { ALLERGENS, allergensFor } from "./allergens.js";
 
@@ -8245,6 +8245,7 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
         </div>
         <button onClick={onFeedback} style={{ ...styles.resetButton, marginTop: 0 }}><MessageSquare size={14} color={COLORS.primaryText} style={{ marginInlineEnd: 6 }} />{tr("sendFeedback")}</button>
       </div>
+      <p dir="ltr" style={{ ...styles.recipeMeta, textAlign: "center", margin: "28px 0 4px" }}>{COPYRIGHT}</p>
     </div>
   );
 }

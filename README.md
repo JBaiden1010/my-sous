@@ -42,3 +42,7 @@ www/index.html       page used by `npm run dev` / `npm run build`
 docs/index.html      single-file build for GitHub Pages
 ```
 
+
+## Copyright
+
+© 2026 Jeremy Baiden. All rights reserved. My Sous (its name, logo, design, recipes, content and code) may not be copied, reused or redistributed without written permission. See [LICENSE](LICENSE).

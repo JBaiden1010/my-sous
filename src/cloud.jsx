@@ -8,10 +8,13 @@
 //
 // Without the library (the claude.ai version, tests) none of this runs and
 // the app behaves exactly as before.
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { loadAppearance, saveAppearance, resolvedTheme } from "./appearance.js";
-import { LOGO_96, LOGO_256 } from "./brand.js";
+import { LOGO_96, LOGO_256, COPYRIGHT } from "./brand.js";
+import { pickRecipeIds } from "./photos.jsx";
 import { RECIPE_IMAGES } from "./recipe-images.js";
+
+const pickMeals = () => pickRecipeIds(4).map((id) => ({ id, src: RECIPE_IMAGES[id] }));
 
 export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
 // Publishable (anon) key: safe to ship in the page; row-level security in the
@@ -72,13 +75,13 @@ const INTRO = [
   },
   {
     emoji: "👨‍🍳",
-    meals: ["shakshuka", "chicken-stir-fry", "pancakes", "jollof-rice"],
+    meals: true,
     title: { en: "Step by step, no guessing", es: "Paso a paso, sin adivinar", fr: "Étape par étape, sans deviner", pt: "Passo a passo, sem adivinhar", hi: "कदम-दर-कदम, बिना अंदाज़े के", zh: "一步一步，不用猜", ar: "خطوة بخطوة، بلا تخمين" },
     body: { en: "Every step tells you how much, how long, and what it should look like when it's done. Change the servings and the amounts update.", es: "Cada paso te dice cuánto, cuánto tiempo y cómo debe verse cuando está listo. Cambia las porciones y las cantidades se ajustan.", fr: "Chaque étape indique combien, combien de temps, et à quoi cela doit ressembler une fois prêt. Changez les portions, les quantités s'adaptent.", pt: "Cada passo diz quanto, por quanto tempo e como deve ficar quando estiver pronto. Mude as porções e as quantidades se ajustam.", hi: "हर कदम बताता है कितना, कितनी देर, और तैयार होने पर कैसा दिखना चाहिए। सर्विंग बदलें तो मात्रा अपने आप बदल जाती है।", zh: "每一步都告诉你用量、时间，以及做好时应该是什么样子。修改份数，用量会自动调整。", ar: "كل خطوة تخبرك بالكمية والمدة وكيف يجب أن يبدو الطبق عند اكتماله. غيّر عدد الحصص وتتغير الكميات." },
   },
   {
     emoji: "💬",
-    meals: ["pad-thai", "bibimbap", "spanish-paella", "chicken-tikka-masala"],
+    meals: true,
     title: { en: "Learn from other cooks", es: "Aprende de otros cocineros", fr: "Apprenez des autres cuisiniers", pt: "Aprenda com outros cozinheiros", hi: "दूसरे रसोइयों से सीखें", zh: "向其他厨师学习", ar: "تعلّم من طهاة آخرين" },
     body: { en: "Share tips, rate recipes, suggest improvements and post short tutorials in the Community.", es: "Comparte consejos, califica recetas, sugiere mejoras y publica tutoriales cortos en la Comunidad.", fr: "Partagez des astuces, notez des recettes, proposez des améliorations et publiez de courts tutoriels dans la Communauté.", pt: "Compartilhe dicas, avalie receitas, sugira melhorias e publique tutoriais curtos na Comunidade.", hi: "कम्युनिटी में टिप्स साझा करें, रेसिपी रेट करें, सुधार सुझाएं और छोटे ट्यूटोरियल पोस्ट करें।", zh: "在社区分享技巧、给食谱评分、提出改进建议、发布短教程。", ar: "شارك النصائح وقيّم الوصفات واقترح تحسينات وانشر دروسًا قصيرة في المجتمع." },
   },
@@ -115,6 +118,10 @@ export function AuthScreen({ sb, onGuest }) {
   const t = (k) => { const e = AUTH_TR[k] || VIEW_TR[k] || INTRO_UI[k]; return e[lang] || e.en; };
   // First visit: a short tour of the app, then the "Save your kitchen" choice.
   const [slide, setSlide] = useState(() => (lsGet("mysous:introSeen") === "1" ? INTRO.length : 0));
+  // A fresh set of four meal photos every time the intro page changes.
+  const [meals, setMeals] = useState(() => pickMeals());
+  const firstSlide = useRef(true);
+  useEffect(() => { if (firstSlide.current) { firstSlide.current = false; return; } setMeals(pickMeals()); }, [slide]);
   const finishIntro = () => { lsSet("mysous:introSeen", "1"); setSlide(INTRO.length); };
   const pickLang = (l) => { setLang(l); lsSet("mysous:lang", l); };
   const desktop = true; // one responsive layout
@@ -191,13 +198,14 @@ export function AuthScreen({ sb, onGuest }) {
       <button onClick={onGuest} style={{ ...button, background: C.primary, color: "#fff", border: "none" }}>{t("guest")}</button>
       <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "8px 0 0", lineHeight: 1.45 }}>{t("guestNote")}</p>
       <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "18px 0 0", lineHeight: 1.45, borderTop: `1px solid ${C.line}`, paddingTop: 12 }}>🔒 {t("privacy")}</p>
+      <p dir="ltr" style={{ color: C.muted, fontSize: 11.5, textAlign: "center", margin: "12px 0 0" }}>{COPYRIGHT}</p>
     </div>
   );
 
   return (
     <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className="ms-root ms-desktop ms-auth"
       style={{ position: "relative", minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
-      <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split .ms-auth-logo { width: 120px !important; height: 120px !important; border-radius: 28px !important; } .ms-auth-split .ms-auth-meals { max-width: 260px !important; gap: 8px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
+      <style>{"@keyframes msMealIn { from { opacity: 0; transform: scale(0.94); } } .ms-meal-in { animation: msMealIn .35s ease-out both; } @media (prefers-reduced-motion: reduce) { .ms-meal-in { animation: none; } } html[data-ms-motion=\"reduce\"] .ms-meal-in { animation: none; } @media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split .ms-auth-logo { width: 120px !important; height: 120px !important; border-radius: 28px !important; } .ms-auth-split .ms-auth-meals { max-width: 260px !important; gap: 8px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
       <div className="ms-auth-frame" style={{
         position: "relative", zIndex: 1,
         width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,
@@ -219,8 +227,8 @@ export function AuthScreen({ sb, onGuest }) {
             <div aria-hidden="true" style={{ background: C.sageSofter, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 18, padding: 32 }}>
               {slide < INTRO.length && INTRO[slide].meals ? (
                 <div className="ms-auth-meals" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, width: "100%", maxWidth: 340 }}>
-                  {INTRO[slide].meals.filter((id) => RECIPE_IMAGES[id]).map((id, i) => (
-                    <img key={id} src={RECIPE_IMAGES[id]} alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 18, display: "block", boxShadow: "0 8px 20px rgba(31,58,14,0.18)", transform: `rotate(${[-2, 1.5, 1.5, -2][i]}deg)` }} />
+                  {meals.map((m, i) => (
+                    <img key={m.id} src={m.src} className="ms-meal-in" alt="" style={{ width: "100%", aspectRatio: "1 / 1", objectFit: "cover", borderRadius: 18, display: "block", boxShadow: "0 8px 20px rgba(31,58,14,0.18)", transform: `rotate(${[-2, 1.5, 1.5, -2][i]}deg)` }} />
                   ))}
                 </div>
               ) : (
