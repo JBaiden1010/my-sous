@@ -76,6 +76,12 @@ const FONT_IMPORT = `[dir="rtl"] .ms-flip { transform: scaleX(-1); }
 .ms-desktop .ms-more-grid > button:hover { border-color: var(--ms-primary) !important; box-shadow: 0 2px 10px rgba(51,53,47,0.06); }
 @media (max-width: 700px) { .ms-desktop .ms-screen > div { padding-left: 16px; padding-right: 16px; } }
 .ms-desktop .ms-header { flex-wrap: wrap; row-gap: 8px; }
+@media (max-width: 640px) {
+  .ms-root.ms-desktop { padding: 0 !important; }
+  .ms-root.ms-desktop > .ms-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; height: 100vh !important; height: 100dvh !important; min-height: 0 !important; }
+  .ms-desktop .ms-header { padding: 14px 16px 10px !important; }
+  .ms-desktop .ms-tabbar { padding: 8px 6px max(12px, env(safe-area-inset-bottom)) !important; }
+}
 @media (max-width: 820px) { .ms-desktop .ms-nav { order: 3; width: 100%; overflow-x: auto; margin-inline-end: 0 !important; } }
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap');
 @keyframes sousTypingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-4px); opacity: 1; } }`;
@@ -263,7 +269,7 @@ const TRANSLATIONS = {
 
   cookTitle: { en: "Cook", es: "Cocinar", fr: "Cuisiner", pt: "Cozinhar", hi: "पकाएं", zh: "烹饪", ar: "طبخ", ru: "Готовить", ta: "சமை" },
   byIngredient: { en: "By ingredient", es: "Por ingrediente", fr: "Par ingrédient", pt: "Por ingrediente", hi: "सामग्री से", zh: "按食材", ar: "حسب المكوّن" },
-  ingredientSearchSubtitle: { en: "Type one ingredient to see every recipe that uses it.", es: "Escribe un ingrediente para ver todas las recetas que lo usan.", fr: "Tapez un ingrédient pour voir toutes les recettes qui l'utilisent.", pt: "Digite um ingrediente para ver todas as receitas que o usam.", hi: "एक सामग्री लिखें और वे सभी रेसिपी देखें जिनमें यह इस्तेमाल होती है।", zh: "输入一种食材，查看所有用到它的菜谱。", ar: "اكتب مكوّنًا واحدًا لترى كل الوصفات التي تستخدمه." },
+  ingredientSearchSubtitle: { en: "Type one or more ingredients to see recipes that use them.", es: "Escribe uno o varios ingredientes para ver recetas que los usan.", fr: "Saisissez un ou plusieurs ingrédients pour voir les recettes qui les utilisent.", pt: "Digite um ou mais ingredientes para ver receitas que os usam.", hi: "एक या ज़्यादा सामग्री लिखें और उनसे बनने वाली रेसिपी देखें।", zh: "输入一种或多种食材，查看用到它们的食谱。", ar: "اكتب مكونًا أو أكثر لترى الوصفات التي تستخدمها." },
   ingredientSearchPlaceholder: { en: "like banana, chicken, rice", es: "p. ej. plátano, pollo, arroz", fr: "ex. banane, poulet, riz", pt: "ex. banana, frango, arroz", hi: "जैसे केला, चिकन, चावल", zh: "例如：香蕉、鸡肉、米饭", ar: "مثل: موز، دجاج، أرز" },
   recipesWithLabel: { en: "Recipes with", es: "Recetas con", fr: "Recettes avec", pt: "Receitas com", hi: "इसके साथ रेसिपी", zh: "包含该食材的菜谱", ar: "وصفات تحتوي على" },
   noIngredientMatch: { en: "No recipes use that ingredient yet. Try a simpler word, like \"berry\" instead of \"blueberries\".", es: "Ninguna receta usa ese ingrediente todavía. Prueba una palabra más simple.", fr: "Aucune recette n'utilise encore cet ingrédient. Essayez un mot plus simple.", pt: "Nenhuma receita usa esse ingrediente ainda. Tente uma palavra mais simples.", hi: "अभी कोई रेसिपी इस सामग्री का उपयोग नहीं करती। कोई सरल शब्द आज़माएं।", zh: "还没有菜谱使用这种食材。试试更简单的词。", ar: "لا توجد وصفات تستخدم هذا المكوّن بعد. جرّب كلمة أبسط." },
@@ -372,6 +378,18 @@ const TRANSLATIONS = {
   cookTextLabel: { en: "Large cooking text", es: "Texto grande al cocinar", fr: "Grand texte en cuisinant", pt: "Texto grande ao cozinhar", hi: "खाना बनाते समय बड़ा टेक्स्ट", zh: "做饭时大字显示", ar: "نص كبير أثناء الطبخ" },
   cookTextSub: { en: "Bigger step text on the cooking screen, easy to read from across the counter.", es: "Pasos más grandes en la pantalla de cocina, fáciles de leer desde lejos.", fr: "Étapes en plus grand sur l'écran de cuisine, lisibles de loin.", pt: "Etapas maiores na tela de cozinhar, fáceis de ler de longe.", hi: "कुकिंग स्क्रीन पर बड़े स्टेप, दूर से भी पढ़ने में आसान।", zh: "做饭页面的步骤字更大，隔着台面也能看清。", ar: "خطوات بخط أكبر في شاشة الطبخ، سهلة القراءة من بعيد." },
   captionsTip: { en: "Tip: add captions to your video, or write the key steps in your post, so everyone can follow, including people who are deaf or hard of hearing.", es: "Consejo: añade subtítulos a tu video o escribe los pasos clave en tu publicación para que todos puedan seguirlo, incluidas las personas sordas o con pérdida auditiva.", fr: "Astuce : ajoutez des sous-titres à votre vidéo ou écrivez les étapes clés dans votre publication, pour que tout le monde puisse suivre, y compris les personnes sourdes ou malentendantes.", pt: "Dica: coloque legendas no vídeo ou escreva os passos principais na publicação, para que todos possam acompanhar, inclusive pessoas surdas ou com deficiência auditiva.", hi: "सुझाव: अपने वीडियो में कैप्शन जोड़ें या पोस्ट में मुख्य स्टेप लिखें, ताकि बहरे या कम सुनने वाले लोग भी समझ सकें।", zh: "小建议：给视频加上字幕，或在帖子里写下关键步骤，方便所有人（包括听障人士）跟着做。", ar: "نصيحة: أضف ترجمة مكتوبة لفيديوك أو اكتب الخطوات الأساسية في منشورك، حتى يتمكن الجميع من المتابعة، بمن فيهم الصم وضعاف السمع." },
+  addAnotherIngredient: { en: "Add another ingredient…", es: "Añade otro ingrediente…", fr: "Ajoutez un autre ingrédient…", pt: "Adicione outro ingrediente…", hi: "एक और सामग्री जोड़ें…", zh: "再添加一种食材…", ar: "أضف مكونًا آخر…" },
+  multiIngredientHint: { en: "Add as many ingredients as you like. Press Enter or use a comma between them.", es: "Añade todos los ingredientes que quieras. Pulsa Intro o sepáralos con comas.", fr: "Ajoutez autant d'ingrédients que vous voulez. Appuyez sur Entrée ou séparez-les par des virgules.", pt: "Adicione quantos ingredientes quiser. Aperte Enter ou separe com vírgulas.", hi: "जितनी चाहें सामग्री जोड़ें। Enter दबाएं या बीच में कॉमा लगाएं।", zh: "可以添加多种食材，按回车或用逗号分隔。", ar: "أضف ما تشاء من المكونات. اضغط Enter أو افصل بينها بفاصلة." },
+  andWord: { en: "and", es: "y", fr: "et", pt: "e", hi: "और", zh: "和", ar: "و" },
+  orWord: { en: "or", es: "o", fr: "ou", pt: "ou", hi: "या", zh: "或", ar: "أو" },
+  topStoresNote: { en: "Shows the top 5 grocery stores for the country you pick.", es: "Muestra los 5 supermercados principales del país que elijas.", fr: "Affiche les 5 principales épiceries du pays choisi.", pt: "Mostra os 5 principais supermercados do país escolhido.", hi: "आपके चुने देश के 5 मुख्य ग्रोसरी स्टोर दिखाता है।", zh: "显示所选国家的 5 大超市。", ar: "يعرض أكبر 5 متاجر بقالة في البلد الذي تختاره." },
+  yourStoresLabel: { en: "Your stores", es: "Tus tiendas", fr: "Vos magasins", pt: "Suas lojas", hi: "आपके स्टोर", zh: "你的商店", ar: "متاجرك" },
+  yourStoresEmpty: { en: "Add the stores you actually shop at. We'll search them for every item on your list.", es: "Añade las tiendas donde compras. Buscaremos en ellas cada artículo de tu lista.", fr: "Ajoutez les magasins où vous faites vos courses. Nous y chercherons chaque article de votre liste.", pt: "Adicione as lojas onde você compra. Vamos procurar cada item da sua lista nelas.", hi: "जिन स्टोर से आप खरीदते हैं, उन्हें जोड़ें। हम आपकी लिस्ट की हर चीज़ वहां खोजेंगे।", zh: "添加你常去的商店，清单上的每样东西都会在那里搜索。", ar: "أضف المتاجر التي تتسوق منها، وسنبحث فيها عن كل عنصر في قائمتك." },
+  storeNamePlaceholder: { en: "Store name (like Farm Boy)", es: "Nombre de la tienda", fr: "Nom du magasin", pt: "Nome da loja", hi: "स्टोर का नाम", zh: "商店名称", ar: "اسم المتجر" },
+  storeSitePlaceholder: { en: "Website (like farmboy.ca)", es: "Sitio web (ej. tienda.com)", fr: "Site web (ex. magasin.fr)", pt: "Site (ex. loja.com.br)", hi: "वेबसाइट (जैसे store.in)", zh: "网址（如 store.com）", ar: "الموقع (مثل store.com)" },
+  addStoreLabel: { en: "Add store", es: "Añadir tienda", fr: "Ajouter", pt: "Adicionar loja", hi: "स्टोर जोड़ें", zh: "添加商店", ar: "أضف متجرًا" },
+  storeNeedName: { en: "Add the store's name.", es: "Escribe el nombre de la tienda.", fr: "Indiquez le nom du magasin.", pt: "Digite o nome da loja.", hi: "स्टोर का नाम लिखें।", zh: "请填写商店名称。", ar: "اكتب اسم المتجر." },
+  storeNeedSite: { en: "Add the store's website, like farmboy.ca.", es: "Escribe el sitio web de la tienda.", fr: "Indiquez le site web du magasin.", pt: "Digite o site da loja.", hi: "स्टोर की वेबसाइट लिखें।", zh: "请填写商店网址。", ar: "اكتب موقع المتجر." },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -3544,48 +3562,87 @@ function agreeUnits(text) {
 // Ingredients change store lineup by country, since grocery chains are
 // national. Equipment stays fixed to the Canadian lineup (including Amazon)
 // regardless of the ingredient country toggle.
+// Top 5 grocery chains per country. Stores whose own search page has a known,
+// stable address link straight to it; for the rest (sites that need a store
+// or account picked first) the link runs a web search limited to that store's
+// site, which reliably lands on its product pages.
+const siteSearch = (domain) => (q) => `https://www.google.com/search?q=${encodeURIComponent(`site:${domain} ${q}`)}`;
 const STORES_INGREDIENTS_BY_COUNTRY = {
   ca: [
     { name: "Walmart", search: (q) => `https://www.walmart.ca/en/search?q=${encodeURIComponent(q)}` },
-    { name: "Real Canadian Superstore", search: (q) => `https://www.realcanadiansuperstore.ca/en/search?search-bar=${encodeURIComponent(q)}` },
+    { name: "Loblaws", search: (q) => `https://www.loblaws.ca/en/search?search-bar=${encodeURIComponent(q)}` },
     { name: "No Frills", search: (q) => `https://www.nofrills.ca/en/search?search-bar=${encodeURIComponent(q)}` },
+    { name: "Sobeys", search: siteSearch("sobeys.com") },
+    { name: "Metro", search: siteSearch("metro.ca") },
   ],
   us: [
     { name: "Walmart", search: (q) => `https://www.walmart.com/search?q=${encodeURIComponent(q)}` },
+    { name: "Kroger", search: (q) => `https://www.kroger.com/search?query=${encodeURIComponent(q)}` },
+    { name: "Costco", search: (q) => `https://www.costco.com/CatalogSearch?keyword=${encodeURIComponent(q)}` },
     { name: "Target", search: (q) => `https://www.target.com/s?searchTerm=${encodeURIComponent(q)}` },
+    { name: "Safeway", search: siteSearch("safeway.com") },
   ],
   au: [
     { name: "Woolworths", search: (q) => `https://www.woolworths.com.au/shop/search/products?searchTerm=${encodeURIComponent(q)}` },
     { name: "Coles", search: (q) => `https://www.coles.com.au/search/products?q=${encodeURIComponent(q)}` },
+    { name: "Aldi", search: siteSearch("aldi.com.au") },
+    { name: "IGA", search: siteSearch("iga.com.au") },
+    { name: "Costco", search: siteSearch("costco.com.au") },
   ],
   mx: [
     { name: "Walmart", search: (q) => `https://www.walmart.com.mx/busqueda?q=${encodeURIComponent(q)}` },
+    { name: "Soriana", search: siteSearch("soriana.com") },
+    { name: "Chedraui", search: siteSearch("chedraui.com.mx") },
+    { name: "La Comer", search: siteSearch("lacomer.com.mx") },
+    { name: "Bodega Aurrera", search: siteSearch("bodegaaurrera.com.mx") },
   ],
   gb: [
     { name: "Tesco", search: (q) => `https://www.tesco.com/groceries/en-GB/search?query=${encodeURIComponent(q)}` },
-    { name: "Sainsbury's", search: () => `https://www.sainsburys.co.uk` },
+    { name: "Sainsbury's", search: siteSearch("sainsburys.co.uk") },
+    { name: "Asda", search: siteSearch("groceries.asda.com") },
+    { name: "Morrisons", search: siteSearch("groceries.morrisons.com") },
+    { name: "Aldi", search: siteSearch("aldi.co.uk") },
   ],
   ie: [
-    { name: "Tesco Ireland", search: () => `https://www.tesco.ie` },
-    { name: "SuperValu", search: () => `https://shop.supervalu.ie` },
+    { name: "Tesco Ireland", search: siteSearch("tesco.ie") },
+    { name: "SuperValu", search: siteSearch("shop.supervalu.ie") },
+    { name: "Dunnes Stores", search: siteSearch("dunnesstoresgrocery.com") },
+    { name: "Lidl", search: siteSearch("lidl.ie") },
+    { name: "Aldi", search: siteSearch("aldi.ie") },
   ],
   nz: [
+    { name: "Woolworths", search: siteSearch("woolworths.co.nz") },
     { name: "New World", search: (q) => `https://www.newworld.co.nz/shop/search?q=${encodeURIComponent(q)}` },
-    { name: "Countdown", search: () => `https://www.woolworths.co.nz` },
+    { name: "Pak'nSave", search: siteSearch("paknsave.co.nz") },
+    { name: "Four Square", search: siteSearch("foursquare.co.nz") },
+    { name: "FreshChoice", search: siteSearch("freshchoice.co.nz") },
   ],
   in: [
-    { name: "BigBasket", search: () => `https://www.bigbasket.com` },
-    { name: "Reliance Fresh", search: () => `https://www.reliancefreshdirect.com` },
+    { name: "BigBasket", search: siteSearch("bigbasket.com") },
+    { name: "JioMart", search: siteSearch("jiomart.com") },
+    { name: "DMart", search: siteSearch("dmart.in") },
+    { name: "Blinkit", search: siteSearch("blinkit.com") },
+    { name: "Amazon Fresh", search: siteSearch("amazon.in") },
   ],
   de: [
-    { name: "REWE", search: () => `https://www.rewe.de` },
-    { name: "Edeka", search: () => `https://www.edeka.de` },
+    { name: "REWE", search: siteSearch("rewe.de") },
+    { name: "Edeka", search: siteSearch("edeka.de") },
+    { name: "Aldi", search: siteSearch("aldi-nord.de") },
+    { name: "Lidl", search: siteSearch("lidl.de") },
+    { name: "Kaufland", search: siteSearch("kaufland.de") },
   ],
   fr: [
-    { name: "Carrefour", search: () => `https://www.carrefour.fr` },
-    { name: "Auchan", search: () => `https://www.auchan.fr` },
+    { name: "Carrefour", search: siteSearch("carrefour.fr") },
+    { name: "E.Leclerc", search: siteSearch("e.leclerc") },
+    { name: "Auchan", search: siteSearch("auchan.fr") },
+    { name: "Intermarché", search: siteSearch("intermarche.com") },
+    { name: "Lidl", search: siteSearch("lidl.fr") },
   ],
 };
+
+// A store the person added: searched through its own website.
+const cleanDomain = (raw) => String(raw || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split(/[/?#\s]/)[0];
+const customStoreLinks = (stores) => (stores || []).filter((x) => x && x.name && x.domain).map((x) => ({ name: x.name, search: siteSearch(x.domain), custom: true }));
 const COUNTRY_OPTIONS = [
   { id: "ca", label: "🇨🇦 Canada" },
   { id: "us", label: "🇺🇸 United States" },
@@ -6997,6 +7054,8 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [favorites, setFavorites] = useState({});
   const [shoppingList, setShoppingList] = useState([]);
+  const [shopCountry, setShopCountry] = useState("ca");
+  const [customStores, setCustomStores] = useState([]);
   const [shoppingInput, setShoppingInput] = useState("");
   const community = useCommunity();
   const [storageLoaded, setStorageLoaded] = useState(false);
@@ -7048,6 +7107,8 @@ export default function App() {
         if (recipeData.filterMatch) setFilterMatch((f) => ({ ...f, ...recipeData.filterMatch }));
       }
       if (shoppingData?.shoppingList) setShoppingList(shoppingData.shoppingList);
+      if (shoppingData?.shopCountry && STORES_INGREDIENTS_BY_COUNTRY[shoppingData.shopCountry]) setShopCountry(shoppingData.shopCountry);
+      if (Array.isArray(shoppingData?.customStores)) setCustomStores(shoppingData.customStores.slice(0, 12));
       setStorageLoaded(true);
     }
     loadPersisted().catch(() => {
@@ -7079,8 +7140,8 @@ export default function App() {
 
   useEffect(() => {
     if (!storageLoaded) return;
-    window.storage.set("sous_shopping", JSON.stringify({ shoppingList })).catch(() => {});
-  }, [storageLoaded, shoppingList]);
+    window.storage.set("sous_shopping", JSON.stringify({ shoppingList, shopCountry, customStores })).catch(() => {});
+  }, [storageLoaded, shoppingList, shopCountry, customStores]);
 
 
   function addIngredient() {
@@ -7344,39 +7405,18 @@ export default function App() {
     setAppearanceState((a) => { const next = { ...a, ...patch }; saveAppearance(next); return next; });
   }
   const isDark = resolvedTheme(appearance) === "dark";
-  const [viewMode, setViewMode] = useState(() => {
-    try {
-      const saved = window.localStorage.getItem("mysous:view");
-      if (saved === "phone" || saved === "desktop") return saved;
-    } catch {}
-    return typeof window !== "undefined" && window.innerWidth >= 900 ? "desktop" : "phone";
-  });
-  function changeViewMode(mode) {
-    setViewMode(mode);
-    try { window.localStorage.setItem("mysous:view", mode); } catch {}
-  }
-  const isDesktop = viewMode === "desktop";
-  const outerStyle = isDesktop ? { ...styles.outer, padding: "20px 20px" } : styles.outer;
-  const frameStyle = isDesktop ? { ...styles.phone, ...styles.desktopFrame } : styles.phone;
-  const viewToggle = (
-    <div style={styles.viewToggle} role="group" aria-label="View">
-      <button onClick={() => changeViewMode("phone")} aria-pressed={!isDesktop} title={t("viewPhone")} style={{ ...styles.viewToggleBtn, ...(!isDesktop ? styles.viewToggleBtnActive : {}) }}>
-        <Smartphone size={14} color={!isDesktop ? COLORS.ink : COLORS.inkMuted} />
-        <span style={styles.viewToggleLabel}>{t("viewPhone")}</span>
-      </button>
-      <button onClick={() => changeViewMode("desktop")} aria-pressed={isDesktop} title={t("viewDesktop")} style={{ ...styles.viewToggleBtn, ...(isDesktop ? styles.viewToggleBtnActive : {}) }}>
-        <Monitor size={14} color={isDesktop ? COLORS.ink : COLORS.inkMuted} />
-        <span style={styles.viewToggleLabel}>{t("viewDesktop")}</span>
-      </button>
-    </div>
-  );
+  // One responsive layout: full width on phones, a centred card on bigger screens.
+  const isDesktop = true;
+  const outerStyle = { ...styles.outer, padding: "20px 20px" };
+  const frameStyle = { ...styles.phone, ...styles.desktopFrame };
+
 
   if (!storageLoaded) {
     return (
       <LanguageContext.Provider value={{ language, t }}>
-      <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+      <div style={outerStyle} className="ms-root ms-desktop" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
         <style>{FONT_IMPORT}</style>
-        <div style={frameStyle}>
+        <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
             <span style={styles.brand}>My&nbsp;Sous</span>
             <span style={styles.brandSub}>prototype</span>
@@ -7393,13 +7433,12 @@ export default function App() {
   if (!onboarded) {
     return (
       <LanguageContext.Provider value={{ language, t }}>
-      <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+      <div style={outerStyle} className="ms-root ms-desktop" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
         <style>{FONT_IMPORT}</style>
-        <div style={frameStyle}>
+        <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
             <span style={styles.brand}>My&nbsp;Sous</span>
             <span style={styles.brandSub}>prototype</span>
-            {viewToggle}
           </div>
           <div style={styles.screenArea}>
             <OnboardingScreen onComplete={finishOnboarding} onChangeLanguage={setLanguage} />
@@ -7419,14 +7458,13 @@ export default function App() {
     <LanguageContext.Provider value={{ language, t }}>
     <CommunityContext.Provider value={{ ratingFor: community.ratingFor, myRating: community.myRating, rate: community.rate }}>
     <AllergyContext.Provider value={profile.allergies || []}>
-    <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+    <div style={outerStyle} className="ms-root ms-desktop" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <style>{FONT_IMPORT}</style>
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
-      <div style={frameStyle}>
+      <div style={frameStyle} className="ms-frame">
         <div className="ms-header" style={styles.statusRow}>
           <span style={styles.brand}>My&nbsp;Sous</span>
           <span style={styles.brandSub}>prototype</span>
-          {viewToggle}
           <button onClick={() => updateAppearance({ theme: isDark ? "light" : "dark" })} aria-label={t(isDark ? "themeLight" : "themeDark")} title={t(isDark ? "themeLight" : "themeDark")} style={styles.settingsButton}>
             {isDark ? <Sun size={17} color={COLORS.inkMuted} /> : <Moon size={17} color={COLORS.inkMuted} />}
           </button>
@@ -7577,6 +7615,10 @@ export default function App() {
               onAddToKitchen={addCheckedToKitchen}
               equipment={equipment}
               equipmentList={equipmentList}
+              country={shopCountry}
+              setCountry={setShopCountry}
+              customStores={customStores}
+              setCustomStores={setCustomStores}
               onBack={() => setScreen(prevScreen)}
             />
           )}
@@ -8191,6 +8233,14 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
   const [mode, setMode] = useState("kitchen");
   const [query, setQuery] = useState("");
   const [ingredientQuery, setIngredientQuery] = useState("");
+  const [ingredientTerms, setIngredientTerms] = useState([]);
+  const [ingredientMatch, setIngredientMatch] = useState("all");
+  const addIngredientTerms = (text) => {
+    const parts = String(text).split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
+    if (!parts.length) return;
+    setIngredientTerms((prev) => [...prev, ...parts.filter((x) => !prev.some((y) => y.toLowerCase() === x.toLowerCase()))]);
+    setIngredientQuery("");
+  };
   const myAllergies = useContext(AllergyContext);
   const [showAllergic, setShowAllergic] = useState(false);
   // Filters start open on "From my kitchen" and folded away in the two search modes.
@@ -8223,14 +8273,18 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
     .map((r) => ({ recipe: r, info: matchInfo(r) }))
     .sort((a, b) => a.recipe.ingredients.length - b.recipe.ingredients.length);
 
-  // Ready-to-cook recipes first, then the ones you're closest to making.
-  const ingredientResults = ingredientQuery.trim()
+  // Several ingredients: "All of these" needs every one, "Any of these" needs at
+  // least one. Ready-to-cook first, then the most matches, then the fewest missing.
+  const activeTerms = [...ingredientTerms, ...(ingredientQuery.trim() ? [ingredientQuery.trim()] : [])];
+  const ingredientResults = activeTerms.length
     ? recipes
         .filter(passesFilters)
-        .filter((r) => r.ingredients.some((i) => ingredientMatchesQuery(i, ingredientQuery)))
-        .map((r) => ({ recipe: r, info: matchInfo(r) }))
+        .map((r) => ({ recipe: r, hits: activeTerms.filter((q) => r.ingredients.some((i) => ingredientMatchesQuery(i, q))).length }))
+        .filter((x) => (ingredientMatch === "all" ? x.hits === activeTerms.length : x.hits > 0))
+        .map((x) => ({ ...x, info: matchInfo(x.recipe) }))
         .sort((a, b) =>
           (b.info.makeable - a.info.makeable) ||
+          (b.hits - a.hits) ||
           (a.info.missingIngredients.length - b.info.missingIngredients.length) ||
           (a.recipe.ingredients.length - b.recipe.ingredients.length))
     : [];
@@ -8358,30 +8412,46 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
       {mode === "ingredient" && (
         <>
           <p style={styles.subtext}>{t("ingredientSearchSubtitle")}</p>
-          <div style={{ position: "relative", marginTop: 14 }}>
-            <Search size={16} color={COLORS.inkMuted} style={styles.searchIcon} />
-            <input value={ingredientQuery} onChange={(e) => setIngredientQuery(e.target.value)} placeholder={t("ingredientSearchPlaceholder")} style={{ ...styles.textInput, paddingInlineStart: 34, paddingInlineEnd: ingredientQuery ? 34 : undefined }} />
-            {ingredientQuery && (
-              <button onClick={() => setIngredientQuery("")} aria-label={t("aClear")} style={{ position: "absolute", insetInlineEnd: 8, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}>
-                <X size={15} color={COLORS.inkMuted} />
-              </button>
-            )}
-          </div>
+          <form onSubmit={(e) => { e.preventDefault(); addIngredientTerms(ingredientQuery); }} style={{ display: "flex", gap: 8, marginTop: 14 }}>
+            <div style={{ position: "relative", flex: 1 }}>
+              <Search size={16} color={COLORS.inkMuted} style={styles.searchIcon} />
+              <input value={ingredientQuery} aria-label={t("ingredientSearchPlaceholder")}
+                onChange={(e) => { const v = e.target.value; if (/[,;]/.test(v)) addIngredientTerms(v); else setIngredientQuery(v); }}
+                onKeyDown={(e) => { if (e.key === "Backspace" && !ingredientQuery && ingredientTerms.length) setIngredientTerms((x) => x.slice(0, -1)); }}
+                placeholder={ingredientTerms.length ? t("addAnotherIngredient") : t("ingredientSearchPlaceholder")}
+                style={{ ...styles.textInput, paddingInlineStart: 34 }} />
+            </div>
+            <button type="submit" aria-label={t("aAdd")} disabled={!ingredientQuery.trim()} style={{ ...styles.addButton, opacity: ingredientQuery.trim() ? 1 : 0.5 }}><Plus size={18} color="#fff" /></button>
+          </form>
+          <p style={{ ...styles.basicsHint, marginTop: 6 }}>{t("multiIngredientHint")}</p>
 
-          {!ingredientQuery.trim() && kitchenChips.length > 0 && (
+          {ingredientTerms.length > 0 && (
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+              {ingredientTerms.map((term) => (
+                <span key={term} style={{ ...styles.equipChip, ...styles.equipChipActive, gap: 4, paddingInlineEnd: 6 }}>
+                  {ingredientLabel(term, language)}
+                  <button onClick={() => setIngredientTerms((x) => x.filter((y) => y !== term))} aria-label={`${t("aRemove")}: ${term}`} style={styles.chipX}><X size={12} color={COLORS.primaryText} /></button>
+                </span>
+              ))}
+              <MatchToggle value={ingredientMatch} onChange={setIngredientMatch} count={activeTerms.length} />
+              <button onClick={() => { setIngredientTerms([]); setIngredientQuery(""); }} style={{ ...styles.linkButton, fontSize: 12.5, marginInlineStart: 4 }}>{t("aClear")}</button>
+            </div>
+          )}
+
+          {kitchenChips.length > 0 && (
             <>
               <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("fromYourKitchenTap")}</div>
               <div style={styles.chipWrap}>
-                {kitchenChips.map((name) => (
-                  <button key={name} onClick={() => setIngredientQuery(name)} style={styles.equipChip}>{ingredientLabel(name, language)}</button>
+                {kitchenChips.filter((name) => !ingredientTerms.some((x) => x.toLowerCase() === name.toLowerCase())).map((name) => (
+                  <button key={name} onClick={() => addIngredientTerms(name)} style={styles.equipChip}>+ {ingredientLabel(name, language)}</button>
                 ))}
               </div>
             </>
           )}
 
-          {ingredientQuery.trim() && (
+          {activeTerms.length > 0 && (
             <>
-              <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("recipesWithLabel")} “{ingredientQuery.trim()}” ({ingredientResults.length})</div>
+              <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("recipesWithLabel")} {activeTerms.map((x) => `“${ingredientLabel(x, language)}”`).join(ingredientMatch === "all" ? ` ${t("andWord")} ` : ` ${t("orWord")} `)} ({ingredientResults.length})</div>
               {ingredientResults.length === 0 && <span style={styles.emptyText}>{t("noIngredientMatch")}</span>}
               <div>{ingredientResults.map(({ recipe, info }) => <RecipeCard key={recipe.id} recipe={recipe} info={info} onOpen={onOpen} onEdit={onEdit} showIngredientCount favorites={favorites} toggleFavorite={toggleFavorite} />)}</div>
             </>
@@ -8542,7 +8612,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
       </div>
 
       <div style={styles.macroRow}>
-        <span style={styles.macroChip}>{scale(recipe.macros.calories)} kcal</span>
+        <span style={styles.macroChip}>{scale(recipe.macros.calories)} {t("caloriesWord").toLowerCase()}</span>
         <span style={styles.macroChip}>{scale(recipe.macros.protein)}g {t("proteinWord").toLowerCase()}</span>
         <span style={styles.macroChip}>{scale(recipe.macros.carbs)}g {t("carbsWord").toLowerCase()}</span>
         <span style={styles.macroChip}>{scale(recipe.macros.fat)}g {t("fatWord").toLowerCase()}</span>
@@ -9170,9 +9240,21 @@ function StoreTip({ term, countryLabel }) {
   );
 }
 
-function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onAdd, onToggle, onRemove, onAddToKitchen, equipment, equipmentList, onBack }) {
+function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onAdd, onToggle, onRemove, onAddToKitchen, equipment, equipmentList, country = "ca", setCountry = () => {}, customStores = [], setCustomStores = () => {}, onBack }) {
   const { t, language } = useContext(LanguageContext);
-  const [ingredientCountry, setIngredientCountry] = useState("ca");
+  const ingredientCountry = country;
+  const [storeName, setStoreName] = useState("");
+  const [storeSite, setStoreSite] = useState("");
+  const [storeHint, setStoreHint] = useState(null);
+  function addStore(e) {
+    e.preventDefault();
+    const name = storeName.trim().slice(0, 40);
+    const domain = cleanDomain(storeSite);
+    if (!name) { setStoreHint("storeNeedName"); return; }
+    if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)) { setStoreHint("storeNeedSite"); return; }
+    setCustomStores([...customStores.filter((x) => x.domain !== domain), { id: `s${Date.now().toString(36)}`, name, domain }].slice(0, 12));
+    setStoreName(""); setStoreSite(""); setStoreHint(null);
+  }
   const tally = {};
   recipes.forEach((r) => {
     const info = matchInfo(r);
@@ -9181,14 +9263,14 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
   const suggestions = Object.entries(tally).sort((a, b) => b[1] - a[1]).slice(0, 8);
   const checkedCount = shoppingList.filter((s) => s.checked).length;
   const missingEquipment = equipmentList.filter((eq) => !equipment[eq.id]);
-  const ingredientStores = STORES_INGREDIENTS_BY_COUNTRY[ingredientCountry] ?? STORES_INGREDIENTS_BY_COUNTRY.ca;
+  const ingredientStores = [...customStoreLinks(customStores), ...(STORES_INGREDIENTS_BY_COUNTRY[ingredientCountry] ?? STORES_INGREDIENTS_BY_COUNTRY.ca)];
   const countryLabel = (COUNTRY_OPTIONS.find((c) => c.id === ingredientCountry)?.label || "").replace(/^\S+\s/, "");
 
   const StoreLinks = ({ term, stores }) => (
     <div style={{ ...styles.chipWrap, marginTop: 6 }}>
       {stores.map((store) => (
-        <a key={store.name} href={store.search(term)} target="_blank" rel="noopener noreferrer" style={styles.buyStoreLink}>
-          {store.name}
+        <a key={store.name} href={store.search(term)} target="_blank" rel="noopener noreferrer" style={{ ...styles.buyStoreLink, ...(store.custom ? { borderColor: COLORS.primary, color: COLORS.primaryText, fontWeight: 600 } : {}) }}>
+          {store.custom ? "★ " : ""}{store.name}
         </a>
       ))}
     </div>
@@ -9222,19 +9304,33 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
         </>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
-        <div style={styles.sectionLabel}>{t("ingredientCountryLabel")}</div>
-        <div style={{ display: "flex", gap: 6 }}>
-          {COUNTRY_OPTIONS.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setIngredientCountry(c.id)}
-              style={{ ...styles.unitToggleBtn, ...(ingredientCountry === c.id ? styles.unitToggleBtnActive : {}) }}
-            >
-              {c.label}
-            </button>
-          ))}
-        </div>
+      <div style={{ ...styles.historyCard, marginTop: 20 }}>
+        <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+          <span style={styles.sectionLabelTight}>{t("ingredientCountryLabel")}</span>
+          <select value={ingredientCountry} onChange={(e) => setCountry(e.target.value)} style={{ ...styles.textInput, width: "auto", minWidth: 200, marginTop: 0 }}>
+            {COUNTRY_OPTIONS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
+        </label>
+        <p style={{ ...styles.basicsHint, marginTop: 6 }}>{t("topStoresNote")}</p>
+
+        <div style={{ ...styles.sectionLabelTight, marginTop: 14 }}>{t("yourStoresLabel")}</div>
+        {customStores.length === 0 && <p style={{ ...styles.basicsHint, marginTop: 0 }}>{t("yourStoresEmpty")}</p>}
+        {customStores.length > 0 && (
+          <div style={{ ...styles.chipWrap, marginBottom: 8 }}>
+            {customStores.map((st) => (
+              <span key={st.id || st.domain} style={{ ...styles.equipChip, ...styles.equipChipActive, gap: 4, paddingInlineEnd: 6 }}>
+                ★ {st.name} <span style={{ fontWeight: 400, opacity: 0.75 }} dir="ltr">({st.domain})</span>
+                <button onClick={() => setCustomStores(customStores.filter((x) => x !== st))} aria-label={`${t("aRemove")}: ${st.name}`} style={styles.chipX}><X size={12} color={COLORS.primaryText} /></button>
+              </span>
+            ))}
+          </div>
+        )}
+        <form onSubmit={addStore} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <input value={storeName} onChange={(e) => { setStoreName(e.target.value); setStoreHint(null); }} placeholder={t("storeNamePlaceholder")} aria-label={t("storeNamePlaceholder")} style={{ ...styles.textInput, flex: "1 1 150px", marginTop: 0 }} />
+          <input value={storeSite} onChange={(e) => { setStoreSite(e.target.value); setStoreHint(null); }} placeholder={t("storeSitePlaceholder")} aria-label={t("storeSitePlaceholder")} inputMode="url" dir="ltr" style={{ ...styles.textInput, flex: "1 1 170px", marginTop: 0 }} />
+          <button type="submit" style={{ ...styles.resetButton, marginTop: 0 }}>+ {t("addStoreLabel")}</button>
+        </form>
+        {storeHint && <div style={{ ...styles.recipeMeta, color: COLORS.accentText, marginTop: 6, whiteSpace: "normal" }}>{t(storeHint)}</div>}
       </div>
 
       {suggestions.length > 0 && (
@@ -9321,7 +9417,7 @@ function NutritionGlossaryScreen({ onBack }) {
               <div style={styles.recipeMeta}>{f.qty}</div>
             </div>
             <div style={styles.glossaryMacros}>
-              <span style={styles.macroChip}>{f.calories} kcal</span>
+              <span style={styles.macroChip}>{f.calories} {t("caloriesWord").toLowerCase()}</span>
               <span style={styles.macroChip}>{f.protein}g {t("proteinWord").toLowerCase()}</span>
               <span style={styles.macroChip}>{f.carbs}g {t("carbsWord").toLowerCase()}</span>
               <span style={styles.macroChip}>{f.fat}g {t("fatWord").toLowerCase()}</span>

@@ -92,11 +92,6 @@ const VIEW_TR = {
   phone: { en: "Phone", es: "Teléfono", fr: "Téléphone", pt: "Celular", hi: "फ़ोन", zh: "手机", ar: "هاتف" },
   desktop: { en: "Desktop", es: "Escritorio", fr: "Ordinateur", pt: "Computador", hi: "डेस्कटॉप", zh: "桌面", ar: "سطح المكتب" },
 };
-const startingView = () => {
-  const saved = lsGet("mysous:view");
-  if (saved === "phone" || saved === "desktop") return saved;
-  return typeof window !== "undefined" && window.innerWidth >= 900 ? "desktop" : "phone";
-};
 
 // Which sign-in providers are switched on in the Supabase dashboard.
 async function enabledProviders() {
@@ -109,12 +104,6 @@ async function enabledProviders() {
   }
 }
 
-const PhoneIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M12 18h.01" /></svg>
-);
-const MonitorIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8" /><path d="M12 17v4" /></svg>
-);
 
 export function AuthScreen({ sb, onGuest }) {
   const [lang, setLang] = useState(startingLanguage);
@@ -123,18 +112,16 @@ export function AuthScreen({ sb, onGuest }) {
   const [slide, setSlide] = useState(() => (lsGet("mysous:introSeen") === "1" ? INTRO.length : 0));
   const finishIntro = () => { lsSet("mysous:introSeen", "1"); setSlide(INTRO.length); };
   const pickLang = (l) => { setLang(l); lsSet("mysous:lang", l); };
-  const [view, setView] = useState(startingView);
+  const desktop = true; // one responsive layout
   const [providers, setProviders] = useState(null);
   const [busy, setBusy] = useState(null);
   const [notice, setNotice] = useState(null);
   const redirectTo = window.location.origin + window.location.pathname;
-  const desktop = view === "desktop";
 
   React.useEffect(() => { enabledProviders().then(setProviders); }, []);
   const [appearance, setAppearance] = useState(loadAppearance);
   const dark = resolvedTheme(appearance) === "dark";
   const toggleTheme = () => { const next = { ...appearance, theme: dark ? "light" : "dark" }; setAppearance(next); saveAppearance(next); };
-  const changeView = (v) => { setView(v); lsSet("mysous:view", v); };
 
   async function signInWith(provider) {
     setNotice(null);
@@ -145,7 +132,6 @@ export function AuthScreen({ sb, onGuest }) {
   }
 
   const button = { width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, boxSizing: "border-box" };
-  const toggleBtn = (active) => ({ display: "flex", alignItems: "center", gap: 5, border: "none", borderRadius: 8, padding: "5px 8px", cursor: "pointer", fontSize: 11.5, fontFamily: "inherit", background: active ? C.card : "transparent", color: active ? C.ink : C.muted, fontWeight: active ? 600 : 400, boxShadow: active ? "0 1px 2px rgba(51,53,47,0.08)" : "none" });
 
   const chip = (active) => ({ padding: "6px 11px", borderRadius: 20, border: `1px solid ${active ? C.primary : C.line}`, background: active ? C.sage : C.card, color: active ? C.sageText : C.muted, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", fontWeight: active ? 600 : 400 });
   const intro = slide < INTRO.length ? (
@@ -204,10 +190,10 @@ export function AuthScreen({ sb, onGuest }) {
   );
 
   return (
-    <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className={desktop ? "ms-root ms-desktop" : "ms-root ms-phone"}
+    <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className="ms-root ms-desktop ms-auth"
       style={{ position: "relative", minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
-      <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split > div:first-child > div:first-child { font-size: 64px !important; } }"}</style>
-      <div style={{
+      <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split > div:first-child > div:first-child { font-size: 56px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
+      <div className="ms-auth-frame" style={{
         position: "relative", zIndex: 1,
         width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,
         background: C.card, borderRadius: desktop ? 18 : 28, border: `1px solid ${C.line}`,
@@ -217,10 +203,7 @@ export function AuthScreen({ sb, onGuest }) {
           <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button onClick={toggleTheme} aria-label={dark ? "Light mode" : "Dark mode"} title={dark ? "Light mode" : "Dark mode"} style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.line}`, background: C.paper, color: C.muted, cursor: "pointer", fontSize: 15, lineHeight: 1 }}>{dark ? "☀" : "☾"}</button>
-          <div role="group" aria-label="View" style={{ display: "flex", background: C.paper, border: `1px solid ${C.line}`, borderRadius: 10, padding: 2 }}>
-            <button onClick={() => changeView("phone")} aria-pressed={!desktop} style={toggleBtn(!desktop)}><PhoneIcon />{t("phone")}</button>
-            <button onClick={() => changeView("desktop")} aria-pressed={desktop} style={toggleBtn(desktop)}><MonitorIcon />{t("desktop")}</button>
-          </div>
+
           </div>
         </div>
         {desktop ? (
