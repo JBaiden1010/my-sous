@@ -32,6 +32,10 @@ import {
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
+import { convertUnits } from "./units.js";
+import { ALLERGENS, allergensFor } from "./allergens.js";
+
+const AllergyContext = createContext([]);
 import { build } from "./world/build.js";
 import { AFRICAN } from "./world/african.js";
 import { BRAZILIAN } from "./world/brazilian.js";
@@ -246,13 +250,13 @@ const TRANSLATIONS = {
 
   kitchenTitleFallback: { en: "My Kitchen", es: "Mi Cocina", fr: "Ma Cuisine", pt: "Minha Cozinha", hi: "मेरी रसोई", zh: "我的厨房", ar: "مطبخي", ru: "Моя кухня", ta: "எனது சமையலறை" },
   kitchenSubtitle: { en: "What do you have right now?", es: "¿Qué tienes ahora mismo?", fr: "Qu'avez-vous sous la main ?", pt: "O que você tem agora?", hi: "अभी आपके पास क्या है?", zh: "你现在有什么食材？", ar: "ماذا لديك الآن؟", ru: "Что у вас есть прямо сейчас?", ta: "இப்போது உங்களிடம் என்ன இருக்கிறது?" },
-  todaysTarget: { en: "Today's rough target", es: "Tu objetivo aproximado de hoy", fr: "Votre objectif approximatif du jour", pt: "Sua meta aproximada de hoje", hi: "आज का अनुमानित लक्ष्य", zh: "今日大致目标", ar: "هدفك التقريبي لليوم" },
+  todaysTarget: { en: "Today's rough goal", es: "Tu objetivo aproximado de hoy", fr: "Votre objectif approximatif du jour", pt: "Sua meta aproximada de hoje", hi: "आज का अनुमानित लक्ष्य", zh: "今日大致目标", ar: "هدفك التقريبي لليوم" },
   readyBadgeLabel: { en: "Ready", es: "Listo", fr: "Prêt", pt: "Pronto", hi: "तैयार", zh: "可以做", ar: "جاهز", ru: "Готово", ta: "தயார்" },
   missingBadgeLabel: { en: "Missing", es: "Falta", fr: "Manque", pt: "Faltando", hi: "गायब", zh: "缺少", ar: "ناقص", ru: "Не хватает", ta: "இல்லை" },
   missingPrefixLabel: { en: "Missing", es: "Falta", fr: "Manque", pt: "Faltando", hi: "गायब है", zh: "缺少", ar: "ناقص" },
-  missingEquipmentPrefix: { en: "Missing equipment", es: "Equipo faltante", fr: "Matériel manquant", pt: "Equipamento faltando", hi: "गायब उपकरण", zh: "缺少的厨具", ar: "معدات ناقصة" },
-  needsEquipmentLabel: { en: "Needs equipment you haven't added.", es: "Necesita equipo que no has añadido.", fr: "Nécessite du matériel que vous n'avez pas ajouté.", pt: "Precisa de equipamento que você não adicionou.", hi: "उपकरण चाहिए जो आपने नहीं जोड़ा है।", zh: "需要你尚未添加的厨具。", ar: "يحتاج إلى معدات لم تضفها بعد." },
-  equipmentLabel: { en: "Equipment", es: "Equipo", fr: "Équipement", pt: "Equipamento", hi: "उपकरण", zh: "厨具", ar: "المعدات" },
+  missingEquipmentPrefix: { en: "Missing tools", es: "Equipo faltante", fr: "Matériel manquant", pt: "Equipamento faltando", hi: "गायब उपकरण", zh: "缺少的厨具", ar: "معدات ناقصة" },
+  needsEquipmentLabel: { en: "Needs a kitchen tool you haven't added.", es: "Necesita equipo que no has añadido.", fr: "Nécessite du matériel que vous n'avez pas ajouté.", pt: "Precisa de equipamento que você não adicionou.", hi: "उपकरण चाहिए जो आपने नहीं जोड़ा है।", zh: "需要你尚未添加的厨具。", ar: "يحتاج إلى معدات لم تضفها بعد." },
+  equipmentLabel: { en: "Kitchen tools", es: "Equipo", fr: "Équipement", pt: "Equipamento", hi: "उपकरण", zh: "厨具", ar: "المعدات" },
   basicsLabel: { en: "Basics", es: "Básicos", fr: "Essentiels", pt: "Básicos", hi: "आवश्यक चीज़ें", zh: "常备调料", ar: "الأساسيات" },
   ingredientsSectionLabel: { en: "Ingredients", es: "Ingredientes", fr: "Ingrédients", pt: "Ingredientes", hi: "सामग्री", zh: "食材", ar: "المكونات" },
   addIngredientPlaceholder: { en: "Add an ingredient…", es: "Añadir un ingrediente…", fr: "Ajouter un ingrédient…", pt: "Adicionar um ingrediente…", hi: "सामग्री जोड़ें…", zh: "添加一种食材…", ar: "أضف مكونًا…" },
@@ -260,7 +264,7 @@ const TRANSLATIONS = {
   cookTitle: { en: "Cook", es: "Cocinar", fr: "Cuisiner", pt: "Cozinhar", hi: "पकाएं", zh: "烹饪", ar: "طبخ", ru: "Готовить", ta: "சமை" },
   byIngredient: { en: "By ingredient", es: "Por ingrediente", fr: "Par ingrédient", pt: "Por ingrediente", hi: "सामग्री से", zh: "按食材", ar: "حسب المكوّن" },
   ingredientSearchSubtitle: { en: "Type one ingredient to see every recipe that uses it.", es: "Escribe un ingrediente para ver todas las recetas que lo usan.", fr: "Tapez un ingrédient pour voir toutes les recettes qui l'utilisent.", pt: "Digite um ingrediente para ver todas as receitas que o usam.", hi: "एक सामग्री लिखें और वे सभी रेसिपी देखें जिनमें यह इस्तेमाल होती है।", zh: "输入一种食材，查看所有用到它的菜谱。", ar: "اكتب مكوّنًا واحدًا لترى كل الوصفات التي تستخدمه." },
-  ingredientSearchPlaceholder: { en: "e.g. banana, chicken, rice", es: "p. ej. plátano, pollo, arroz", fr: "ex. banane, poulet, riz", pt: "ex. banana, frango, arroz", hi: "जैसे केला, चिकन, चावल", zh: "例如：香蕉、鸡肉、米饭", ar: "مثل: موز، دجاج، أرز" },
+  ingredientSearchPlaceholder: { en: "like banana, chicken, rice", es: "p. ej. plátano, pollo, arroz", fr: "ex. banane, poulet, riz", pt: "ex. banana, frango, arroz", hi: "जैसे केला, चिकन, चावल", zh: "例如：香蕉、鸡肉、米饭", ar: "مثل: موز، دجاج، أرز" },
   recipesWithLabel: { en: "Recipes with", es: "Recetas con", fr: "Recettes avec", pt: "Receitas com", hi: "इसके साथ रेसिपी", zh: "包含该食材的菜谱", ar: "وصفات تحتوي على" },
   noIngredientMatch: { en: "No recipes use that ingredient yet. Try a simpler word, like \"berry\" instead of \"blueberries\".", es: "Ninguna receta usa ese ingrediente todavía. Prueba una palabra más simple.", fr: "Aucune recette n'utilise encore cet ingrédient. Essayez un mot plus simple.", pt: "Nenhuma receita usa esse ingrediente ainda. Tente uma palavra mais simples.", hi: "अभी कोई रेसिपी इस सामग्री का उपयोग नहीं करती। कोई सरल शब्द आज़माएं।", zh: "还没有菜谱使用这种食材。试试更简单的词。", ar: "لا توجد وصفات تستخدم هذا المكوّن بعد. جرّب كلمة أبسط." },
   fromYourKitchenTap: { en: "Or tap something you already have", es: "O toca algo que ya tienes", fr: "Ou touchez quelque chose que vous avez déjà", pt: "Ou toque em algo que você já tem", hi: "या जो आपके पास पहले से है उस पर टैप करें", zh: "或点选你已有的食材", ar: "أو اضغط على شيء لديك بالفعل" },
@@ -335,6 +339,39 @@ const TRANSLATIONS = {
   timerStop: { en: "Stop", es: "Detener", fr: "Arrêter", pt: "Parar", hi: "बंद करें", zh: "停止", ar: "إيقاف" },
   timerDone: { en: "Time's up! Check it", es: "¡Tiempo! Revísalo", fr: "C'est l'heure ! Vérifiez", pt: "Tempo esgotado! Confira", hi: "समय पूरा! देख लें", zh: "时间到！看看状态", ar: "انتهى الوقت! تحقّق" },
   screenOnNote: { en: "Your screen stays on while you cook.", es: "Tu pantalla se mantiene encendida mientras cocinas.", fr: "Votre écran reste allumé pendant que vous cuisinez.", pt: "Sua tela fica ligada enquanto você cozinha.", hi: "खाना बनाते समय आपकी स्क्रीन चालू रहेगी।", zh: "做饭时屏幕会保持常亮。", ar: "تبقى شاشتك مضاءة أثناء الطبخ." },
+  aAdd: { en: "Add", es: "Añadir", fr: "Ajouter", pt: "Adicionar", hi: "जोड़ें", zh: "添加", ar: "إضافة" },
+  aRemove: { en: "Remove", es: "Quitar", fr: "Retirer", pt: "Remover", hi: "हटाएं", zh: "移除", ar: "إزالة" },
+  aEdit: { en: "Edit recipe", es: "Editar receta", fr: "Modifier la recette", pt: "Editar receita", hi: "रेसिपी बदलें", zh: "编辑食谱", ar: "تعديل الوصفة" },
+  aSave: { en: "Save to Cookbook", es: "Guardar en el recetario", fr: "Enregistrer dans le livre", pt: "Salvar no livro de receitas", hi: "कुकबुक में सेव करें", zh: "保存到食谱本", ar: "احفظ في كتاب الوصفات" },
+  aUnsave: { en: "Remove from Cookbook", es: "Quitar del recetario", fr: "Retirer du livre", pt: "Remover do livro de receitas", hi: "कुकबुक से हटाएं", zh: "从食谱本移除", ar: "إزالة من كتاب الوصفات" },
+  aShare: { en: "Share to Community", es: "Compartir en la Comunidad", fr: "Partager dans la Communauté", pt: "Compartilhar na Comunidade", hi: "कम्युनिटी में साझा करें", zh: "分享到社区", ar: "مشاركة في المجتمع" },
+  aDelete: { en: "Delete recipe", es: "Eliminar receta", fr: "Supprimer la recette", pt: "Excluir receita", hi: "रेसिपी हटाएं", zh: "删除食谱", ar: "حذف الوصفة" },
+  aClear: { en: "Clear", es: "Borrar", fr: "Effacer", pt: "Limpar", hi: "साफ़ करें", zh: "清除", ar: "مسح" },
+  aFewerServings: { en: "Fewer servings", es: "Menos porciones", fr: "Moins de portions", pt: "Menos porções", hi: "कम सर्विंग", zh: "减少份数", ar: "حصص أقل" },
+  aMoreServings: { en: "More servings", es: "Más porciones", fr: "Plus de portions", pt: "Mais porções", hi: "ज़्यादा सर्विंग", zh: "增加份数", ar: "حصص أكثر" },
+  allergiesLabel: { en: "Allergies", es: "Alergias", fr: "Allergies", pt: "Alergias", hi: "एलर्जी", zh: "过敏", ar: "الحساسية" },
+  allergiesHint: { en: "We'll warn you about recipes with these and hide them in Cook. This is based on the ingredient list, so always check packaging.", es: "Te avisaremos de las recetas que los contengan y las ocultaremos en Cocinar. Se basa en la lista de ingredientes: revisa siempre el envase.", fr: "Nous vous signalerons les recettes qui en contiennent et les masquerons dans Cuisiner. Basé sur la liste d'ingrédients : vérifiez toujours l'emballage.", pt: "Vamos avisar sobre receitas com estes itens e escondê-las em Cozinhar. Baseado na lista de ingredientes: confira sempre a embalagem.", hi: "इनसे बनी रेसिपी पर हम चेतावनी देंगे और उन्हें कुक में छिपा देंगे। यह सामग्री सूची पर आधारित है, इसलिए पैकेट ज़रूर जांचें।", zh: "含有这些成分的食谱会给出提醒，并在“做饭”中隐藏。这基于配料表，请务必查看包装。", ar: "سننبهك إلى الوصفات التي تحتوي عليها ونخفيها في قسم الطبخ. يعتمد ذلك على قائمة المكونات، لذا تحقق دائمًا من العبوة." },
+  allergen_peanuts: { en: "Peanuts", es: "Cacahuetes", fr: "Arachides", pt: "Amendoim", hi: "मूंगफली", zh: "花生", ar: "الفول السوداني" },
+  allergen_treenuts: { en: "Tree nuts", es: "Frutos secos", fr: "Fruits à coque", pt: "Castanhas e nozes", hi: "मेवे (नट्स)", zh: "坚果", ar: "المكسرات" },
+  allergen_dairy: { en: "Milk / dairy", es: "Leche / lácteos", fr: "Lait / produits laitiers", pt: "Leite / laticínios", hi: "दूध / डेयरी", zh: "牛奶/乳制品", ar: "الحليب ومشتقاته" },
+  allergen_eggs: { en: "Eggs", es: "Huevos", fr: "Œufs", pt: "Ovos", hi: "अंडे", zh: "鸡蛋", ar: "البيض" },
+  allergen_gluten: { en: "Gluten / wheat", es: "Gluten / trigo", fr: "Gluten / blé", pt: "Glúten / trigo", hi: "ग्लूटेन / गेहूं", zh: "麸质/小麦", ar: "الغلوتين / القمح" },
+  allergen_soy: { en: "Soy", es: "Soja", fr: "Soja", pt: "Soja", hi: "सोया", zh: "大豆", ar: "الصويا" },
+  allergen_fish: { en: "Fish", es: "Pescado", fr: "Poisson", pt: "Peixe", hi: "मछली", zh: "鱼", ar: "السمك" },
+  allergen_shellfish: { en: "Shellfish", es: "Mariscos", fr: "Crustacés et fruits de mer", pt: "Frutos do mar", hi: "शेलफ़िश", zh: "贝类/甲壳类", ar: "المحار والقشريات" },
+  allergen_sesame: { en: "Sesame", es: "Sésamo", fr: "Sésame", pt: "Gergelim", hi: "तिल", zh: "芝麻", ar: "السمسم" },
+  containsLabel: { en: "Contains:", es: "Contiene:", fr: "Contient :", pt: "Contém:", hi: "इसमें है:", zh: "含有：", ar: "يحتوي على:" },
+  checkLabels: { en: "Always check packaging", es: "Revisa siempre el envase", fr: "Vérifiez toujours l'emballage", pt: "Confira sempre a embalagem", hi: "पैकेट ज़रूर जांचें", zh: "请务必查看包装", ar: "تحقق دائمًا من العبوة" },
+  allergyHidden: { en: "{n} recipes hidden because of your allergies.", es: "{n} recetas ocultas por tus alergias.", fr: "{n} recettes masquées à cause de vos allergies.", pt: "{n} receitas escondidas por causa das suas alergias.", hi: "आपकी एलर्जी के कारण {n} रेसिपी छिपाई गई हैं।", zh: "因你的过敏设置，已隐藏 {n} 道菜。", ar: "تم إخفاء {n} وصفة بسبب حساسيتك." },
+  allergyShowing: { en: "Showing {n} recipes that contain your allergens.", es: "Mostrando {n} recetas con tus alérgenos.", fr: "{n} recettes contenant vos allergènes sont affichées.", pt: "Mostrando {n} receitas com seus alérgenos.", hi: "आपके एलर्जन वाली {n} रेसिपी दिखाई जा रही हैं।", zh: "正在显示 {n} 道含有你过敏原的菜。", ar: "يتم عرض {n} وصفة تحتوي على مسببات حساسيتك." },
+  allergyShowThem: { en: "Show them", es: "Mostrarlas", fr: "Les afficher", pt: "Mostrar", hi: "दिखाएं", zh: "显示", ar: "عرضها" },
+  allergyHideAgain: { en: "Hide them", es: "Ocultarlas", fr: "Les masquer", pt: "Esconder", hi: "छिपाएं", zh: "隐藏", ar: "إخفاؤها" },
+  unitsLabel: { en: "Measurements", es: "Medidas", fr: "Mesures", pt: "Medidas", hi: "माप", zh: "计量单位", ar: "وحدات القياس" },
+  unitsUS: { en: "Cups & °F", es: "Tazas y °F", fr: "Tasses et °F", pt: "Xícaras e °F", hi: "कप और °F", zh: "杯和°F", ar: "أكواب و°F" },
+  unitsMetric: { en: "Metric (ml, g, °C)", es: "Métrico (ml, g, °C)", fr: "Métrique (ml, g, °C)", pt: "Métrico (ml, g, °C)", hi: "मीट्रिक (ml, g, °C)", zh: "公制（毫升、克、°C）", ar: "متري (مل، غ، °C)" },
+  cookTextLabel: { en: "Large cooking text", es: "Texto grande al cocinar", fr: "Grand texte en cuisinant", pt: "Texto grande ao cozinhar", hi: "खाना बनाते समय बड़ा टेक्स्ट", zh: "做饭时大字显示", ar: "نص كبير أثناء الطبخ" },
+  cookTextSub: { en: "Bigger step text on the cooking screen, easy to read from across the counter.", es: "Pasos más grandes en la pantalla de cocina, fáciles de leer desde lejos.", fr: "Étapes en plus grand sur l'écran de cuisine, lisibles de loin.", pt: "Etapas maiores na tela de cozinhar, fáceis de ler de longe.", hi: "कुकिंग स्क्रीन पर बड़े स्टेप, दूर से भी पढ़ने में आसान।", zh: "做饭页面的步骤字更大，隔着台面也能看清。", ar: "خطوات بخط أكبر في شاشة الطبخ، سهلة القراءة من بعيد." },
+  captionsTip: { en: "Tip: add captions to your video, or write the key steps in your post, so everyone can follow, including people who are deaf or hard of hearing.", es: "Consejo: añade subtítulos a tu video o escribe los pasos clave en tu publicación para que todos puedan seguirlo, incluidas las personas sordas o con pérdida auditiva.", fr: "Astuce : ajoutez des sous-titres à votre vidéo ou écrivez les étapes clés dans votre publication, pour que tout le monde puisse suivre, y compris les personnes sourdes ou malentendantes.", pt: "Dica: coloque legendas no vídeo ou escreva os passos principais na publicação, para que todos possam acompanhar, inclusive pessoas surdas ou com deficiência auditiva.", hi: "सुझाव: अपने वीडियो में कैप्शन जोड़ें या पोस्ट में मुख्य स्टेप लिखें, ताकि बहरे या कम सुनने वाले लोग भी समझ सकें।", zh: "小建议：给视频加上字幕，或在帖子里写下关键步骤，方便所有人（包括听障人士）跟着做。", ar: "نصيحة: أضف ترجمة مكتوبة لفيديوك أو اكتب الخطوات الأساسية في منشورك، حتى يتمكن الجميع من المتابعة، بمن فيهم الصم وضعاف السمع." },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -391,12 +428,12 @@ const TRANSLATIONS = {
   almostThere: { en: "Almost there", es: "Casi listo", fr: "Presque prêt", pt: "Quase lá", hi: "लगभग तैयार", zh: "差一点就够了", ar: "على وشك الاكتمال" },
 
   settingsTitle: { en: "Settings", es: "Configuración", fr: "Paramètres", pt: "Configurações", hi: "सेटिंग्स", zh: "设置", ar: "الإعدادات", ru: "Настройки", ta: "அமைப்புகள்" },
-  dailyTargets: { en: "Daily targets", es: "Objetivos diarios", fr: "Objectifs quotidiens", pt: "Metas diárias", hi: "दैनिक लक्ष्य", zh: "每日目标", ar: "الأهداف اليومية" },
+  dailyTargets: { en: "Daily goals", es: "Objetivos diarios", fr: "Objectifs quotidiens", pt: "Metas diárias", hi: "दैनिक लक्ष्य", zh: "每日目标", ar: "الأهداف اليومية" },
   profileLabel: { en: "Profile", es: "Perfil", fr: "Profil", pt: "Perfil", hi: "प्रोफ़ाइल", zh: "个人资料", ar: "الملف الشخصي" },
   accessibilityLabel: { en: "Accessibility & personalization", es: "Accesibilidad y personalización", fr: "Accessibilité et personnalisation", pt: "Acessibilidade e personalização", hi: "सुलभता और वैयक्तिकरण", zh: "无障碍与个性化", ar: "إمكانية الوصول والتخصيص" },
   languageLabel: { en: "Language", es: "Idioma", fr: "Langue", pt: "Idioma", hi: "भाषा", zh: "语言", ar: "اللغة" },
   cookingLevelLabel: { en: "Cooking level", es: "Nivel de cocina", fr: "Niveau de cuisine", pt: "Nível de culinária", hi: "खाना पकाने का स्तर", zh: "烹饪水平", ar: "مستوى الطبخ" },
-  dietaryPreference: { en: "Dietary preference", es: "Preferencia alimentaria", fr: "Préférence alimentaire", pt: "Preferência alimentar", hi: "आहार वरीयता", zh: "饮食偏好", ar: "التفضيلات الغذائية" },
+  dietaryPreference: { en: "Diet", es: "Preferencia alimentaria", fr: "Préférence alimentaire", pt: "Preferência alimentar", hi: "आहार वरीयता", zh: "饮食偏好", ar: "التفضيلات الغذائية" },
   kitchenDataLabel: { en: "Kitchen data", es: "Datos de cocina", fr: "Données de cuisine", pt: "Dados da cozinha", hi: "रसोई डेटा", zh: "厨房数据", ar: "بيانات المطبخ" },
   saveProfile: { en: "Save profile", es: "Guardar perfil", fr: "Enregistrer le profil", pt: "Salvar perfil", hi: "प्रोफ़ाइल सहेजें", zh: "保存个人资料", ar: "حفظ الملف الشخصي" },
 
@@ -430,13 +467,13 @@ const TRANSLATIONS = {
   cookingGoalLabel: { en: "Cooking goal", es: "Objetivo de cocina", fr: "Objectif culinaire", pt: "Objetivo culinário", hi: "खाना पकाने का लक्ष्य", zh: "烹饪目标", ar: "هدف الطبخ" },
   biologicalSexLabel: { en: "Biological sex", es: "Sexo biológico", fr: "Sexe biologique", pt: "Sexo biológico", hi: "जैविक लिंग", zh: "生理性别", ar: "الجنس البيولوجي" },
   biologicalSexHint: { en: "Only used to make the calorie estimate more accurate — skip it if you'd rather not say.", es: "Solo se usa para que la estimación de calorías sea más precisa — omítelo si prefieres no decirlo.", fr: "Utilisé uniquement pour affiner l'estimation calorique — ignorez si vous préférez ne pas le dire.", pt: "Usado apenas para tornar a estimativa de calorias mais precisa — pule se preferir não dizer.", hi: "केवल कैलोरी अनुमान को अधिक सटीक बनाने के लिए उपयोग किया जाता है — यदि आप नहीं बताना चाहें तो छोड़ दें।", zh: "仅用于让卡路里估算更准确——如果不想透露可以跳过。", ar: "يُستخدم فقط لجعل تقدير السعرات أكثر دقة — تخطَّه إذا كنت تفضل عدم الإفصاح." },
-  noTrackMessage: { en: "No problem — we won't show calorie or macro numbers anywhere in the app. You can still use everything else, and can turn tracking back on anytime in Settings.", es: "Sin problema — no mostraremos números de calorías ni macros en ningún lugar de la app. Puedes seguir usando todo lo demás, y activar el seguimiento cuando quieras desde Configuración.", fr: "Pas de souci — nous n'afficherons aucun chiffre de calories ou de macros dans l'application. Vous pouvez toujours utiliser tout le reste, et réactiver le suivi à tout moment dans les Paramètres.", pt: "Sem problema — não mostraremos números de calorias ou macros em nenhum lugar do app. Você ainda pode usar tudo o mais, e pode reativar o rastreamento a qualquer momento em Configurações.", hi: "कोई बात नहीं — हम ऐप में कहीं भी कैलोरी या मैक्रो नंबर नहीं दिखाएंगे। आप बाकी सब कुछ इस्तेमाल कर सकते हैं, और सेटिंग्स से कभी भी ट्रैकिंग वापस चालू कर सकते हैं।", zh: "没问题——我们不会在应用中的任何地方显示卡路里或宏量营养素数字。你仍然可以使用其他所有功能，并可以随时在设置中重新开启追踪。", ar: "لا مشكلة — لن نعرض أرقام السعرات أو المغذيات الكبرى في أي مكان بالتطبيق. لا يزال بإمكانك استخدام كل شيء آخر، ويمكنك إعادة تفعيل التتبع في أي وقت من الإعدادات." },
+  noTrackMessage: { en: "No problem — we won't show calorie, protein, carb or fat numbers anywhere in the app. You can still use everything else, and can turn tracking back on anytime in Settings.", es: "Sin problema — no mostraremos números de calorías ni macros en ningún lugar de la app. Puedes seguir usando todo lo demás, y activar el seguimiento cuando quieras desde Configuración.", fr: "Pas de souci — nous n'afficherons aucun chiffre de calories ou de macros dans l'application. Vous pouvez toujours utiliser tout le reste, et réactiver le suivi à tout moment dans les Paramètres.", pt: "Sem problema — não mostraremos números de calorias ou macros em nenhum lugar do app. Você ainda pode usar tudo o mais, e pode reativar o rastreamento a qualquer momento em Configurações.", hi: "कोई बात नहीं — हम ऐप में कहीं भी कैलोरी या मैक्रो नंबर नहीं दिखाएंगे। आप बाकी सब कुछ इस्तेमाल कर सकते हैं, और सेटिंग्स से कभी भी ट्रैकिंग वापस चालू कर सकते हैं।", zh: "没问题——我们不会在应用中的任何地方显示卡路里或宏量营养素数字。你仍然可以使用其他所有功能，并可以随时在设置中重新开启追踪。", ar: "لا مشكلة — لن نعرض أرقام السعرات أو المغذيات الكبرى في أي مكان بالتطبيق. لا يزال بإمكانك استخدام كل شيء آخر، ويمكنك إعادة تفعيل التتبع في أي وقت من الإعدادات." },
   extremeCautionText: { en: "This is a fast pace. Rapid changes aren't right for everyone, and sustainable, gradual goals tend to work better long-term — consider talking to a doctor or registered dietitian before pursuing this.", es: "Este es un ritmo rápido. Los cambios rápidos no son adecuados para todos, y las metas graduales y sostenibles suelen funcionar mejor a largo plazo — considera hablar con un médico o dietista antes de seguir esto.", fr: "C'est un rythme rapide. Les changements rapides ne conviennent pas à tout le monde, et des objectifs progressifs et durables fonctionnent souvent mieux à long terme — envisagez d'en parler à un médecin ou un diététicien avant de vous lancer.", pt: "Esse é um ritmo rápido. Mudanças rápidas não são adequadas para todos, e metas graduais e sustentáveis costumam funcionar melhor a longo prazo — considere conversar com um médico ou nutricionista antes de seguir por esse caminho.", hi: "यह एक तेज़ गति है। तेज़ बदलाव सभी के लिए सही नहीं होते, और टिकाऊ, धीरे-धीरे बढ़ने वाले लक्ष्य लंबे समय में बेहतर काम करते हैं — इसे अपनाने से पहले किसी डॉक्टर या पंजीकृत आहार विशेषज्ञ से बात करने पर विचार करें।", zh: "这个速度较快。快速的变化并不适合所有人，可持续的渐进目标长期来看往往效果更好——在采取这种方式之前，建议咨询医生或注册营养师。", ar: "هذه وتيرة سريعة. التغييرات السريعة ليست مناسبة للجميع، والأهداف التدريجية المستدامة تنجح غالبًا بشكل أفضل على المدى الطويل — فكر في استشارة طبيب أو أخصائي تغذية مسجل قبل اتباع هذا." },
   calorieDisclaimer: { en: "These numbers are rough general estimates, not medical advice. If you have — or are recovering from — an eating disorder, or have specific health needs, please talk to a doctor or registered dietitian instead of relying on app-generated targets.", es: "Estos números son estimaciones generales, no consejo médico. Si tienes — o te estás recuperando de — un trastorno alimentario, o tienes necesidades de salud específicas, habla con un médico o dietista en lugar de confiar en los objetivos generados por la app.", fr: "Ces chiffres sont des estimations générales approximatives, pas un avis médical. Si vous avez — ou êtes en convalescence d'un — trouble alimentaire, ou avez des besoins de santé spécifiques, parlez-en à un médecin ou un diététicien plutôt que de vous fier aux objectifs générés par l'application.", pt: "Esses números são estimativas gerais aproximadas, não aconselhamento médico. Se você tem — ou está se recuperando de — um transtorno alimentar, ou tem necessidades de saúde específicas, converse com um médico ou nutricionista em vez de confiar nas metas geradas pelo app.", hi: "ये संख्याएं सामान्य अनुमान हैं, चिकित्सा सलाह नहीं। यदि आपको खान-पान संबंधी विकार है — या उससे उबर रहे हैं — या विशेष स्वास्थ्य आवश्यकताएं हैं, तो कृपया ऐप-जनित लक्ष्यों पर भरोसा करने के बजाय डॉक्टर या पंजीकृत आहार विशेषज्ञ से बात करें।", zh: "这些数字只是粗略的一般估算，并非医疗建议。如果你有饮食失调（或正在康复中），或有特殊健康需求，请咨询医生或注册营养师，而不要依赖应用生成的目标。", ar: "هذه الأرقام تقديرات عامة تقريبية، وليست نصيحة طبية. إذا كنت تعاني — أو تتعافى — من اضطراب في الأكل، أو لديك احتياجات صحية خاصة، فيرجى التحدث إلى طبيب أو أخصائي تغذية مسجل بدلاً من الاعتماد على الأهداف التي يولدها التطبيق." },
   activityLevelLabel: { en: "Activity level", es: "Nivel de actividad", fr: "Niveau d'activité", pt: "Nível de atividade", hi: "गतिविधि स्तर", zh: "活动水平", ar: "مستوى النشاط" },
   optionalTag: { en: "optional", es: "opcional", fr: "facultatif", pt: "opcional", hi: "वैकल्पिक", zh: "可选", ar: "اختياري" },
   continueLabel: { en: "Continue", es: "Continuar", fr: "Continuer", pt: "Continuar", hi: "जारी रखें", zh: "继续", ar: "متابعة" },
-  recommendedTargetsTitle: { en: "Your recommended targets", es: "Tus objetivos recomendados", fr: "Vos objectifs recommandés", pt: "Suas metas recomendadas", hi: "आपके अनुशंसित लक्ष्य", zh: "你的推荐目标", ar: "أهدافك الموصى بها" },
+  recommendedTargetsTitle: { en: "Your suggested daily goals", es: "Tus objetivos recomendados", fr: "Vos objectifs recommandés", pt: "Suas metas recomendadas", hi: "आपके अनुशंसित लक्ष्य", zh: "你的推荐目标", ar: "أهدافك الموصى بها" },
   recommendedTargetsSubtitle: { en: "Based on what you told us — drag the sliders or type a number to adjust. You can change these anytime from Settings too.", es: "Según lo que nos dijiste — arrastra los controles o escribe un número para ajustar. También puedes cambiar esto desde Configuración.", fr: "D'après ce que vous nous avez dit — faites glisser les curseurs ou entrez un chiffre. Vous pouvez aussi tout modifier depuis les Paramètres.", pt: "Com base no que você nos disse — arraste os controles ou digite um número. Você também pode mudar isso em Configurações.", hi: "आपने जो बताया उसके आधार पर — स्लाइडर खींचें या संख्या टाइप करें। आप इसे सेटिंग्स से भी बदल सकते हैं।", zh: "根据你提供的信息——拖动滑块或输入数字进行调整。你也可以随时在设置中更改。", ar: "بناءً على ما أخبرتنا به — اسحب أشرطة التمرير أو اكتب رقمًا للتعديل. يمكنك أيضًا تغيير هذا في أي وقت من الإعدادات." },
   letsCookLabel: { en: "Let's cook", es: "A cocinar", fr: "Allons cuisiner", pt: "Vamos cozinhar", hi: "चलिए पकाते हैं", zh: "开始做饭", ar: "لنبدأ الطبخ" },
 
@@ -446,15 +483,15 @@ const TRANSLATIONS = {
   expiresOnLabel: { en: "Expires on", es: "Caduca el", fr: "Expire le", pt: "Expira em", hi: "समाप्ति तिथि", zh: "到期日期", ar: "تاريخ الانتهاء" },
   expAbbrevLabel: { en: "exp", es: "cad", fr: "exp", pt: "val", hi: "समाप्ति", zh: "到期", ar: "ينتهي" },
   quantityHint: { en: "Leave these blank if you don't want to track it — they're just here to help you use things before they go bad.", es: "Deja esto en blanco si no quieres registrarlo — solo está aquí para ayudarte a usar las cosas antes de que se echen a perder.", fr: "Laissez vide si vous ne voulez pas suivre ça — c'est juste là pour vous aider à utiliser les choses avant qu'elles ne s'abîment.", pt: "Deixe em branco se não quiser rastrear — é só para te ajudar a usar as coisas antes que estraguem.", hi: "अगर आप इसे ट्रैक नहीं करना चाहते तो इसे खाली छोड़ दें — यह सिर्फ चीज़ों को खराब होने से पहले उपयोग करने में मदद के लिए है।", zh: "如果不想追踪，可以留空——这只是帮助你在食材变质前用掉它们。", ar: "اترك هذه فارغة إذا كنت لا تريد تتبعها — إنها هنا فقط لمساعدتك على استخدام الأشياء قبل أن تفسد." },
-  qtyExamplePlaceholder: { en: "e.g. 2 dozen", es: "ej. 2 docenas", fr: "ex. 2 douzaines", pt: "ex. 2 dúzias", hi: "जैसे 2 दर्जन", zh: "例如 2打", ar: "مثال: 2 دزينة" },
+  qtyExamplePlaceholder: { en: "like 2 dozen", es: "ej. 2 docenas", fr: "ex. 2 douzaines", pt: "ex. 2 dúzias", hi: "जैसे 2 दर्जन", zh: "例如 2打", ar: "مثال: 2 دزينة" },
   seeReadyRecipes: { en: "recipe ready to cook", en_plural: "recipes ready to cook", es: "receta lista para cocinar", fr: "recette prête à cuisiner", pt: "receita pronta para cozinhar", hi: "पकाने के लिए तैयार रेसिपी", zh: "道菜可以烹饪", ar: "وصفة جاهزة للطبخ" },
   seeWhatYouCanMake: { en: "See what you can make", es: "Mira qué puedes cocinar", fr: "Voyez ce que vous pouvez cuisiner", pt: "Veja o que você pode cozinhar", hi: "देखें आप क्या बना सकते हैं", zh: "看看你能做什么", ar: "شاهد ما يمكنك صنعه" },
 
-  cookSubtitleKitchen: { en: "Pulled straight from My Kitchen — equipment and ingredients", es: "Tomado directamente de Mi Cocina — equipo e ingredientes", fr: "Directement tiré de Ma Cuisine — équipement et ingrédients", pt: "Direto da Minha Cozinha — equipamento e ingredientes", hi: "सीधे मेरी रसोई से — उपकरण और सामग्री", zh: "直接来自我的厨房——厨具与食材", ar: "مباشرة من مطبخي — المعدات والمكونات" },
+  cookSubtitleKitchen: { en: "Based on what's in My Kitchen: your tools and ingredients", es: "Tomado directamente de Mi Cocina — equipo e ingredientes", fr: "Directement tiré de Ma Cuisine — équipement et ingrédients", pt: "Direto da Minha Cozinha — equipamento e ingredientes", hi: "सीधे मेरी रसोई से — उपकरण और सामग्री", zh: "直接来自我的厨房——厨具与食材", ar: "مباشرة من مطبخي — المعدات والمكونات" },
   cookSubtitleSearch: { en: "Know what you want? Search it — closest matches with the fewest ingredients show first.", es: "¿Sabes lo que quieres? Búscalo — las coincidencias más cercanas con menos ingredientes aparecen primero.", fr: "Vous savez ce que vous voulez ? Cherchez-le — les meilleures correspondances avec le moins d'ingrédients apparaissent en premier.", pt: "Sabe o que quer? Busque — as correspondências mais próximas com menos ingredientes aparecem primeiro.", hi: "जानते हैं क्या चाहिए? खोजें — सबसे कम सामग्री वाले परिणाम पहले दिखेंगे।", zh: "知道自己想吃什么？搜索一下——所需食材最少的最相近结果会先显示。", ar: "تعرف ماذا تريد؟ ابحث عنه — أقرب النتائج بأقل عدد من المكونات تظهر أولاً." },
   addCuisinePlaceholder: { en: "Don't see yours? Add a cuisine…", es: "¿No ves la tuya? Añade una cocina…", fr: "Vous ne voyez pas la vôtre ? Ajoutez une cuisine…", pt: "Não vê a sua? Adicione uma culinária…", hi: "अपनी नहीं दिख रही? एक व्यंजन जोड़ें…", zh: "没看到你的菜系？添加一个…", ar: "لا ترى مطبخك؟ أضف مطبخًا…" },
-  addEquipmentPlaceholder: { en: "Don't see it? Add equipment (e.g. Air fryer)…", es: "¿No lo ves? Añade equipo (ej. Freidora de aire)…", fr: "Vous ne le voyez pas ? Ajoutez du matériel (ex. Friteuse à air)…", pt: "Não vê? Adicione equipamento (ex. Fritadeira de ar)…", hi: "नहीं दिख रहा? उपकरण जोड़ें (जैसे एयर फ्रायर)…", zh: "没看到？添加厨具（例如 空气炸锅）…", ar: "لا تراه؟ أضف معدات (مثل: مقلاة هوائية)…" },
-  noKitchenMatch: { en: "Nothing fully matches yet — add ingredients or equipment in My Kitchen.", es: "Nada coincide completamente todavía — añade ingredientes o equipo en Mi Cocina.", fr: "Rien ne correspond encore totalement — ajoutez des ingrédients ou du matériel dans Ma Cuisine.", pt: "Nada corresponde totalmente ainda — adicione ingredientes ou equipamento na Minha Cozinha.", hi: "अभी तक कुछ भी पूरी तरह मेल नहीं खाता — मेरी रसोई में सामग्री या उपकरण जोड़ें।", zh: "目前还没有完全匹配的——在我的厨房中添加食材或厨具。", ar: "لا يوجد تطابق كامل بعد — أضف مكونات أو معدات في مطبخي." },
+  addEquipmentPlaceholder: { en: "Don't see it? Add a tool (like an air fryer)…", es: "¿No lo ves? Añade equipo (ej. Freidora de aire)…", fr: "Vous ne le voyez pas ? Ajoutez du matériel (ex. Friteuse à air)…", pt: "Não vê? Adicione equipamento (ex. Fritadeira de ar)…", hi: "नहीं दिख रहा? उपकरण जोड़ें (जैसे एयर फ्रायर)…", zh: "没看到？添加厨具（例如 空气炸锅）…", ar: "لا تراه؟ أضف معدات (مثل: مقلاة هوائية)…" },
+  noKitchenMatch: { en: "Nothing fully matches yet. Add ingredients or tools in My Kitchen.", es: "Nada coincide completamente todavía — añade ingredientes o equipo en Mi Cocina.", fr: "Rien ne correspond encore totalement — ajoutez des ingrédients ou du matériel dans Ma Cuisine.", pt: "Nada corresponde totalmente ainda — adicione ingredientes ou equipamento na Minha Cozinha.", hi: "अभी तक कुछ भी पूरी तरह मेल नहीं खाता — मेरी रसोई में सामग्री या उपकरण जोड़ें।", zh: "目前还没有完全匹配的——在我的厨房中添加食材或厨具。", ar: "لا يوجد تطابق كامل بعد — أضف مكونات أو معدات في مطبخي." },
   noFilterMatch: { en: "Nothing matches those filters yet with what's in your kitchen.", es: "Nada coincide con esos filtros todavía con lo que tienes en tu cocina.", fr: "Rien ne correspond à ces filtres avec ce qu'il y a dans votre cuisine.", pt: "Nada corresponde a esses filtros com o que há na sua cozinha.", hi: "आपकी रसोई की चीज़ों से ये फ़िल्टर अभी मेल नहीं खाते।", zh: "根据你厨房现有的东西，暂时没有符合这些筛选条件的。", ar: "لا يوجد ما يطابق هذه الفلاتر بعد بناءً على ما في مطبخك." },
   noSearchMatch: { en: "No meals match that search.", es: "Ninguna comida coincide con esa búsqueda.", fr: "Aucun repas ne correspond à cette recherche.", pt: "Nenhuma refeição corresponde a essa busca.", hi: "उस खोज से कोई भोजन मेल नहीं खाता।", zh: "没有符合该搜索的菜谱。", ar: "لا توجد وجبات تطابق هذا البحث." },
   allMealsFewestFirst: { en: "All meals, fewest ingredients first", es: "Todas las comidas, menos ingredientes primero", fr: "Tous les repas, le moins d'ingrédients d'abord", pt: "Todas as refeições, menos ingredientes primeiro", hi: "सभी भोजन, सबसे कम सामग्री पहले", zh: "所有菜谱，食材最少的排在前面", ar: "كل الوجبات، الأقل مكونات أولاً" },
@@ -480,7 +517,7 @@ const TRANSLATIONS = {
   editRecipeTitle: { en: "Edit Recipe", es: "Editar Receta", fr: "Modifier la Recette", pt: "Editar Receita", hi: "रेसिपी संपादित करें", zh: "编辑菜谱", ar: "تعديل الوصفة" },
   remixNoticeText: { en: "This is a My Sous recipe — saving will keep the original untouched and create your own personal twist instead.", es: "Esta es una receta de My Sous — al guardar, el original se mantiene intacto y se crea tu propia versión personal.", fr: "Ceci est une recette My Sous — l'enregistrement laissera l'original intact et créera votre propre version personnelle.", pt: "Esta é uma receita do My Sous — salvar manterá o original intacto e criará sua própria versão pessoal.", hi: "यह एक My Sous रेसिपी है — सहेजने से मूल अपरिवर्तित रहेगा और आपकी अपनी व्यक्तिगत रेसिपी बनेगी।", zh: "这是一道 My Sous 菜谱——保存后原版将保持不变，会为你创建专属的个人版本。", ar: "هذه وصفة من My Sous — الحفظ سيُبقي النسخة الأصلية كما هي وينشئ نسختك الشخصية الخاصة بدلاً من ذلك." },
   brandLabel: { en: "Brand", es: "Marca", fr: "Marque", pt: "Marca", hi: "ब्रांड", zh: "品牌", ar: "العلامة التجارية" },
-  brandPlaceholder: { en: "e.g. Heinz", es: "ej. Heinz", fr: "ex. Heinz", pt: "ex. Heinz", hi: "जैसे Heinz", zh: "例如 亨氏", ar: "مثال: هاينز" },
+  brandPlaceholder: { en: "like Heinz", es: "ej. Heinz", fr: "ex. Heinz", pt: "ex. Heinz", hi: "जैसे Heinz", zh: "例如 亨氏", ar: "مثال: هاينز" },
   recipeNameLabel: { en: "Recipe name", es: "Nombre de la receta", fr: "Nom de la recette", pt: "Nome da receita", hi: "रेसिपी का नाम", zh: "菜谱名称", ar: "اسم الوصفة" },
   emojiLabel: { en: "Emoji", es: "Emoji", fr: "Emoji", pt: "Emoji", hi: "इमोजी", zh: "表情符号", ar: "الرمز التعبيري" },
   timeLabel: { en: "Time", es: "Tiempo", fr: "Temps", pt: "Tempo", hi: "समय", zh: "时间", ar: "الوقت" },
@@ -488,7 +525,7 @@ const TRANSLATIONS = {
   stepsLabel: { en: "Steps", es: "Pasos", fr: "Étapes", pt: "Passos", hi: "चरण", zh: "步骤", ar: "الخطوات" },
   addStepLabel: { en: "+ Add step", es: "+ Añadir paso", fr: "+ Ajouter une étape", pt: "+ Adicionar passo", hi: "+ चरण जोड़ें", zh: "+ 添加步骤", ar: "+ أضف خطوة" },
   instructionPlaceholder: { en: "What do you do in this step?", es: "¿Qué haces en este paso?", fr: "Que faites-vous à cette étape ?", pt: "O que você faz nesta etapa?", hi: "इस चरण में आप क्या करते हैं?", zh: "这一步要做什么？", ar: "ماذا تفعل في هذه الخطوة؟" },
-  measurePlaceholder: { en: "Time / measurement (e.g. 2 cups, 5 min)", es: "Tiempo / medida (ej. 2 tazas, 5 min)", fr: "Temps / mesure (ex. 2 tasses, 5 min)", pt: "Tempo / medida (ex. 2 xícaras, 5 min)", hi: "समय / माप (जैसे 2 कप, 5 मिनट)", zh: "时间／用量（例如 2杯，5分钟）", ar: "الوقت / المقدار (مثال: كوبان، 5 دقائق)" },
+  measurePlaceholder: { en: "Time / amount (like 2 cups, 5 min)", es: "Tiempo / medida (ej. 2 tazas, 5 min)", fr: "Temps / mesure (ex. 2 tasses, 5 min)", pt: "Tempo / medida (ex. 2 xícaras, 5 min)", hi: "समय / माप (जैसे 2 कप, 5 मिनट)", zh: "时间／用量（例如 2杯，5分钟）", ar: "الوقت / المقدار (مثال: كوبان، 5 دقائق)" },
   visualPlaceholder: { en: "What should it look like?", es: "¿Cómo debería verse?", fr: "À quoi cela devrait ressembler ?", pt: "Como deve parecer?", hi: "इसे कैसा दिखना चाहिए?", zh: "应该是什么样子？", ar: "كيف يجب أن يبدو؟" },
   flavorBoostsLabel: { en: "Flavor boosts (optional)", es: "Mejoras de sabor (opcional)", fr: "Astuces de saveur (facultatif)", pt: "Toques de sabor (opcional)", hi: "स्वाद बढ़ाने के तरीके (वैकल्पिक)", zh: "风味提升（可选）", ar: "إضافات النكهة (اختياري)" },
   addFlavorPlaceholder: { en: "Add a flavor tip…", es: "Añade un consejo de sabor…", fr: "Ajoutez une astuce de saveur…", pt: "Adicione uma dica de sabor…", hi: "एक स्वाद सुझाव जोड़ें…", zh: "添加风味小贴士…", ar: "أضف نصيحة نكهة…" },
@@ -508,12 +545,12 @@ const TRANSLATIONS = {
   nothingCookedYet: { en: "Nothing cooked yet — finish a recipe to see it here.", es: "Nada cocinado todavía — termina una receta para verla aquí.", fr: "Rien de cuisiné encore — terminez une recette pour la voir ici.", pt: "Nada cozinhado ainda — termine uma receita para vê-la aqui.", hi: "अभी तक कुछ नहीं पकाया — यहां देखने के लिए एक रेसिपी पूरी करें।", zh: "还没有做过菜——完成一道菜谱后会显示在这里。", ar: "لم يتم طهي شيء بعد — أنهِ وصفة لرؤيتها هنا." },
 
   moreSubtitle: { en: "Everything else, in one place", es: "Todo lo demás, en un solo lugar", fr: "Tout le reste, au même endroit", pt: "Tudo mais, em um só lugar", hi: "बाकी सब कुछ, एक ही जगह", zh: "其他一切，都在这里", ar: "كل شيء آخر، في مكان واحد" },
-  historySub: { en: "Meals cooked, ratings, achievements", es: "Comidas cocinadas, calificaciones, logros", fr: "Repas cuisinés, notes, succès", pt: "Refeições cozinhadas, avaliações, conquistas", hi: "पके भोजन, रेटिंग, उपलब्धियां", zh: "已做的菜、评分、成就", ar: "الوجبات المطبوخة، التقييمات، الإنجازات" },
+  historySub: { en: "Meals you've cooked, ratings and badges", es: "Comidas cocinadas, calificaciones, logros", fr: "Repas cuisinés, notes, succès", pt: "Refeições cozinhadas, avaliações, conquistas", hi: "पके भोजन, रेटिंग, उपलब्धियां", zh: "已做的菜、评分、成就", ar: "الوجبات المطبوخة، التقييمات، الإنجازات" },
   cookbookSub: { en: "Your saved recipes", es: "Tus recetas guardadas", fr: "Vos recettes enregistrées", pt: "Suas receitas salvas", hi: "आपकी सहेजी गई रेसिपी", zh: "你保存的菜谱", ar: "وصفاتك المحفوظة" },
   communitySub: { en: "Tips, ratings and tutorials from other cooks", es: "Consejos, calificaciones y tutoriales de otros cocineros", fr: "Astuces, notes et tutoriels d'autres cuisiniers", pt: "Dicas, avaliações e tutoriais de outros cozinheiros", hi: "दूसरे रसोइयों के टिप्स, रेटिंग और ट्यूटोरियल", zh: "来自其他厨师的技巧、评分和教程", ar: "نصائح وتقييمات ودروس من طهاة آخرين" },
   shoppingSub: { en: "What to buy next", es: "Qué comprar después", fr: "Quoi acheter ensuite", pt: "O que comprar a seguir", hi: "आगे क्या खरीदें", zh: "接下来该买什么", ar: "ماذا تشتري بعد ذلك" },
-  glossaryLabel: { en: "Nutrition Glossary", es: "Glosario Nutricional", fr: "Glossaire Nutritionnel", pt: "Glossário Nutricional", hi: "पोषण शब्दावली", zh: "营养词典", ar: "مسرد التغذية" },
-  glossarySub: { en: "Macros for common ingredients", es: "Macros de ingredientes comunes", fr: "Macros des ingrédients courants", pt: "Macros de ingredientes comuns", hi: "सामान्य सामग्री के मैक्रोज़", zh: "常见食材的宏量营养素", ar: "المغذيات الكبرى للمكونات الشائعة" },
+  glossaryLabel: { en: "Nutrition guide", es: "Glosario Nutricional", fr: "Glossaire Nutritionnel", pt: "Glossário Nutricional", hi: "पोषण शब्दावली", zh: "营养词典", ar: "مسرد التغذية" },
+  glossarySub: { en: "Protein, carbs and fat in common foods", es: "Macros de ingredientes comunes", fr: "Macros des ingrédients courants", pt: "Macros de ingredientes comuns", hi: "सामान्य सामग्री के मैक्रोज़", zh: "常见食材的宏量营养素", ar: "المغذيات الكبرى للمكونات الشائعة" },
   glossarySearchPlaceholder: { en: "Search an ingredient…", es: "Buscar un ingrediente…", fr: "Rechercher un ingrédient…", pt: "Buscar um ingrediente…", hi: "एक सामग्री खोजें…", zh: "搜索食材…", ar: "ابحث عن مكوّن…" },
   whereToBuyLabel: { en: "Where to Buy", es: "Dónde Comprar", fr: "Où Acheter", pt: "Onde Comprar", hi: "कहाँ से खरीदें", zh: "在哪里购买", ar: "أين تشتري" },
   whereToBuySub: { en: "What you have and where to find what you don't", es: "Lo que tienes y dónde encontrar lo que no", fr: "Ce que vous avez et où trouver ce qu'il vous manque", pt: "O que você tem e onde encontrar o que falta", hi: "आपके पास क्या है और जो नहीं है वह कहाँ मिलेगा", zh: "你已拥有的和还需寻找的", ar: "ما تملكه وأين تجد ما ينقصك" },
@@ -526,7 +563,7 @@ const TRANSLATIONS = {
   liveCheckEmpty: { en: "Claude didn't have a suggestion for this one.", es: "Claude no tuvo sugerencias para este producto.", fr: "Claude n'a pas de suggestion pour celui-ci.", pt: "O Claude não teve sugestão para este item.", hi: "Claude के पास इसके लिए कोई सुझाव नहीं था।", zh: "Claude 对这一项没有建议。", ar: "لم يكن لدى Claude اقتراح لهذا العنصر." },
   liveCheckNote: { en: "From Claude's general knowledge, not live stock. Use the store links to check.", es: "Según el conocimiento general de Claude, no es stock en vivo. Usa los enlaces de tiendas para comprobar.", fr: "D'après les connaissances générales de Claude, pas le stock en direct. Vérifiez avec les liens des magasins.", pt: "Com base no conhecimento geral do Claude, não no estoque ao vivo. Use os links das lojas para conferir.", hi: "Claude की सामान्य जानकारी से, लाइव स्टॉक नहीं। जाँचने के लिए स्टोर लिंक देखें।", zh: "基于 Claude 的常识，并非实时库存。请用商店链接确认。", ar: "من معرفة Claude العامة وليس المخزون الحالي. استخدم روابط المتاجر للتحقق." },
   retryLabel: { en: "Retry", es: "Reintentar", fr: "Réessayer", pt: "Tentar novamente", hi: "फिर से कोशिश करें", zh: "重试", ar: "أعد المحاولة" },
-  equipmentSectionTitle: { en: "Equipment", es: "Equipo", fr: "Matériel", pt: "Equipamento", hi: "उपकरण", zh: "厨具", ar: "المعدات" },
+  equipmentSectionTitle: { en: "Kitchen tools", es: "Equipo", fr: "Matériel", pt: "Equipamento", hi: "उपकरण", zh: "厨具", ar: "المعدات" },
   ingredientsSectionTitle: { en: "Ingredients you're missing", es: "Ingredientes que te faltan", fr: "Ingrédients qui vous manquent", pt: "Ingredientes que faltam", hi: "जो सामग्री नहीं है", zh: "你缺少的食材", ar: "المكونات الناقصة" },
   ownedLabel: { en: "Owned", es: "Tienes", fr: "Possédé", pt: "Você tem", hi: "मौजूद है", zh: "已拥有", ar: "متوفر" },
   missingLabel: { en: "Missing", es: "Falta", fr: "Manquant", pt: "Faltando", hi: "गायब", zh: "缺少", ar: "ناقص" },
@@ -539,7 +576,7 @@ const TRANSLATIONS = {
   glossaryEmpty: { en: "No ingredients match that search.", es: "Ningún ingrediente coincide con esa búsqueda.", fr: "Aucun ingrédient ne correspond à cette recherche.", pt: "Nenhum ingrediente corresponde a essa busca.", hi: "उस खोज से कोई सामग्री मेल नहीं खाती।", zh: "没有符合该搜索的食材。", ar: "لا توجد مكونات تطابق هذا البحث." },
   aiGreeting: { en: "Hey! I'm your Sous-Chef. Ask me anything about a recipe, a substitution, or a technique.", es: "¡Hola! Soy tu Sous-Chef. Pregúntame lo que quieras sobre una receta, un sustituto o una técnica.", fr: "Salut ! Je suis votre Sous-Chef. Demandez-moi tout sur une recette, un remplacement ou une technique.", pt: "Oi! Sou seu Sous-Chef. Pergunte qualquer coisa sobre uma receita, uma substituição ou uma técnica.", hi: "नमस्ते! मैं आपका सू-शेफ हूँ। रेसिपी, विकल्प, या तकनीक के बारे में कुछ भी पूछें।", zh: "嗨！我是你的副厨师。随时问我关于食谱、替代品或技巧的任何问题。", ar: "مرحبًا! أنا مساعد الطاهي الخاص بك. اسألني أي شيء عن وصفة أو بديل أو تقنية." },
   askSousChefPlaceholder: { en: "Ask the Sous-Chef…", es: "Pregúntale al Sous-Chef…", fr: "Demandez au Sous-Chef…", pt: "Pergunte ao Sous-Chef…", hi: "सू-शेफ से पूछें…", zh: "问问副厨师…", ar: "اسأل مساعد الطاهي…" },
-  settingsSub: { en: "Profile, targets, dietary preference", es: "Perfil, objetivos, preferencia alimentaria", fr: "Profil, objectifs, préférence alimentaire", pt: "Perfil, metas, preferência alimentar", hi: "प्रोफ़ाइल, लक्ष्य, आहार वरीयता", zh: "个人资料、目标、饮食偏好", ar: "الملف الشخصي، الأهداف، التفضيلات الغذائية" },
+  settingsSub: { en: "Profile, daily goals, diet and display", es: "Perfil, objetivos, preferencia alimentaria", fr: "Profil, objectifs, préférence alimentaire", pt: "Perfil, metas, preferência alimentar", hi: "प्रोफ़ाइल, लक्ष्य, आहार वरीयता", zh: "个人资料、目标、饮食偏好", ar: "الملف الشخصي، الأهداف، التفضيلات الغذائية" },
 
   cookbookHeaderSub: { en: "Recipes you've saved to make again", es: "Recetas que guardaste para hacer de nuevo", fr: "Recettes que vous avez enregistrées pour refaire", pt: "Receitas que você salvou para fazer de novo", hi: "आपकी सहेजी गई रेसिपी जिन्हें आप फिर बनाएंगे", zh: "你保存下来准备再次制作的菜谱", ar: "الوصفات التي حفظتها لصنعها مرة أخرى" },
   cookbookEmpty: { en: "Tap the heart on any recipe to save it here.", es: "Toca el corazón en cualquier receta para guardarla aquí.", fr: "Appuyez sur le cœur d'une recette pour l'enregistrer ici.", pt: "Toque no coração de qualquer receita para salvá-la aqui.", hi: "किसी भी रेसिपी को यहां सहेजने के लिए हार्ट पर टैप करें।", zh: "点击任意菜谱上的爱心即可保存到这里。", ar: "اضغط على القلب في أي وصفة لحفظها هنا." },
@@ -562,9 +599,9 @@ const TRANSLATIONS = {
   achievement10Meals: { en: "10 Meals Cooked", es: "10 comidas cocinadas", fr: "10 repas cuisinés", pt: "10 refeições cozinhadas", hi: "10 भोजन पके", zh: "已做10道菜", ar: "10 وجبات مطبوخة" },
   achievementKitchenPro: { en: "Kitchen Pro", es: "Experto de cocina", fr: "Pro de la cuisine", pt: "Pro da cozinha", hi: "किचन प्रो", zh: "厨房达人", ar: "محترف المطبخ" },
 
-  targetsSubtitle: { en: "We recommend your targets from your profile — adjust manually below if anything feels off.", es: "Recomendamos tus objetivos según tu perfil — ajusta manualmente abajo si algo no se siente bien.", fr: "Nous recommandons vos objectifs selon votre profil — ajustez manuellement ci-dessous si besoin.", pt: "Recomendamos suas metas com base no seu perfil — ajuste manualmente abaixo se algo parecer errado.", hi: "हम आपकी प्रोफ़ाइल से आपके लक्ष्यों की सिफारिश करते हैं — यदि कुछ ठीक न लगे तो नीचे मैन्युअल रूप से समायोजित करें।", zh: "我们会根据你的资料推荐目标——如果感觉不合适，可以在下方手动调整。", ar: "نوصي بأهدافك بناءً على ملفك الشخصي — عدّلها يدويًا أدناه إذا شعرت أن شيئًا غير مناسب." },
+  targetsSubtitle: { en: "We suggest daily goals based on your profile. Change them below if anything looks off.", es: "Recomendamos tus objetivos según tu perfil — ajusta manualmente abajo si algo no se siente bien.", fr: "Nous recommandons vos objectifs selon votre profil — ajustez manuellement ci-dessous si besoin.", pt: "Recomendamos suas metas com base no seu perfil — ajuste manualmente abaixo se algo parecer errado.", hi: "हम आपकी प्रोफ़ाइल से आपके लक्ष्यों की सिफारिश करते हैं — यदि कुछ ठीक न लगे तो नीचे मैन्युअल रूप से समायोजित करें।", zh: "我们会根据你的资料推荐目标——如果感觉不合适，可以在下方手动调整。", ar: "نوصي بأهدافك بناءً على ملفك الشخصي — عدّلها يدويًا أدناه إذا شعرت أن شيئًا غير مناسب." },
   adjustManuallyLabel: { en: "Adjust manually", es: "Ajustar manualmente", fr: "Ajuster manuellement", pt: "Ajustar manualmente", hi: "मैन्युअल रूप से समायोजित करें", zh: "手动调整", ar: "تعديل يدوي" },
-  saveTargetsLabel: { en: "Save targets", es: "Guardar objetivos", fr: "Enregistrer les objectifs", pt: "Salvar metas", hi: "लक्ष्य सहेजें", zh: "保存目标", ar: "حفظ الأهداف" },
+  saveTargetsLabel: { en: "Save goals", es: "Guardar objetivos", fr: "Enregistrer les objectifs", pt: "Salvar metas", hi: "लक्ष्य सहेजें", zh: "保存目标", ar: "حفظ الأهداف" },
   clearAllIngredients: { en: "Clear all ingredients", es: "Borrar todos los ingredientes", fr: "Effacer tous les ingrédients", pt: "Limpar todos os ingredientes", hi: "सभी सामग्री साफ़ करें", zh: "清空所有食材", ar: "مسح كل المكونات" },
   dietaryHint: { en: "Applied as a default filter in Cook — you can still change it there.", es: "Se aplica como filtro predeterminado en Cocinar — aún puedes cambiarlo allí.", fr: "Appliqué comme filtre par défaut dans Cuisiner — vous pouvez toujours le modifier là-bas.", pt: "Aplicado como filtro padrão em Cozinhar — você ainda pode mudar lá.", hi: "कुक में डिफ़ॉल्ट फ़िल्टर के रूप में लागू — आप इसे वहां भी बदल सकते हैं।", zh: "已作为“烹饪”页面的默认筛选条件应用——你仍可以在那里更改。", ar: "يُطبَّق كفلتر افتراضي في صفحة الطبخ — يمكنك تغييره هناك." },
 };
@@ -7381,6 +7418,7 @@ export default function App() {
   return (
     <LanguageContext.Provider value={{ language, t }}>
     <CommunityContext.Provider value={{ ratingFor: community.ratingFor, myRating: community.myRating, rate: community.rate }}>
+    <AllergyContext.Provider value={profile.allergies || []}>
     <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <style>{FONT_IMPORT}</style>
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
@@ -7393,7 +7431,7 @@ export default function App() {
             {isDark ? <Sun size={17} color={COLORS.inkMuted} /> : <Moon size={17} color={COLORS.inkMuted} />}
           </button>
           {showGear && (
-            <button onClick={openSettings} style={styles.settingsButton}>
+            <button onClick={openSettings} aria-label={t("settingsTitle")} title={t("settingsTitle")} style={styles.settingsButton}>
               <SettingsIcon size={18} color={COLORS.inkMuted} />
             </button>
           )}
@@ -7475,6 +7513,8 @@ export default function App() {
               servings={servings}
               setServings={setServings}
               onBack={() => { setScreen("cook"); setActiveRecipe(null); }}
+              units={appearance.units}
+              allergies={profile.allergies || []}
             />
           )}
           {screen === "complete" && activeRecipe && <CompleteScreen recipe={activeRecipe} servings={servings} onDone={finishMeal} />}
@@ -7571,6 +7611,7 @@ export default function App() {
         )}
       </div>
     </div>
+    </AllergyContext.Provider>
     </CommunityContext.Provider>
     </LanguageContext.Provider>
   );
@@ -7593,6 +7634,7 @@ function ProfileFields({
   heightUnit, setHeightUnit, height, setHeight, heightFt, setHeightFt, heightIn, setHeightIn,
   weightUnit, setWeightUnit, weight, setWeight,
   cookingGoal, setCookingGoal,
+  allergies, setAllergies,
 }) {
   const { t, language } = useContext(LanguageContext);
   return (
@@ -7645,6 +7687,24 @@ function ProfileFields({
           );
         })}
       </div>
+
+      {setAllergies && (
+        <>
+          <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("allergiesLabel")} ({t("optionalTag")})</div>
+          <p style={{ ...styles.basicsHint, marginTop: 0 }}>{t("allergiesHint")}</p>
+          <div style={styles.chipWrap} role="group" aria-label={t("allergiesLabel")}>
+            {ALLERGENS.map((a) => {
+              const on = (allergies || []).includes(a.id);
+              return (
+                <button key={a.id} aria-pressed={on} onClick={() => setAllergies(on ? allergies.filter((x) => x !== a.id) : [...(allergies || []), a.id])}
+                  style={{ ...styles.equipChip, ...(on ? { border: `1px solid ${COLORS.accentText}`, background: COLORS.accentSofter, color: COLORS.accentText, fontWeight: 600 } : {}) }}>
+                  {a.emoji} {t("allergen_" + a.id)}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
     </>
   );
 }
@@ -7660,8 +7720,9 @@ function OnboardingScreen({ onComplete, onChangeLanguage }) {
   const [weightUnit, setWeightUnit] = useState("kg");
   const [weight, setWeight] = useState("");
   const [cookingGoal, setCookingGoal] = useState("");
+  const [allergies, setAllergies] = useState([]);
 
-  const profileData = { name, age, heightUnit, height, heightFt, heightIn, weightUnit, weight, cookingGoal };
+  const profileData = { name, age, heightUnit, height, heightFt, heightIn, weightUnit, weight, cookingGoal, allergies };
 
   return (
     <div style={styles.screenPad}>
@@ -7679,6 +7740,7 @@ function OnboardingScreen({ onComplete, onChangeLanguage }) {
         heightUnit={heightUnit} setHeightUnit={setHeightUnit} height={height} setHeight={setHeight} heightFt={heightFt} setHeightFt={setHeightFt} heightIn={heightIn} setHeightIn={setHeightIn}
         weightUnit={weightUnit} setWeightUnit={setWeightUnit} weight={weight} setWeight={setWeight}
         cookingGoal={cookingGoal} setCookingGoal={setCookingGoal}
+        allergies={allergies} setAllergies={setAllergies}
       />
       <button onClick={() => onComplete({ ...profileData, language })} style={styles.primaryButton}>
         {t("letsCook")}
@@ -7735,6 +7797,11 @@ function AppearanceCard({ appearance: a, onChange }) {
           { id: "large", label: t("textLarge"), style: { fontSize: 15 } },
           { id: "xl", label: t("textXL"), style: { fontSize: 17 } },
         ]} />
+        <SegmentRow label={t("unitsLabel")} value={a.units} onChange={(v) => onChange({ units: v })} options={[
+          { id: "us", label: t("unitsUS") },
+          { id: "metric", label: t("unitsMetric") },
+        ]} />
+        <SwitchRow label={t("cookTextLabel")} sub={t("cookTextSub")} checked={a.cookingText === "large"} onChange={(v) => onChange({ cookingText: v ? "large" : "normal" })} />
         <SwitchRow label={t("readableFontLabel")} sub={t("readableFontSub")} checked={a.readableFont} onChange={(v) => onChange({ readableFont: v })} />
         <SwitchRow label={t("contrastLabel")} sub={t("contrastSub")} checked={a.highContrast} onChange={(v) => onChange({ highContrast: v })} />
         <SwitchRow label={t("reduceMotionLabel")} sub={t("reduceMotionSub")} checked={a.reduceMotion} onChange={(v) => onChange({ reduceMotion: v })} />
@@ -7818,9 +7885,10 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
   const [cookingGoal, setCookingGoal] = useState(profile.cookingGoal);
   const [formLanguage, setFormLanguage] = useState(profile.language || "en");
   const [cookingLevel, setCookingLevel] = useState(profile.cookingLevel || "beginner");
+  const [allergies, setAllergies] = useState(profile.allergies || []);
 
   function handleSaveProfile() {
-    onSave({ name, age, heightUnit, height, heightFt, heightIn, weightUnit, weight, cookingGoal, language: formLanguage, cookingLevel });
+    onSave({ name, age, heightUnit, height, heightFt, heightIn, weightUnit, weight, cookingGoal, language: formLanguage, cookingLevel, allergies });
   }
 
   function handleLanguageChange(lang) {
@@ -7844,6 +7912,7 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
         heightUnit={heightUnit} setHeightUnit={setHeightUnit} height={height} setHeight={setHeight} heightFt={heightFt} setHeightFt={setHeightFt} heightIn={heightIn} setHeightIn={setHeightIn}
         weightUnit={weightUnit} setWeightUnit={setWeightUnit} weight={weight} setWeight={setWeight}
         cookingGoal={cookingGoal} setCookingGoal={setCookingGoal}
+        allergies={allergies} setAllergies={setAllergies}
       />
 
       <div style={{ ...styles.sectionLabel, marginTop: 22 }}>{tr("accessibilityLabel")}</div>
@@ -7926,7 +7995,7 @@ function KitchenScreen({
           placeholder={t("addEquipmentPlaceholder")}
           style={styles.textInput}
         />
-        <button onClick={addCustomEquipment} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+        <button onClick={addCustomEquipment} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
       </div>
 
       <div style={{ ...styles.sectionLabel, marginTop: 22 }}>{t("basicsLabel")}</div>
@@ -7952,7 +8021,7 @@ function KitchenScreen({
           placeholder={t("addIngredientPlaceholder")}
           style={styles.textInput}
         />
-        <button onClick={addIngredient} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+        <button onClick={addIngredient} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
       </div>
       <div style={{ display: "flex", gap: 8, marginTop: -2 }}>
         <span style={{ flex: 1, fontSize: 10.5, color: COLORS.inkMuted }}>{t("quantityLabel")} ({t("optionalTag")})</span>
@@ -7979,7 +8048,7 @@ function KitchenScreen({
               {item.quantity && <span style={styles.ingredientMeta}> · {item.quantity}</span>}
               {item.expiration && <span style={styles.ingredientMeta}> · {t("expAbbrevLabel")} {item.expiration}</span>}
             </div>
-            <button onClick={() => removeIngredient(item.name)} style={styles.chipX}><X size={12} color={COLORS.inkMuted} /></button>
+            <button onClick={() => removeIngredient(item.name)} aria-label={`${t("aRemove")}: ${ingredientLabel(item.name, language)}`} style={styles.chipX}><X size={12} color={COLORS.inkMuted} /></button>
           </div>
         ))}
         {ingredients.length === 0 && <span style={styles.emptyText}>{t("nothingAddedYet")}</span>}
@@ -8017,12 +8086,27 @@ function RecipeImage({ recipe, height }) {
   );
 }
 
+function AllergyWarning({ recipe, compact }) {
+  const { t } = useContext(LanguageContext);
+  const mine = useContext(AllergyContext);
+  const hits = allergensFor(recipe, mine);
+  if (!hits.length) return null;
+  const names = hits.map((a) => t("allergen_" + a)).join(", ");
+  return (
+    <div role="note" style={compact ? styles.allergyChip : styles.allergyBanner}>
+      <span aria-hidden="true">⚠</span> {t("containsLabel")} {names}{compact ? "" : `. ${t("checkLabels")}`}
+    </div>
+  );
+}
+
 function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, toggleFavorite, onEdit }) {
   const { t, language } = useContext(LanguageContext);
   const cuisineLabel = labelFor(CUISINES_TR, recipe.cuisine, language);
   const isFav = favorites && favorites[recipe.id];
   return (
-    <div className="ms-recipe-card" style={styles.recipeCard} onClick={() => onOpen(recipe)}>
+    <div className="ms-recipe-card" style={styles.recipeCard} onClick={() => onOpen(recipe)} role="button" tabIndex={0}
+      aria-label={`${recipeName(recipe, language)}. ${info.makeable ? t("readyBadgeLabel") : `${t("missingBadgeLabel")} ${info.missingIngredients.length + (info.haveEquip ? 0 : 1)}`}`}
+      onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onOpen(recipe); } }}>
       <div style={{ display: "flex", gap: 12 }}>
         <RecipeImage recipe={recipe} height={64} />
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -8030,12 +8114,12 @@ function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, togg
             <span style={{ ...styles.recipeName, minWidth: 0, overflowWrap: "anywhere", lineHeight: 1.3 }}>{recipeName(recipe, language)}</span>
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
               {onEdit && (
-                <button onClick={(e) => { e.stopPropagation(); onEdit(recipe); }} style={styles.favButton}>
+                <button onClick={(e) => { e.stopPropagation(); onEdit(recipe); }} aria-label={`${t("aEdit")}: ${recipeName(recipe, language)}`} style={styles.favButton}>
                   <Pencil size={14} color={COLORS.inkMuted} />
                 </button>
               )}
               {toggleFavorite && (
-                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }} style={styles.favButton}>
+                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }} aria-label={t(isFav ? "aUnsave" : "aSave")} aria-pressed={!!isFav} style={styles.favButton}>
                   <Heart size={15} color={isFav ? COLORS.accent : COLORS.inkMuted} fill={isFav ? COLORS.accent : "none"} />
                 </button>
               )}
@@ -8064,6 +8148,7 @@ function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, togg
           </div>
         </div>
       </div>
+      <AllergyWarning recipe={recipe} compact />
       <div style={{ ...styles.chipWrap, marginTop: 10, gap: 5 }}>
         {recipe.categories.map((c) => (
           <span key={c} style={styles.dietPill}>{CATEGORIES.find((cat) => cat.id === c)?.emoji} {labelFor(CATEGORIES_TR, c, language)}</span>
@@ -8106,16 +8191,21 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
   const [mode, setMode] = useState("kitchen");
   const [query, setQuery] = useState("");
   const [ingredientQuery, setIngredientQuery] = useState("");
+  const myAllergies = useContext(AllergyContext);
+  const [showAllergic, setShowAllergic] = useState(false);
   // Filters start open on "From my kitchen" and folded away in the two search modes.
   const [filtersOpenByMode, setFiltersOpenByMode] = useState({ kitchen: true, search: false, ingredient: false });
   const filtersOpen = filtersOpenByMode[mode];
   const setFiltersOpen = (fn) => setFiltersOpenByMode((m) => ({ ...m, [mode]: fn(m[mode]) }));
 
   // The same filters apply in all three modes (kitchen, search, by ingredient).
-  const passesFilters = (r) =>
+  const passesOtherFilters = (r) =>
     matchesPicked(r.mealTime || [], selectedMealTimes, "any") &&
     matchesPicked(r.categories || [], selectedCategories, filterMatch.categories) &&
     matchesPicked([].concat(r.cuisine || []), selectedCuisines, filterMatch.cuisines);
+  const hasMyAllergen = (r) => allergensFor(r, myAllergies).length > 0;
+  const passesFilters = (r) => passesOtherFilters(r) && (showAllergic || !hasMyAllergen(r));
+  const hiddenForAllergies = myAllergies.length ? recipes.filter((r) => passesOtherFilters(r) && hasMyAllergen(r)).length : 0;
   const filtered = recipes.filter(passesFilters);
   const setMatch = (group, how) => setFilterMatch((f) => ({ ...f, [group]: how }));
 
@@ -8168,6 +8258,13 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
         <button onClick={() => setMode("ingredient")} style={{ ...styles.modeButton, ...(mode === "ingredient" ? styles.modeButtonActive : {}) }}>{t("byIngredient")}</button>
       </div>
 
+      {hiddenForAllergies > 0 && (
+        <div role="status" style={{ ...styles.communityNote, marginTop: 10, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", background: COLORS.accentSofter, color: COLORS.accentText }}>
+          <span aria-hidden="true">⚠</span>
+          <span style={{ flex: 1, minWidth: 180 }}>{(showAllergic ? t("allergyShowing") : t("allergyHidden")).replace("{n}", hiddenForAllergies)}</span>
+          <button onClick={() => setShowAllergic((v) => !v)} style={{ ...styles.linkButton, color: COLORS.accentText, fontWeight: 700, textDecoration: "underline" }}>{t(showAllergic ? "allergyHideAgain" : "allergyShowThem")}</button>
+        </div>
+      )}
       <button onClick={() => setFiltersOpen((v) => !v)} aria-expanded={filtersOpen} style={{ ...styles.linkButton, fontWeight: 700, marginTop: 6, display: "flex", alignItems: "center", gap: 6 }}>
         {t("filtersLabel")}{anyFilterActive ? ` (${selectedMealTimes.length + selectedCategories.length + selectedCuisines.length})` : ""}
         <span aria-hidden="true" className={filtersOpen ? undefined : "ms-flip"}>{filtersOpen ? "▾" : "▸"}</span>
@@ -8214,7 +8311,7 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
               placeholder={t("addCuisinePlaceholder")}
               style={styles.textInput}
             />
-            <button onClick={addCuisine} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+            <button onClick={addCuisine} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
           </div>
 
           {anyFilterActive && (
@@ -8265,7 +8362,7 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
             <Search size={16} color={COLORS.inkMuted} style={styles.searchIcon} />
             <input value={ingredientQuery} onChange={(e) => setIngredientQuery(e.target.value)} placeholder={t("ingredientSearchPlaceholder")} style={{ ...styles.textInput, paddingInlineStart: 34, paddingInlineEnd: ingredientQuery ? 34 : undefined }} />
             {ingredientQuery && (
-              <button onClick={() => setIngredientQuery("")} aria-label="Clear" style={{ position: "absolute", insetInlineEnd: 8, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}>
+              <button onClick={() => setIngredientQuery("")} aria-label={t("aClear")} style={{ position: "absolute", insetInlineEnd: 8, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex" }}>
                 <X size={15} color={COLORS.inkMuted} />
               </button>
             )}
@@ -8388,7 +8485,7 @@ function TimerBar({ timer, setTimer }) {
   );
 }
 
-function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings, onBack }) {
+function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings, onBack, units = "us", allergies = [] }) {
   const { t, language } = useContext(LanguageContext);
   const steps = recipeSteps(recipe, language);
   const step = steps[stepIndex];
@@ -8412,7 +8509,9 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const isFirst = stepIndex === 0;
   const ratio = servings / 2;
   const scale = (v) => Math.round(v * ratio);
-  const measureText = scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio);
+  const cv = (x) => convertUnits(x, units, language);
+  const measureText = cv(scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio));
+  const alsoCheck = secondarySignal(recipe, stepIndex, language);
   const timerSecs = stepTimerSeconds(recipe.steps[stepIndex]?.measure || step.measure);
 
   return (
@@ -8430,14 +8529,15 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
         </span>
       )}
       <h1 style={{ ...styles.h1, fontSize: 20, marginTop: 8 }}>{recipeName(recipe, language)}</h1>
+      <AllergyWarning recipe={recipe} />
       <div style={{ marginTop: 4 }}><RatingBadge recipeId={recipe.id} /></div>
 
       <div style={styles.servingsRow}>
         <span style={styles.targetLabel}>{t("servingsLabel")}</span>
         <div style={styles.stepperRow}>
-          <button onClick={() => setServings((s) => Math.max(1, s - 1))} style={styles.stepperButton}>−</button>
-          <span style={styles.targetValue}>{servings}</span>
-          <button onClick={() => setServings((s) => Math.min(12, s + 1))} style={styles.stepperButton}>+</button>
+          <button onClick={() => setServings((s) => Math.max(1, s - 1))} aria-label={t("aFewerServings")} style={styles.stepperButton}>−</button>
+          <span style={styles.targetValue} aria-live="polite">{servings}</span>
+          <button onClick={() => setServings((s) => Math.min(12, s + 1))} aria-label={t("aMoreServings")} style={styles.stepperButton}>+</button>
         </div>
       </div>
 
@@ -8454,7 +8554,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
         {showIngredients ? "▾" : "▸"} {t("ingredientsSectionLabel")} ({recipe.ingredients.length})
       </button>
       {showIngredients && (
-        <ul style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "grid", gap: 6 }}>
+        <ul className="ms-step-ingredients" style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "grid", gap: 6 }}>
           {recipe.ingredients.map((ing) => (
             <li key={ing}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, cursor: "pointer", color: gotIt[ing] ? COLORS.inkMuted : COLORS.ink, textDecoration: gotIt[ing] ? "line-through" : "none" }}>
@@ -8466,7 +8566,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
         </ul>
       )}
 
-      <div style={styles.stepInstruction}>{step.instruction}</div>
+      <div style={styles.stepInstruction} className="ms-step-text">{cv(step.instruction)}</div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
         <StepTimer seconds={timerSecs} label={`${recipe.id}:${stepIndex}`} timer={timer} setTimer={setTimer} />
@@ -8477,7 +8577,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
           <Clock size={16} color={COLORS.accent} />
           <div style={{ marginInlineStart: 10 }}>
             <div style={styles.milestoneLabel}>{t("timeMeasureLabel")}</div>
-            <div style={styles.milestoneValue}>{measureText}</div>
+            <div style={styles.milestoneValue} className="ms-step-detail">{measureText}</div>
           </div>
         </div>
         <div style={styles.milestoneDivider} />
@@ -8485,17 +8585,17 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
           <Utensils size={16} color={COLORS.accent} />
           <div style={{ marginInlineStart: 10 }}>
             <div style={styles.milestoneLabel}>{t("visualCueLabel")}</div>
-            <div style={styles.milestoneValue}>{step.visual}</div>
+            <div style={styles.milestoneValue} className="ms-step-detail">{cv(step.visual)}</div>
           </div>
         </div>
-        {secondarySignal(recipe, stepIndex, language) && (
+        {alsoCheck && (
           <>
             <div style={styles.milestoneDivider} />
             <div style={styles.milestoneRow}>
               <Eye size={16} color={COLORS.accent} />
               <div style={{ marginInlineStart: 10 }}>
                 <div style={styles.milestoneLabel}>{t("alsoCheckLabel")}</div>
-                <div style={styles.milestoneValue}>{secondarySignal(recipe, stepIndex, language)}</div>
+                <div style={styles.milestoneValue} className="ms-step-detail">{cv(alsoCheck)}</div>
               </div>
             </div>
           </>
@@ -8690,13 +8790,13 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
       <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("ingredientsSectionLabel")}</div>
       <div style={styles.inputRow}>
         <input value={ingredientDraft} onChange={(e) => setIngredientDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addIngredientDraft()} placeholder={t("addIngredientPlaceholder")} style={styles.textInput} />
-        <button onClick={addIngredientDraft} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+        <button onClick={addIngredientDraft} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
       </div>
       <div style={styles.chipWrap}>
         {ingredientsList.map((ing) => (
           <div key={ing} style={styles.ingredientChip}>
             <span style={{ textTransform: "capitalize" }}>{ing}</span>
-            <button onClick={() => setIngredientsList(ingredientsList.filter((i) => i !== ing))} style={styles.chipX}><X size={12} color={COLORS.inkMuted} /></button>
+            <button onClick={() => setIngredientsList(ingredientsList.filter((i) => i !== ing))} aria-label={`${t("aRemove")}: ${ing}`} style={styles.chipX}><X size={12} color={COLORS.inkMuted} /></button>
           </div>
         ))}
       </div>
@@ -8715,7 +8815,7 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
             <span style={styles.milestoneLabel}>{t("stepOfLabel")} {i + 1}</span>
             {stepsList.length > 1 && (
-              <button onClick={() => removeStepRow(i)} style={styles.chipX}><X size={13} color={COLORS.inkMuted} /></button>
+              <button onClick={() => removeStepRow(i)} aria-label={`${t("aRemove")}: ${t("stepOfLabel")} ${i + 1}`} style={styles.chipX}><X size={13} color={COLORS.inkMuted} /></button>
             )}
           </div>
           <input value={s.instruction} onChange={(e) => updateStep(i, "instruction", e.target.value)} placeholder={t("instructionPlaceholder")} style={{ ...styles.textInput, marginBottom: 6 }} />
@@ -8728,13 +8828,13 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
       <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("flavorBoostsLabel")}</div>
       <div style={styles.inputRow}>
         <input value={flavorDraft} onChange={(e) => setFlavorDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addFlavorDraft()} placeholder={t("addFlavorPlaceholder")} style={styles.textInput} />
-        <button onClick={addFlavorDraft} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+        <button onClick={addFlavorDraft} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
       </div>
       <div style={styles.chipWrap}>
         {flavorBoostsList.map((f, i) => (
           <div key={i} style={styles.ingredientChip}>
             <span>{f}</span>
-            <button onClick={() => setFlavorBoostsList(flavorBoostsList.filter((_, idx) => idx !== i))} style={styles.chipX}><X size={12} color={COLORS.inkMuted} /></button>
+            <button onClick={() => setFlavorBoostsList(flavorBoostsList.filter((_, idx) => idx !== i))} aria-label={t("aRemove")} style={styles.chipX}><X size={12} color={COLORS.inkMuted} /></button>
           </div>
         ))}
       </div>
@@ -8940,7 +9040,7 @@ function CookbookScreen({ recipes, userRecipes, favorites, toggleFavorite, setFa
             <div style={{ flex: 1 }}>
               <div style={styles.recipeCardTop}>
                 <span style={styles.recipeName}>{recipeName(recipe, language)}</span>
-                <button onClick={() => toggleFavorite(recipe.id)} style={styles.favButton}>
+                <button onClick={() => toggleFavorite(recipe.id)} aria-label={t(favorites[recipe.id] ? "aUnsave" : "aSave")} aria-pressed={!!favorites[recipe.id]} style={styles.favButton}>
                   <Heart size={16} color={favorites[recipe.id] ? COLORS.accent : COLORS.inkMuted} fill={favorites[recipe.id] ? COLORS.accent : "none"} />
                 </button>
               </div>
@@ -8949,9 +9049,9 @@ function CookbookScreen({ recipes, userRecipes, favorites, toggleFavorite, setFa
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
             <button onClick={() => onOpen(recipe)} style={{ ...styles.primaryButton, marginTop: 0, flex: 1, padding: "10px 0", fontSize: 13 }}>{t("cookThisLabel")}</button>
-            <button onClick={() => onEdit(recipe)} style={{ ...styles.resetButton, marginTop: 0 }}><Pencil size={14} color={COLORS.inkMuted} /></button>
-            <button onClick={() => onShare(recipe)} style={{ ...styles.resetButton, marginTop: 0 }}><Users size={14} color={COLORS.inkMuted} /></button>
-            <button onClick={() => onDelete(recipe.id)} style={{ ...styles.resetButton, marginTop: 0 }}><X size={14} color={COLORS.inkMuted} /></button>
+            <button onClick={() => onEdit(recipe)} aria-label={`${t("aEdit")}: ${recipeName(recipe, language)}`} title={t("aEdit")} style={{ ...styles.resetButton, marginTop: 0, minWidth: 44, minHeight: 44, justifyContent: "center" }}><Pencil size={16} color={COLORS.inkMuted} /></button>
+            <button onClick={() => onShare(recipe)} aria-label={`${t("aShare")}: ${recipeName(recipe, language)}`} title={t("aShare")} style={{ ...styles.resetButton, marginTop: 0, minWidth: 44, minHeight: 44, justifyContent: "center" }}><Users size={16} color={COLORS.inkMuted} /></button>
+            <button onClick={() => onDelete(recipe.id)} aria-label={`${t("aDelete")}: ${recipeName(recipe, language)}`} title={t("aDelete")} style={{ ...styles.resetButton, marginTop: 0, minWidth: 44, minHeight: 44, justifyContent: "center" }}><X size={16} color={COLORS.inkMuted} /></button>
           </div>
         </div>
       ))}
@@ -8966,7 +9066,7 @@ function CookbookScreen({ recipes, userRecipes, favorites, toggleFavorite, setFa
             <div style={{ flex: 1 }}>
               <div style={styles.recipeCardTop}>
                 <span style={styles.recipeName}>{recipeName(recipe, language)}</span>
-                <button onClick={() => toggleFavorite(recipe.id)} style={styles.favButton}>
+                <button onClick={() => toggleFavorite(recipe.id)} aria-label={t("aUnsave")} aria-pressed="true" style={styles.favButton}>
                   <Heart size={16} color={COLORS.accent} fill={COLORS.accent} />
                 </button>
               </div>
@@ -9160,18 +9260,18 @@ function ShoppingScreen({ recipes, matchInfo, shoppingList, input, setInput, onA
       <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("yourListLabel")}</div>
       <div style={styles.inputRow}>
         <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && onAdd(input)} placeholder={t("addItemPlaceholder")} style={styles.textInput} />
-        <button onClick={() => onAdd(input)} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+        <button onClick={() => onAdd(input)} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
       </div>
 
       {shoppingList.length === 0 && <span style={styles.emptyText}>{t("emptyListText")}</span>}
       {shoppingList.map((item) => (
         <div key={item.id} style={styles.buyRow}>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <button onClick={() => onToggle(item.id)} style={{ ...styles.shoppingCheck, ...(item.checked ? { background: COLORS.primary, border: `1px solid ${COLORS.primary}` } : {}) }}>
+            <button onClick={() => onToggle(item.id)} role="checkbox" aria-checked={!!item.checked} aria-label={item.name} style={{ ...styles.shoppingCheck, ...(item.checked ? { background: COLORS.primary, border: `1px solid ${COLORS.primary}` } : {}) }}>
               {item.checked ? <Check size={13} color="#fff" /> : null}
             </button>
             <span style={{ flex: 1, textTransform: "capitalize", textDecoration: item.checked ? "line-through" : "none", color: item.checked ? COLORS.inkMuted : COLORS.ink }}>{item.name}</span>
-            <button onClick={() => onRemove(item.id)} style={styles.chipX}><X size={14} color={COLORS.inkMuted} /></button>
+            <button onClick={() => onRemove(item.id)} aria-label={`${t("aRemove")}: ${item.name}`} style={styles.chipX}><X size={14} color={COLORS.inkMuted} /></button>
           </div>
           {!item.checked && (
             <>
@@ -9580,6 +9680,7 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
 
           {kind === "tutorial" && (
             <>
+              <p style={{ ...styles.basicsHint, marginTop: 8 }}>💬 {t("captionsTip")}</p>
               <input value={link} onChange={(e) => { setLink(e.target.value); setHint(null); }} placeholder={t("tutorialLink")} inputMode="url" dir="ltr" style={{ ...styles.textInput, marginTop: 10 }} />
               {c.canUpload && (
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
@@ -9735,7 +9836,7 @@ const styles = {
   targetValue: { fontSize: 16, fontWeight: 600, color: COLORS.ink, minWidth: 30, textAlign: "center" },
   stepperRow: { display: "flex", alignItems: "center", gap: 12 },
   servingsRow: { display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 14, background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 12, padding: "10px 14px" },
-  stepperButton: { width: 28, height: 28, borderRadius: 8, border: `1px solid ${COLORS.line}`, background: COLORS.card, fontSize: 16, color: COLORS.ink, cursor: "pointer", lineHeight: 1 },
+  stepperButton: { width: 40, height: 40, borderRadius: 10, border: `1px solid ${COLORS.line}`, background: COLORS.card, fontSize: 16, color: COLORS.ink, cursor: "pointer", lineHeight: 1 },
   macroNumberInput: { width: 90, textAlign: "end", padding: "6px 10px", borderRadius: 8, border: `1px solid ${COLORS.line}`, fontSize: 15, fontWeight: 600, color: COLORS.ink, background: COLORS.card, fontFamily: "'Inter', sans-serif" },
   macroSlider: { width: "100%", marginTop: 8, accentColor: COLORS.primary },
   macroRow: { display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 },
@@ -9750,8 +9851,8 @@ const styles = {
   basicChipOff: { background: COLORS.paper, color: COLORS.inkMuted },
   ingredientChip: { display: "flex", alignItems: "center", padding: "6px 6px 6px 12px", borderRadius: 20, background: COLORS.paper, border: `1px solid ${COLORS.line}`, fontSize: 13, color: COLORS.ink },
   ingredientMeta: { fontSize: 11, color: COLORS.inkMuted },
-  favButton: { background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex" },
-  chipX: { background: "none", border: "none", cursor: "pointer", marginInlineStart: 6, padding: 4, display: "flex" },
+  favButton: { background: "none", border: "none", cursor: "pointer", padding: 0, display: "flex", alignItems: "center", justifyContent: "center", minWidth: 44, minHeight: 44, margin: "-12px -8px", borderRadius: 12 },
+  chipX: { background: "none", border: "none", cursor: "pointer", marginInlineStart: 2, padding: 0, display: "flex", alignItems: "center", justifyContent: "center", minWidth: 40, minHeight: 40, margin: "-10px -8px -10px 0", borderRadius: 12 },
   inputRow: { display: "flex", gap: 8, marginBottom: 12 },
   textInput: { flex: 1, width: "100%", boxSizing: "border-box", padding: "11px 14px", borderRadius: 12, border: `1px solid ${COLORS.line}`, fontSize: 14, fontFamily: "'Inter', sans-serif", outline: "none", color: COLORS.ink, background: COLORS.paper },
   selectInput: { width: "100%", boxSizing: "border-box", padding: "11px 14px", borderRadius: 12, border: `1px solid ${COLORS.line}`, fontSize: 13.5, fontFamily: "'Inter', sans-serif", outline: "none", color: COLORS.ink, background: COLORS.paper, appearance: "auto", cursor: "pointer" },
@@ -9805,6 +9906,8 @@ const styles = {
   tabButton: { flex: 1, background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", padding: "4px 0" },
   tabLabel: { fontSize: 10.5 },
   exitButton: { display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px 9px 12px", marginBottom: 10, borderRadius: 22, border: `1px solid ${COLORS.line}`, background: COLORS.card, color: COLORS.ink, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif", minHeight: 44 },
+  allergyChip: { marginTop: 8, display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 600, color: COLORS.accentText, background: COLORS.accentSofter, border: `1px solid ${COLORS.accentSoft}`, borderRadius: 8, padding: "3px 9px" },
+  allergyBanner: { marginTop: 10, fontSize: 13.5, fontWeight: 600, lineHeight: 1.45, color: COLORS.accentText, background: COLORS.accentSofter, border: `1px solid ${COLORS.accentSoft}`, borderRadius: 12, padding: "10px 12px" },
   cookToolButton: { display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 13px", borderRadius: 20, border: `1px solid ${COLORS.line}`, background: COLORS.sageSofter, color: COLORS.primaryText, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Inter', sans-serif" },
   timerBar: { position: "sticky", top: 0, zIndex: 3, display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", marginBottom: 12, borderRadius: 14, background: COLORS.sage, color: COLORS.primaryText, boxShadow: "0 2px 10px var(--ms-shadow)" },
   timerBarDone: { background: COLORS.accent, color: COLORS.onInk },
@@ -9836,5 +9939,5 @@ const styles = {
   liveCheckResult: { fontSize: 12.5, color: COLORS.ink, background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 10, padding: "8px 10px", marginTop: 6, lineHeight: 1.4 },
   liveCheckRetry: { fontSize: 12, fontWeight: 600, color: COLORS.accentText, background: "none", border: "none", padding: 0, marginInlineStart: 4, cursor: "pointer", textDecoration: "underline" },
   glossaryMacros: { display: "flex", flexWrap: "wrap", gap: 4, justifyContent: "flex-end", maxWidth: 160 },
-  shoppingCheck: { width: 20, height: 20, borderRadius: 6, border: `1px solid ${COLORS.line}`, background: COLORS.card, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 },
+  shoppingCheck: { width: 26, height: 26, borderRadius: 7, border: `1px solid ${COLORS.line}`, background: COLORS.card, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 },
 };

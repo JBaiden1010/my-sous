@@ -3,11 +3,19 @@
 // Settings live in this browser (localStorage "mysous:appearance") and are
 // applied as attributes on <html>, which the stylesheet below reads.
 
-export const APPEARANCE_DEFAULTS = { theme: "system", textSize: "default", readableFont: false, highContrast: false, reduceMotion: false };
+export const APPEARANCE_DEFAULTS = { theme: "system", textSize: "default", readableFont: false, highContrast: false, reduceMotion: false, cookingText: "normal" };
 const KEY = "mysous:appearance";
 
+// Cups and °F in the US (and a few others), metric everywhere else, until the person picks.
+const defaultUnits = () => {
+  const loc = (typeof navigator !== "undefined" && navigator.language) || "en-US";
+  return /-(US|LR|MM)$/i.test(loc) ? "us" : "metric";
+};
+
 export function loadAppearance() {
-  try { return { ...APPEARANCE_DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch { return { ...APPEARANCE_DEFAULTS }; }
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { saved = {}; }
+  return { ...APPEARANCE_DEFAULTS, units: defaultUnits(), ...saved };
 }
 
 const systemDark = () => typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -21,6 +29,7 @@ export function applyAppearance(a) {
   h.dataset.msFont = a.readableFont ? "readable" : "default";
   h.dataset.msContrast = a.highContrast ? "high" : "normal";
   h.dataset.msMotion = a.reduceMotion ? "reduce" : "normal";
+  h.dataset.msCookText = a.cookingText === "large" ? "large" : "normal";
   h.style.colorScheme = h.dataset.msTheme;
 }
 
@@ -68,6 +77,11 @@ html, body { background: var(--ms-paper); color: var(--ms-ink); }
 /* Reduced motion: the setting, or the device preference */
 :root[data-ms-motion="reduce"] *, :root[data-ms-motion="reduce"] *::before, :root[data-ms-motion="reduce"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 @media (prefers-reduced-motion: reduce) { .ms-root *, .ms-root *::before, .ms-root *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+/* Large text on the cooking screen only */
+:root[data-ms-cook-text="large"] .ms-step-text { font-size: 27px !important; line-height: 1.35 !important; }
+:root[data-ms-cook-text="large"] .ms-step-detail { font-size: 18px !important; line-height: 1.45 !important; }
+:root[data-ms-cook-text="large"] .ms-step-ingredients label { font-size: 17px !important; }
 
 /* Clear focus ring for keyboard users */
 .ms-root :focus-visible { outline: 3px solid var(--ms-primary) !important; outline-offset: 2px; border-radius: 8px; }
