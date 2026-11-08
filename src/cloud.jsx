@@ -16,6 +16,9 @@ export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
 export const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZmlqemV2cGNiY2JkcmNtc3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMTE3MzksImV4cCI6MjEwOTU4NzczOX0.eiFVtscMWrpZ4w60J1rMiZbJlsDEwrOp5xJuHWvsEHY";
 
+// Apple sign-in needs a paid Apple Developer account; switch on once it's set up in Supabase.
+export const APPLE_SIGN_IN_ENABLED = false;
+
 const GUEST_FLAG = "mysous:guest";
 const APP_KEYS = ["sous_profile", "sous_kitchen", "sous_recipes", "sous_shopping"];
 const lsGet = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
@@ -115,9 +118,11 @@ export function AuthScreen({ sb, onGuest }) {
       <button onClick={() => signInWith("google")} disabled={!!busy} style={{ ...button, background: C.card, color: C.ink, border: `1px solid ${C.line}` }}>
         {busy === "google" ? t("opening") : t("google")}
       </button>
-      <button onClick={() => signInWith("apple")} disabled={!!busy} style={{ ...button, background: "#1F1F1F", color: "#fff", border: "1px solid #1F1F1F", marginTop: 10 }}>
-        {busy === "apple" ? t("opening") : t("apple")}
-      </button>
+      {APPLE_SIGN_IN_ENABLED && (
+        <button onClick={() => signInWith("apple")} disabled={!!busy} style={{ ...button, background: "#1F1F1F", color: "#fff", border: "1px solid #1F1F1F", marginTop: 10 }}>
+          {busy === "apple" ? t("opening") : t("apple")}
+        </button>
+      )}
       {notice && <div role="status" style={{ color: C.accentText, fontSize: 13, marginTop: 10, lineHeight: 1.45 }}>{t(notice)}</div>}
 
       <div style={{ display: "flex", alignItems: "center", gap: 10, color: C.muted, fontSize: 13, margin: "18px 0" }}>
