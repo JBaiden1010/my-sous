@@ -337,6 +337,11 @@ const TRANSLATIONS = {
   readAloud: { en: "Read step aloud", es: "Leer paso en voz alta", fr: "Lire l'étape à voix haute", pt: "Ler etapa em voz alta", hi: "स्टेप पढ़कर सुनाएं", zh: "朗读这一步", ar: "اقرأ الخطوة بصوت عالٍ" },
   stopReading: { en: "Stop reading", es: "Dejar de leer", fr: "Arrêter la lecture", pt: "Parar leitura", hi: "पढ़ना बंद करें", zh: "停止朗读", ar: "أوقف القراءة" },
   screenOnNote: { en: "Your screen stays on while you cook.", es: "Tu pantalla se mantiene encendida mientras cocinas.", fr: "Votre écran reste allumé pendant que vous cuisinez.", pt: "Sua tela fica ligada enquanto você cozinha.", hi: "खाना बनाते समय आपकी स्क्रीन चालू रहेगी।", zh: "做饭时屏幕会保持常亮。", ar: "تبقى شاشتك مضاءة أثناء الطبخ." },
+  speakStep: { en: "Step {n} of {total}.", es: "Paso {n} de {total}.", fr: "Étape {n} sur {total}.", pt: "Etapa {n} de {total}.", hi: "{total} में से स्टेप {n}।", zh: "第 {n} 步，共 {total} 步。", ar: "الخطوة {n} من {total}." },
+  speakAmount: { en: "Time and amount:", es: "Tiempo y cantidad:", fr: "Temps et quantité :", pt: "Tempo e quantidade:", hi: "समय और मात्रा:", zh: "时间和用量：", ar: "الوقت والكمية:" },
+  speakLook: { en: "It should look like this:", es: "Debe verse así:", fr: "Voici à quoi cela doit ressembler :", pt: "Deve ficar assim:", hi: "यह ऐसा दिखना चाहिए:", zh: "应该是这个样子：", ar: "يجب أن يبدو هكذا:" },
+  speakAlso: { en: "Also check:", es: "Revisa también:", fr: "Vérifiez aussi :", pt: "Confira também:", hi: "यह भी जांचें:", zh: "另外检查：", ar: "تحقق أيضًا:" },
+  speakLast: { en: "That's the last step.", es: "Ese es el último paso.", fr: "C'est la dernière étape.", pt: "Essa é a última etapa.", hi: "यह आखिरी स्टेप है।", zh: "这是最后一步。", ar: "هذه هي الخطوة الأخيرة." },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -8347,6 +8352,33 @@ function useWakeLock(active) {
   return on;
 }
 
+// Turns kitchen shorthand into words that sound natural when spoken
+// ("~15 min" -> "about 15 minutes", "1 cup + 2 cups" -> "1 cup plus 2 cups").
+const SPEAK_WORDS = {
+  en: { about: "about", plus: "plus", to: "to", min: "minutes", sec: "seconds", hr: "hours", deg: "degrees" },
+  es: { about: "unos", plus: "más", to: "a", min: "minutos", sec: "segundos", hr: "horas", deg: "grados" },
+  fr: { about: "environ", plus: "plus", to: "à", min: "minutes", sec: "secondes", hr: "heures", deg: "degrés" },
+  pt: { about: "cerca de", plus: "mais", to: "a", min: "minutos", sec: "segundos", hr: "horas", deg: "graus" },
+  hi: { about: "लगभग", plus: "और", to: "से", min: "मिनट", sec: "सेकंड", hr: "घंटे", deg: "डिग्री" },
+  zh: { about: "大约", plus: "加", to: "到", min: "分钟", sec: "秒", hr: "小时", deg: "度" },
+  ar: { about: "حوالي", plus: "زائد", to: "إلى", min: "دقائق", sec: "ثوانٍ", hr: "ساعات", deg: "درجة" },
+};
+function speakable(text, language) {
+  const w = SPEAK_WORDS[language] || SPEAK_WORDS.en;
+  return String(text || "")
+    .replace(/~\s*/g, `${w.about} `)
+    .replace(/(\d)\s*[–-]\s*(\d)/g, `$1 ${w.to} $2`)
+    .replace(/\s\+\s/g, ` ${w.plus} `)
+    .replace(/°\s*([CF])\b/g, ` ${w.deg} $1`)
+    .replace(/(\d)\s*(?:mins?|minutes?)\b/gi, `$1 ${w.min}`)
+    .replace(/(\d)\s*(?:secs?|seconds?)\b/gi, `$1 ${w.sec}`)
+    .replace(/(\d)\s*(?:hrs?|hours?)\b/gi, `$1 ${w.hr}`)
+    .replace(/\s*—\s*/g, ", ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.!?]*$/, ".");
+}
+
 const SPEECH_LANG = { en: "en-US", es: "es-ES", fr: "fr-FR", pt: "pt-BR", hi: "hi-IN", zh: "zh-CN", ar: "ar-SA" };
 const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function";
 
@@ -8399,7 +8431,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const step = steps[stepIndex];
   const [timer, setTimer] = useState(null);
   const [speaking, setSpeaking] = useState(false);
-  const [showIngredients, setShowIngredients] = useState(false);
+  const [showIngredients, setShowIngredients] = useState(true);
   const [gotIt, setGotIt] = useState({});
   const screenOn = useWakeLock(true);
   useEffect(() => () => { if (canSpeak()) window.speechSynthesis.cancel(); }, []);
@@ -8423,14 +8455,33 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const measureText = scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio);
   const timerSecs = stepTimerSeconds(recipe.steps[stepIndex]?.measure || step.measure);
 
+  // Reads the step as a few short sentences, with a natural pause between
+  // each part: the step number, what to do, the time/amount, what it should
+  // look like, and anything else to check.
   function readStep() {
     if (!canSpeak()) return;
     const synth = window.speechSynthesis;
     if (speaking) { synth.cancel(); setSpeaking(false); return; }
-    const u = new window.SpeechSynthesisUtterance([step.instruction, measureText, step.visual].filter(Boolean).join(". "));
-    u.lang = SPEECH_LANG[language] || "en-US";
-    u.onend = u.onerror = () => setSpeaking(false);
-    synth.cancel(); synth.speak(u); setSpeaking(true);
+    const also = secondarySignal(recipe, stepIndex, language);
+    const hasAmount = measureText && measureText !== "N/A";
+    const parts = [
+      t("speakStep").replace("{n}", stepIndex + 1).replace("{total}", steps.length),
+      speakable(step.instruction, language),
+      hasAmount ? `${t("speakAmount")} ${speakable(measureText, language)}` : null,
+      step.visual ? `${t("speakLook")} ${speakable(step.visual, language)}` : null,
+      also ? `${t("speakAlso")} ${speakable(also, language)}` : null,
+      isLast ? t("speakLast") : null,
+    ].filter(Boolean);
+    synth.cancel();
+    parts.forEach((text, i) => {
+      const u = new window.SpeechSynthesisUtterance(text);
+      u.lang = SPEECH_LANG[language] || "en-US";
+      u.rate = 0.95;
+      if (i === parts.length - 1) u.onend = () => setSpeaking(false);
+      u.onerror = () => setSpeaking(false);
+      synth.speak(u);
+    });
+    setSpeaking(true);
   }
 
   return (
