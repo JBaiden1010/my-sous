@@ -15,8 +15,6 @@ export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
 // database decides what each person can read and write.
 export const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtnZmlqemV2cGNiY2JkcmNtc3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQwMTE3MzksImV4cCI6MjEwOTU4NzczOX0.eiFVtscMWrpZ4w60J1rMiZbJlsDEwrOp5xJuHWvsEHY";
-// Flip to true after the Google provider is set up in the Supabase dashboard.
-export const GOOGLE_SIGN_IN_ENABLED = false;
 
 const GUEST_FLAG = "mysous:guest";
 const APP_KEYS = ["sous_profile", "sous_kitchen", "sous_recipes", "sous_shopping"];
@@ -33,10 +31,14 @@ const AUTH_TR = {
   sending: { en: "Sending…", es: "Enviando…", fr: "Envoi…", pt: "Enviando…", hi: "भेजा जा रहा है…", zh: "正在发送…", ar: "جارٍ الإرسال…" },
   sent: { en: "Check your email and tap the link to sign in. You can close this tab.", es: "Revisa tu correo y toca el enlace para entrar. Puedes cerrar esta pestaña.", fr: "Consultez vos e-mails et touchez le lien pour vous connecter. Vous pouvez fermer cet onglet.", pt: "Confira seu e-mail e toque no link para entrar. Pode fechar esta aba.", hi: "अपना ईमेल देखें और साइन इन करने के लिए लिंक पर टैप करें। आप यह टैब बंद कर सकते हैं।", zh: "请查看邮箱并点击链接登录。你可以关闭此页面。", ar: "تحقق من بريدك واضغط الرابط لتسجيل الدخول. يمكنك إغلاق هذه الصفحة." },
   badEmail: { en: "Enter a valid email.", es: "Escribe un correo válido.", fr: "Saisissez un e-mail valide.", pt: "Digite um e-mail válido.", hi: "सही ईमेल डालें।", zh: "请输入有效的邮箱。", ar: "أدخل بريدًا صحيحًا." },
-  failed: { en: "Couldn't send the link. Wait a minute and try again.", es: "No se pudo enviar el enlace. Espera un minuto e inténtalo otra vez.", fr: "Impossible d'envoyer le lien. Attendez une minute et réessayez.", pt: "Não foi possível enviar o link. Aguarde um minuto e tente de novo.", hi: "लिंक नहीं भेजा जा सका। एक मिनट रुककर फिर कोशिश करें।", zh: "无法发送链接，请稍等一分钟再试。", ar: "تعذّر إرسال الرابط. انتظر دقيقة وحاول مرة أخرى." },
+  failed: { en: "Couldn't start sign-in. Check your connection and try again.", es: "No se pudo iniciar sesión. Revisa tu conexión e inténtalo de nuevo.", fr: "Impossible de lancer la connexion. Vérifiez votre connexion et réessayez.", pt: "Não foi possível entrar. Verifique a conexão e tente de novo.", hi: "साइन-इन शुरू नहीं हो सका। अपना कनेक्शन जांचें और फिर कोशिश करें।", zh: "无法开始登录，请检查网络后重试。", ar: "تعذّر بدء تسجيل الدخول. تحقق من الاتصال وحاول مرة أخرى." },
   or: { en: "or", es: "o", fr: "ou", pt: "ou", hi: "या", zh: "或", ar: "أو" },
   guest: { en: "Continue as guest", es: "Continuar como invitado", fr: "Continuer en invité", pt: "Continuar como convidado", hi: "मेहमान के रूप में जारी रखें", zh: "以访客身份继续", ar: "المتابعة كضيف" },
   privacy: { en: "Your kitchen and personal details stay private. Only what you post in the Community is public. No ads, and your data is never sold.", es: "Tu cocina y tus datos personales son privados. Solo lo que publicas en la Comunidad es público. Sin anuncios y nunca vendemos tus datos.", fr: "Votre cuisine et vos informations personnelles restent privées. Seul ce que vous publiez dans la Communauté est public. Pas de pub, et vos données ne sont jamais vendues.", pt: "Sua cozinha e seus dados pessoais ficam privados. Só o que você publica na Comunidade é público. Sem anúncios, e seus dados nunca são vendidos.", hi: "आपकी रसोई और निजी जानकारी निजी रहती है। सिर्फ़ कम्युनिटी में की गई पोस्ट सार्वजनिक होती हैं। कोई विज्ञापन नहीं, और आपका डेटा कभी बेचा नहीं जाता।", zh: "你的厨房和个人信息保持私密，只有你在社区发布的内容是公开的。没有广告，数据绝不出售。", ar: "يبقى مطبخك وبياناتك الشخصية خاصة. فقط ما تنشره في المجتمع يكون علنيًا. لا إعلانات، ولا تُباع بياناتك أبدًا." },
+  apple: { en: "Continue with Apple", es: "Continuar con Apple", fr: "Continuer avec Apple", pt: "Continuar com a Apple", hi: "Apple से जारी रखें", zh: "使用 Apple 继续", ar: "المتابعة باستخدام Apple" },
+  opening: { en: "Opening…", es: "Abriendo…", fr: "Ouverture…", pt: "Abrindo…", hi: "खुल रहा है…", zh: "正在打开…", ar: "جارٍ الفتح…" },
+  googleOff: { en: "Google sign-in isn't switched on yet. Continue as a guest for now. Your data will move to your account when you sign in later.", es: "El inicio con Google aún no está activado. Continúa como invitado por ahora; tus datos pasarán a tu cuenta cuando inicies sesión.", fr: "La connexion Google n'est pas encore activée. Continuez en invité pour l'instant ; vos données passeront dans votre compte quand vous vous connecterez.", pt: "O login com Google ainda não está ativado. Continue como convidado por enquanto; seus dados irão para sua conta quando você entrar.", hi: "Google साइन-इन अभी चालू नहीं है। अभी मेहमान के रूप में जारी रखें; बाद में साइन इन करने पर आपका डेटा खाते में चला जाएगा।", zh: "Google 登录尚未开启。请先以访客身份继续，之后登录时数据会转入你的账户。", ar: "تسجيل الدخول عبر Google غير مفعّل بعد. تابع كضيف الآن، وستنتقل بياناتك إلى حسابك عند تسجيل الدخول لاحقًا." },
+  appleOff: { en: "Apple sign-in isn't switched on yet. Continue as a guest for now. Your data will move to your account when you sign in later.", es: "El inicio con Apple aún no está activado. Continúa como invitado por ahora; tus datos pasarán a tu cuenta cuando inicies sesión.", fr: "La connexion Apple n'est pas encore activée. Continuez en invité pour l'instant ; vos données passeront dans votre compte quand vous vous connecterez.", pt: "O login com Apple ainda não está ativado. Continue como convidado por enquanto; seus dados irão para sua conta quando você entrar.", hi: "Apple साइन-इन अभी चालू नहीं है। अभी मेहमान के रूप में जारी रखें; बाद में साइन इन करने पर आपका डेटा खाते में चला जाएगा।", zh: "Apple 登录尚未开启。请先以访客身份继续，之后登录时数据会转入你的账户。", ar: "تسجيل الدخول عبر Apple غير مفعّل بعد. تابع كضيف الآن، وستنتقل بياناتك إلى حسابك عند تسجيل الدخول لاحقًا." },
   guestNote: { en: "As a guest, everything stays on this device. You can sign in later from Settings.", es: "Como invitado, todo se queda en este dispositivo. Puedes iniciar sesión después en Ajustes.", fr: "En invité, tout reste sur cet appareil. Vous pourrez vous connecter plus tard dans les Paramètres.", pt: "Como convidado, tudo fica neste dispositivo. Você pode entrar depois em Configurações.", hi: "मेहमान के रूप में सब कुछ इसी डिवाइस पर रहता है। आप बाद में सेटिंग्स से साइन इन कर सकते हैं।", zh: "访客模式下，所有内容只保存在本设备上。之后可以在设置里登录。", ar: "كضيف، يبقى كل شيء على هذا الجهاز. يمكنك تسجيل الدخول لاحقًا من الإعدادات." },
 };
 const LANGS = ["en", "es", "fr", "pt", "hi", "zh", "ar"];
@@ -53,56 +55,99 @@ export function startingLanguage() {
 
 const C = { paper: "#F8F5EF", card: "#FFFFFF", ink: "#33352F", muted: "#6A6C63", line: "#E4E0D6", primary: "#71866A", sageSofter: "#EBF0E6", accentText: "#9A5232" };
 
+const VIEW_TR = {
+  phone: { en: "Phone", es: "Teléfono", fr: "Téléphone", pt: "Celular", hi: "फ़ोन", zh: "手机", ar: "هاتف" },
+  desktop: { en: "Desktop", es: "Escritorio", fr: "Ordinateur", pt: "Computador", hi: "डेस्कटॉप", zh: "桌面", ar: "سطح المكتب" },
+};
+const startingView = () => {
+  const saved = lsGet("mysous:view");
+  if (saved === "phone" || saved === "desktop") return saved;
+  return typeof window !== "undefined" && window.innerWidth >= 900 ? "desktop" : "phone";
+};
+
+// Which sign-in providers are switched on in the Supabase dashboard.
+async function enabledProviders() {
+  try {
+    const res = await fetch(SUPABASE_URL + "/auth/v1/settings", { headers: { apikey: SUPABASE_ANON_KEY } });
+    const json = await res.json();
+    return json.external || {};
+  } catch {
+    return null; // unknown: let the button try
+  }
+}
+
+const PhoneIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" /><path d="M12 18h.01" /></svg>
+);
+const MonitorIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8" /><path d="M12 17v4" /></svg>
+);
+
 export function AuthScreen({ sb, onGuest }) {
   const lang = startingLanguage();
-  const t = (k) => AUTH_TR[k][lang] || AUTH_TR[k].en;
-  const [email, setEmail] = useState("");
-  const [state, setState] = useState("idle"); // idle | sending | sent | error | bad
+  const t = (k) => (AUTH_TR[k] || VIEW_TR[k])[lang] || (AUTH_TR[k] || VIEW_TR[k]).en;
+  const [view, setView] = useState(startingView);
+  const [providers, setProviders] = useState(null);
+  const [busy, setBusy] = useState(null);
+  const [notice, setNotice] = useState(null);
   const redirectTo = window.location.origin + window.location.pathname;
+  const desktop = view === "desktop";
 
-  async function sendLink(e) {
-    e.preventDefault();
-    const value = email.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) { setState("bad"); return; }
-    setState("sending");
-    const { error } = await sb.auth.signInWithOtp({ email: value, options: { emailRedirectTo: redirectTo } });
-    setState(error ? "error" : "sent");
+  React.useEffect(() => { enabledProviders().then(setProviders); }, []);
+  const changeView = (v) => { setView(v); lsSet("mysous:view", v); };
+
+  async function signInWith(provider) {
+    setNotice(null);
+    if (providers && providers[provider] === false) { setNotice(provider === "google" ? "googleOff" : "appleOff"); return; }
+    setBusy(provider);
+    const { error } = await sb.auth.signInWithOAuth({ provider, options: { redirectTo } });
+    if (error) { setBusy(null); setNotice("failed"); }
   }
 
-  const button = { width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" };
+  const button = { width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, boxSizing: "border-box" };
+  const toggleBtn = (active) => ({ display: "flex", alignItems: "center", gap: 5, border: "none", borderRadius: 8, padding: "5px 8px", cursor: "pointer", fontSize: 11.5, fontFamily: "inherit", background: active ? C.card : "transparent", color: active ? C.ink : C.muted, fontWeight: active ? 600 : 400, boxShadow: active ? "0 1px 2px rgba(51,53,47,0.08)" : "none" });
+
+  const content = (
+    <div style={{ width: "100%", maxWidth: 380, margin: "0 auto" }}>
+      <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, margin: "6px 0 8px", lineHeight: 1.2 }}>{t("title")}</h1>
+      <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5, margin: "0 0 22px" }}>{t("sub")}</p>
+
+      <button onClick={() => signInWith("google")} disabled={!!busy} style={{ ...button, background: C.card, color: C.ink, border: `1px solid ${C.line}` }}>
+        {busy === "google" ? t("opening") : t("google")}
+      </button>
+      <button onClick={() => signInWith("apple")} disabled={!!busy} style={{ ...button, background: "#1F1F1F", color: "#fff", border: "1px solid #1F1F1F", marginTop: 10 }}>
+        {busy === "apple" ? t("opening") : t("apple")}
+      </button>
+      {notice && <div role="status" style={{ color: C.accentText, fontSize: 13, marginTop: 10, lineHeight: 1.45 }}>{t(notice)}</div>}
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10, color: C.muted, fontSize: 13, margin: "18px 0" }}>
+        <span style={{ flex: 1, height: 1, background: C.line }} />{t("or")}<span style={{ flex: 1, height: 1, background: C.line }} />
+      </div>
+
+      <button onClick={onGuest} style={{ ...button, background: C.primary, color: "#fff", border: "none" }}>{t("guest")}</button>
+      <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "8px 0 0", lineHeight: 1.45 }}>{t("guestNote")}</p>
+      <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "18px 0 0", lineHeight: 1.45, borderTop: `1px solid ${C.line}`, paddingTop: 12 }}>🔒 {t("privacy")}</p>
+    </div>
+  );
+
   return (
-    <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} style={{ minHeight: "100vh", background: C.paper, display: "flex", alignItems: "center", justifyContent: "center", padding: 16, boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
-      <div style={{ width: "100%", maxWidth: 400, background: C.card, border: `1px solid ${C.line}`, borderRadius: 20, padding: "28px 22px", boxSizing: "border-box" }}>
-        <div style={{ fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 700 }}>My Sous</div>
-        <h1 style={{ fontFamily: "Georgia, serif", fontSize: 26, margin: "18px 0 6px" }}>{t("title")}</h1>
-        <p style={{ color: C.muted, fontSize: 14, lineHeight: 1.5, margin: "0 0 20px" }}>{t("sub")}</p>
-
-        {state === "sent" ? (
-          <div role="status" style={{ background: C.sageSofter, color: "#4F6449", borderRadius: 12, padding: "12px 14px", fontSize: 14, lineHeight: 1.5 }}>{t("sent")}</div>
-        ) : (
-          <>
-            {GOOGLE_SIGN_IN_ENABLED && (
-              <>
-                <button onClick={() => sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo } })} style={{ ...button, background: C.card, color: C.ink, border: `1px solid ${C.line}` }}>
-                  {t("google")}
-                </button>
-                <div style={{ textAlign: "center", color: C.muted, fontSize: 13, margin: "14px 0" }}>{t("or")}</div>
-              </>
-            )}
-            <form onSubmit={sendLink} noValidate>
-              <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setState("idle"); }} placeholder={t("email")} aria-label={t("email")} autoComplete="email" dir="ltr"
-                style={{ width: "100%", boxSizing: "border-box", padding: "12px 14px", borderRadius: 12, border: `1px solid ${C.line}`, background: C.paper, fontSize: 15, fontFamily: "inherit", marginBottom: 10 }} />
-              <button type="submit" disabled={state === "sending"} style={{ ...button, background: C.primary, color: "#fff", border: "none" }}>
-                {state === "sending" ? t("sending") : t("send")}
-              </button>
-            </form>
-            {(state === "bad" || state === "error") && <div style={{ color: C.accentText, fontSize: 13, marginTop: 8 }}>{t(state === "bad" ? "badEmail" : "failed")}</div>}
-          </>
-        )}
-
-        <button onClick={onGuest} style={{ ...button, background: "none", border: "none", color: "#4F6449", marginTop: 14 }}>{t("guest")}</button>
-        <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "4px 0 0", lineHeight: 1.45 }}>{t("guestNote")}</p>
-        <p style={{ color: C.muted, fontSize: 12, textAlign: "center", margin: "14px 0 0", lineHeight: 1.45, borderTop: `1px solid ${C.line}`, paddingTop: 12 }}>🔒 {t("privacy")}</p>
+    <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className={desktop ? "ms-desktop" : "ms-phone"}
+      style={{ minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
+      <div style={{
+        width: desktop ? "100%" : 390, maxWidth: desktop ? 1280 : "100%", minHeight: desktop ? "calc(100vh - 40px)" : 780,
+        background: C.card, borderRadius: desktop ? 18 : 28, border: `1px solid ${C.line}`,
+        boxShadow: "0 1px 2px rgba(51,53,47,0.04), 0 20px 40px rgba(51,53,47,0.10)", display: "flex", flexDirection: "column", overflow: "hidden", boxSizing: "border-box",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px max(24px, calc(50% - 300px))" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</div>
+          <div role="group" aria-label="View" style={{ display: "flex", background: C.paper, border: `1px solid ${C.line}`, borderRadius: 10, padding: 2 }}>
+            <button onClick={() => changeView("phone")} aria-pressed={!desktop} style={toggleBtn(!desktop)}><PhoneIcon />{t("phone")}</button>
+            <button onClick={() => changeView("desktop")} aria-pressed={desktop} style={toggleBtn(desktop)}><MonitorIcon />{t("desktop")}</button>
+          </div>
+        </div>
+        <div style={{ flex: 1, padding: desktop ? "48px 24px" : "28px 22px", display: "flex", alignItems: desktop ? "center" : "flex-start" }}>
+          {content}
+        </div>
       </div>
     </div>
   );
