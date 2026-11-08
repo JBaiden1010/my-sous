@@ -9,6 +9,8 @@
 // Without the library (the claude.ai version, tests) none of this runs and
 // the app behaves exactly as before.
 import React, { useState } from "react";
+import { PhotoBackdrop } from "./photos.jsx";
+import { loadAppearance, saveAppearance, resolvedTheme } from "./appearance.js";
 
 export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
 // Publishable (anon) key: safe to ship in the page; row-level security in the
@@ -85,7 +87,7 @@ const INTRO_UI = {
   language: { en: "Language", es: "Idioma", fr: "Langue", pt: "Idioma", hi: "भाषा", zh: "语言", ar: "اللغة" },
 };
 
-const C = { paper: "#F8F5EF", card: "#FFFFFF", ink: "#33352F", muted: "#6A6C63", line: "#E4E0D6", primary: "#71866A", sageSofter: "#EBF0E6", accentText: "#9A5232" };
+const C = { paper: "var(--ms-paper)", card: "var(--ms-card)", ink: "var(--ms-ink)", muted: "var(--ms-ink-muted)", line: "var(--ms-line)", primary: "var(--ms-primary)", sage: "var(--ms-sage)", sageSofter: "var(--ms-sage-softer)", sageText: "var(--ms-primary-text)", accentText: "var(--ms-accent-text)" };
 
 const VIEW_TR = {
   phone: { en: "Phone", es: "Teléfono", fr: "Téléphone", pt: "Celular", hi: "फ़ोन", zh: "手机", ar: "هاتف" },
@@ -130,6 +132,9 @@ export function AuthScreen({ sb, onGuest }) {
   const desktop = view === "desktop";
 
   React.useEffect(() => { enabledProviders().then(setProviders); }, []);
+  const [appearance, setAppearance] = useState(loadAppearance);
+  const dark = resolvedTheme(appearance) === "dark";
+  const toggleTheme = () => { const next = { ...appearance, theme: dark ? "light" : "dark" }; setAppearance(next); saveAppearance(next); };
   const changeView = (v) => { setView(v); lsSet("mysous:view", v); };
 
   async function signInWith(provider) {
@@ -143,7 +148,7 @@ export function AuthScreen({ sb, onGuest }) {
   const button = { width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, boxSizing: "border-box" };
   const toggleBtn = (active) => ({ display: "flex", alignItems: "center", gap: 5, border: "none", borderRadius: 8, padding: "5px 8px", cursor: "pointer", fontSize: 11.5, fontFamily: "inherit", background: active ? C.card : "transparent", color: active ? C.ink : C.muted, fontWeight: active ? 600 : 400, boxShadow: active ? "0 1px 2px rgba(51,53,47,0.08)" : "none" });
 
-  const chip = (active) => ({ padding: "6px 11px", borderRadius: 20, border: `1px solid ${active ? C.primary : C.line}`, background: active ? "#DCE5D5" : C.card, color: active ? "#4F6449" : C.muted, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", fontWeight: active ? 600 : 400 });
+  const chip = (active) => ({ padding: "6px 11px", borderRadius: 20, border: `1px solid ${active ? C.primary : C.line}`, background: active ? C.sage : C.card, color: active ? C.sageText : C.muted, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit", fontWeight: active ? 600 : 400 });
   const intro = slide < INTRO.length ? (
     <div style={{ width: "100%", maxWidth: 380, margin: "0 auto", display: "flex", flexDirection: "column", minHeight: "100%" }}>
       {slide === 0 && (
@@ -200,31 +205,36 @@ export function AuthScreen({ sb, onGuest }) {
   );
 
   return (
-    <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className={desktop ? "ms-desktop" : "ms-phone"}
-      style={{ minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
+    <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className={desktop ? "ms-root ms-desktop" : "ms-root ms-phone"}
+      style={{ position: "relative", minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
       <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split > div:first-child > div:first-child { font-size: 64px !important; } }"}</style>
+      <PhotoBackdrop outer />
       <div style={{
+        position: "relative", zIndex: 1,
         width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,
         background: C.card, borderRadius: desktop ? 18 : 28, border: `1px solid ${C.line}`,
         boxShadow: "0 1px 2px rgba(51,53,47,0.04), 0 20px 40px rgba(51,53,47,0.10)", display: "flex", flexDirection: "column", overflow: "hidden", boxSizing: "border-box",
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px 24px" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
           <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={toggleTheme} aria-label={dark ? "Light mode" : "Dark mode"} title={dark ? "Light mode" : "Dark mode"} style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.line}`, background: C.paper, color: C.muted, cursor: "pointer", fontSize: 15, lineHeight: 1 }}>{dark ? "☀" : "☾"}</button>
           <div role="group" aria-label="View" style={{ display: "flex", background: C.paper, border: `1px solid ${C.line}`, borderRadius: 10, padding: 2 }}>
             <button onClick={() => changeView("phone")} aria-pressed={!desktop} style={toggleBtn(!desktop)}><PhoneIcon />{t("phone")}</button>
             <button onClick={() => changeView("desktop")} aria-pressed={desktop} style={toggleBtn(desktop)}><MonitorIcon />{t("desktop")}</button>
           </div>
+          </div>
         </div>
         {desktop ? (
           <div style={{ flex: 1, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }} className="ms-auth-split">
-            <div aria-hidden="true" style={{ background: "#EBF0E6", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 18, padding: 32 }}>
+            <div aria-hidden="true" style={{ background: C.sageSofter, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 18, padding: 32 }}>
               <div style={{ fontSize: 120, lineHeight: 1 }}>{slide < INTRO.length ? INTRO[slide].emoji : "🍳"}</div>
-              <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: "#4F6449", textAlign: "center", maxWidth: 320, lineHeight: 1.35 }}>My Sous</div>
+              <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: C.sageText, textAlign: "center", maxWidth: 320, lineHeight: 1.35 }}>My Sous</div>
             </div>
-            <div style={{ padding: "48px 40px", display: "flex", alignItems: "center" }}>{content}</div>
+            <div className="ms-auth-body" style={{ padding: "48px 40px", display: "flex", alignItems: "center" }}>{content}</div>
           </div>
         ) : (
-          <div style={{ flex: 1, padding: "28px 22px", display: "flex", alignItems: "flex-start" }}>{content}</div>
+          <div className="ms-auth-body" style={{ flex: 1, padding: "28px 22px", display: "flex", alignItems: "flex-start" }}>{content}</div>
         )}
       </div>
     </div>

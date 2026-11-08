@@ -2,6 +2,9 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { startCloud, AuthScreen, isGuestChosen, chooseGuest } from "./cloud.jsx";
+import { injectAppearanceCss, applyAppearance, loadAppearance } from "./appearance.js";
+injectAppearanceCss();
+applyAppearance(loadAppearance());
 window.React = React;
 
 // Default storage: this browser's localStorage (guests, and the claude.ai version).

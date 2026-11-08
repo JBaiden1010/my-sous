@@ -26,8 +26,12 @@ import {
   Eye,
   Smartphone,
   Monitor,
+  Sun,
+  Moon,
 } from "./lucide-shim.js";
 import { RECIPE_IMAGES } from "./recipe-images.js";
+import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
+import { PhotoBackdrop, pickRecipeIds } from "./photos.jsx";
 import { build } from "./world/build.js";
 import { AFRICAN } from "./world/african.js";
 import { BRAZILIAN } from "./world/brazilian.js";
@@ -59,8 +63,13 @@ const FONT_IMPORT = `[dir="rtl"] .ms-flip { transform: scaleX(-1); }
 .ms-desktop div:has(> .ms-recipe-card) { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
 .ms-desktop div:has(> .ms-recipe-card) > .ms-recipe-card { margin-bottom: 0 !important; }
 .ms-desktop .ms-more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-width: 980px; }
-.ms-desktop .ms-more-grid > button { border: 1px solid #E4E0D6 !important; border-radius: 14px; padding: 16px !important; background: #FFFFFF !important; transition: border-color .15s, box-shadow .15s; }
-.ms-desktop .ms-more-grid > button:hover { border-color: #71866A !important; box-shadow: 0 2px 10px rgba(51,53,47,0.06); }
+.ms-desktop .ms-more-grid > button { border: 1px solid var(--ms-line) !important; border-radius: 14px; padding: 16px !important; background: var(--ms-card) !important; transition: border-color .15s, box-shadow .15s; }
+.ms-inspire-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+.ms-desktop .ms-inspire-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; max-width: 980px; }
+.ms-inspire-tile { position: relative; aspect-ratio: 4 / 3; border: none; border-radius: 14px; background-size: cover; background-position: center; cursor: pointer; overflow: hidden; display: flex; align-items: flex-end; padding: 10px 12px; text-align: start; transition: transform .15s; }
+.ms-inspire-tile:hover { transform: translateY(-2px); }
+.ms-inspire-tile span { color: #fff; font-weight: 600; font-size: 14px; line-height: 1.25; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-family: 'Inter', sans-serif; }
+.ms-desktop .ms-more-grid > button:hover { border-color: var(--ms-primary) !important; box-shadow: 0 2px 10px rgba(51,53,47,0.06); }
 @media (max-width: 700px) { .ms-desktop .ms-screen > div { padding-left: 16px; padding-right: 16px; } }
 .ms-desktop .ms-header { flex-wrap: wrap; row-gap: 8px; }
 @media (max-width: 820px) { .ms-desktop .ms-nav { order: 3; width: 100%; overflow-x: auto; margin-inline-end: 0 !important; } }
@@ -71,19 +80,20 @@ const FONT_IMPORT = `[dir="rtl"] .ms-flip { transform: scaleX(-1); }
 // Fills use the palette exactly; *Text variants are deeper shades of the same
 // hue so small text stays readable (4.5:1) on cream and light tints.
 const COLORS = {
-  paper: "#F8F5EF",        // cream: app background
-  card: "#FFFFFF",
-  ink: "#33352F",          // charcoal: text
-  inkMuted: "#6A6C63",
-  line: "#E4E0D6",
-  primary: "#71866A",      // forest sage: buttons and navigation
-  primaryText: "#4F6449",
-  sage: "#DCE5D5",         // sage: secondary sections
-  sageSofter: "#EBF0E6",
-  accent: "#C87955",       // terracotta: accents and highlights
-  accentText: "#9A5232",
-  accentSoft: "#F0DACE",
-  accentSofter: "#F8ECE5",
+  paper: "var(--ms-paper)",               // cream: app background
+  card: "var(--ms-card)",
+  ink: "var(--ms-ink)",                   // charcoal: text
+  inkMuted: "var(--ms-ink-muted)",
+  line: "var(--ms-line)",
+  primary: "var(--ms-primary)",           // forest sage: buttons and navigation
+  primaryText: "var(--ms-primary-text)",
+  sage: "var(--ms-sage)",                 // sage: secondary sections
+  sageSofter: "var(--ms-sage-softer)",
+  accent: "var(--ms-accent)",             // terracotta: accents and highlights
+  accentText: "var(--ms-accent-text)",
+  accentSoft: "var(--ms-accent-soft)",
+  accentSofter: "var(--ms-accent-softer)",
+  onInk: "var(--ms-on-ink)",              // text on an ink-coloured background
 };
 
 const EQUIPMENT = [
@@ -299,6 +309,28 @@ const TRANSLATIONS = {
   clearFilters: { en: "Clear filters", es: "Quitar filtros", fr: "Effacer les filtres", pt: "Limpar filtros", hi: "फ़िल्टर हटाएं", zh: "清除筛选", ar: "مسح عوامل التصفية" },
   recipesWord: { en: "recipes", es: "recetas", fr: "recettes", pt: "receitas", hi: "रेसिपी", zh: "道菜", ar: "وصفات" },
   filtersLabel: { en: "Filters", es: "Filtros", fr: "Filtres", pt: "Filtros", hi: "फ़िल्टर", zh: "筛选", ar: "عوامل التصفية" },
+  appearanceLabel: { en: "Appearance & accessibility", es: "Apariencia y accesibilidad", fr: "Apparence et accessibilité", pt: "Aparência e acessibilidade", hi: "रूप और सुलभता", zh: "外观与无障碍", ar: "المظهر وإمكانية الوصول" },
+  themeLabel: { en: "Mode", es: "Modo", fr: "Mode", pt: "Modo", hi: "मोड", zh: "模式", ar: "الوضع" },
+  themeLight: { en: "Light", es: "Claro", fr: "Clair", pt: "Claro", hi: "लाइट", zh: "浅色", ar: "فاتح" },
+  themeDark: { en: "Dark", es: "Oscuro", fr: "Sombre", pt: "Escuro", hi: "डार्क", zh: "深色", ar: "داكن" },
+  themeSystem: { en: "Match device", es: "Como el dispositivo", fr: "Comme l'appareil", pt: "Igual ao dispositivo", hi: "डिवाइस जैसा", zh: "跟随设备", ar: "مثل الجهاز" },
+  textSizeLabel: { en: "Text size", es: "Tamaño del texto", fr: "Taille du texte", pt: "Tamanho do texto", hi: "टेक्स्ट का आकार", zh: "文字大小", ar: "حجم النص" },
+  textSmall: { en: "Small", es: "Pequeño", fr: "Petit", pt: "Pequeno", hi: "छोटा", zh: "小", ar: "صغير" },
+  textDefault: { en: "Default", es: "Normal", fr: "Normal", pt: "Padrão", hi: "सामान्य", zh: "默认", ar: "افتراضي" },
+  textLarge: { en: "Large", es: "Grande", fr: "Grand", pt: "Grande", hi: "बड़ा", zh: "大", ar: "كبير" },
+  textXL: { en: "Extra large", es: "Muy grande", fr: "Très grand", pt: "Muito grande", hi: "बहुत बड़ा", zh: "特大", ar: "كبير جدًا" },
+  readableFontLabel: { en: "Easy-to-read font", es: "Letra fácil de leer", fr: "Police facile à lire", pt: "Fonte fácil de ler", hi: "पढ़ने में आसान फ़ॉन्ट", zh: "易读字体", ar: "خط سهل القراءة" },
+  readableFontSub: { en: "Clearer letter shapes and a bit more spacing. Helpful for low vision or dyslexia.", es: "Letras más claras y algo más de espacio. Útil con baja visión o dislexia.", fr: "Lettres plus nettes et un peu plus d'espace. Utile en cas de basse vision ou de dyslexie.", pt: "Letras mais nítidas e um pouco mais de espaço. Útil para baixa visão ou dislexia.", hi: "साफ़ अक्षर और थोड़ा ज़्यादा अंतर। कम दृष्टि या डिस्लेक्सिया में मददगार।", zh: "字形更清晰、间距稍大，适合低视力或阅读障碍人士。", ar: "أشكال حروف أوضح ومسافات أكبر قليلًا. مفيد لضعف البصر أو عسر القراءة." },
+  contrastLabel: { en: "Higher contrast", es: "Más contraste", fr: "Contraste renforcé", pt: "Mais contraste", hi: "ज़्यादा कंट्रास्ट", zh: "高对比度", ar: "تباين أعلى" },
+  contrastSub: { en: "Darker text and stronger outlines.", es: "Texto más oscuro y bordes más marcados.", fr: "Texte plus foncé et contours plus nets.", pt: "Texto mais escuro e contornos mais fortes.", hi: "गहरा टेक्स्ट और साफ़ किनारे।", zh: "文字更深、边框更明显。", ar: "نص أغمق وحدود أوضح." },
+  reduceMotionLabel: { en: "Reduce motion", es: "Reducir movimiento", fr: "Réduire les animations", pt: "Reduzir movimento", hi: "कम एनिमेशन", zh: "减少动态效果", ar: "تقليل الحركة" },
+  reduceMotionSub: { en: "Turns off animations and sliding effects.", es: "Desactiva animaciones y efectos de deslizamiento.", fr: "Désactive les animations et les effets de glissement.", pt: "Desativa animações e efeitos de deslizar.", hi: "एनिमेशन और स्लाइड इफ़ेक्ट बंद करता है।", zh: "关闭动画和滑动效果。", ar: "يوقف الرسوم المتحركة وتأثيرات الانزلاق." },
+  photoBgLabel: { en: "Photo background", es: "Fondo con fotos", fr: "Fond en photos", pt: "Fundo com fotos", hi: "फ़ोटो बैकग्राउंड", zh: "照片背景", ar: "خلفية بالصور" },
+  photoBgSub: { en: "Faded recipe photos behind the app. Turn off for a plain background.", es: "Fotos de recetas suaves detrás de la app. Desactívalo para un fondo liso.", fr: "Photos de recettes estompées derrière l'app. Désactivez pour un fond uni.", pt: "Fotos de receitas suaves atrás do app. Desative para um fundo liso.", hi: "ऐप के पीछे हल्की रेसिपी फ़ोटो। सादा बैकग्राउंड के लिए बंद करें।", zh: "应用背后淡淡的菜品照片。关闭后为纯色背景。", ar: "صور وصفات باهتة خلف التطبيق. أوقفها لخلفية سادة." },
+  getInspired: { en: "Get inspired", es: "Inspírate", fr: "Laissez-vous inspirer", pt: "Inspire-se", hi: "प्रेरणा लें", zh: "找找灵感", ar: "استلهم" },
+  getInspiredSub: { en: "A few recipes to try next.", es: "Algunas recetas para probar.", fr: "Quelques recettes à essayer.", pt: "Algumas receitas para experimentar.", hi: "आगे आज़माने के लिए कुछ रेसिपी।", zh: "接下来可以试试这些菜。", ar: "بعض الوصفات لتجربتها." },
+  shuffleLabel: { en: "Shuffle", es: "Mezclar", fr: "Mélanger", pt: "Embaralhar", hi: "बदलें", zh: "换一批", ar: "تبديل" },
+  skipToContent: { en: "Skip to content", es: "Ir al contenido", fr: "Aller au contenu", pt: "Pular para o conteúdo", hi: "सामग्री पर जाएं", zh: "跳到内容", ar: "انتقل إلى المحتوى" },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -7263,6 +7295,14 @@ export default function App() {
   }
 
   // Phone frame vs. full-width desktop layout. Remembered per browser.
+  const [appearance, setAppearanceState] = useState(loadAppearance);
+  const appearanceRef = useRef(appearance);
+  appearanceRef.current = appearance;
+  useEffect(() => { injectAppearanceCss(); applyAppearance(appearanceRef.current); return watchSystemTheme(() => appearanceRef.current); }, []);
+  function updateAppearance(patch) {
+    setAppearanceState((a) => { const next = { ...a, ...patch }; saveAppearance(next); return next; });
+  }
+  const isDark = resolvedTheme(appearance) === "dark";
   const [viewMode, setViewMode] = useState(() => {
     try {
       const saved = window.localStorage.getItem("mysous:view");
@@ -7293,8 +7333,9 @@ export default function App() {
   if (!storageLoaded) {
     return (
       <LanguageContext.Provider value={{ language, t }}>
-      <div style={outerStyle} className={isDesktop ? "ms-desktop" : "ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+      <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
         <style>{FONT_IMPORT}</style>
+        <PhotoBackdrop outer />
         <div style={frameStyle}>
           <div className="ms-header" style={styles.statusRow}>
             <span style={styles.brand}>My&nbsp;Sous</span>
@@ -7312,8 +7353,9 @@ export default function App() {
   if (!onboarded) {
     return (
       <LanguageContext.Provider value={{ language, t }}>
-      <div style={outerStyle} className={isDesktop ? "ms-desktop" : "ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+      <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
         <style>{FONT_IMPORT}</style>
+        <PhotoBackdrop outer />
         <div style={frameStyle}>
           <div className="ms-header" style={styles.statusRow}>
             <span style={styles.brand}>My&nbsp;Sous</span>
@@ -7337,13 +7379,19 @@ export default function App() {
   return (
     <LanguageContext.Provider value={{ language, t }}>
     <CommunityContext.Provider value={{ ratingFor: community.ratingFor, myRating: community.myRating, rate: community.rate }}>
-    <div style={outerStyle} className={isDesktop ? "ms-desktop" : "ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
+    <div style={outerStyle} className={isDesktop ? "ms-root ms-desktop" : "ms-root ms-phone"} dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <style>{FONT_IMPORT}</style>
+      <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
+      <PhotoBackdrop outer />
       <div style={frameStyle}>
+        <PhotoBackdrop />
         <div className="ms-header" style={styles.statusRow}>
           <span style={styles.brand}>My&nbsp;Sous</span>
           <span style={styles.brandSub}>prototype</span>
           {viewToggle}
+          <button onClick={() => updateAppearance({ theme: isDark ? "light" : "dark" })} aria-label={t(isDark ? "themeLight" : "themeDark")} title={t(isDark ? "themeLight" : "themeDark")} style={styles.settingsButton}>
+            {isDark ? <Sun size={17} color={COLORS.inkMuted} /> : <Moon size={17} color={COLORS.inkMuted} />}
+          </button>
           {showGear && (
             <button onClick={openSettings} style={styles.settingsButton}>
               <SettingsIcon size={18} color={COLORS.inkMuted} />
@@ -7351,7 +7399,7 @@ export default function App() {
           )}
         </div>
 
-        <div style={styles.screenArea} className="ms-screen">
+        <div style={styles.screenArea} className="ms-screen" id="ms-main" role="main">
           <ScreenErrorBoundary t={t} resetKey={screen} onHome={() => { setActiveRecipe(null); setScreen("home"); }}>
           {screen === "home" && (
             <HomeScreen
@@ -7436,6 +7484,8 @@ export default function App() {
               onOpenSettings={openSettings}
               favoritesCount={Object.keys(favorites).length}
               shoppingCount={shoppingList.length}
+              recipes={allRecipes}
+              onOpenRecipe={(r) => { setPrevScreen("more"); startGuided(r); }}
             />
           )}
           {screen === "history" && (
@@ -7502,6 +7552,8 @@ export default function App() {
               selectedCategories={selectedCategories}
               toggleCategory={toggleCategory}
               onResetKitchen={resetKitchen}
+              appearance={appearance}
+              onAppearance={updateAppearance}
             />
           )}
           </ScreenErrorBoundary>
@@ -7635,6 +7687,63 @@ function OnboardingScreen({ onComplete, onChangeLanguage }) {
   );
 }
 
+function SwitchRow({ label, sub, checked, onChange }) {
+  return (
+    <label style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderTop: `1px solid ${COLORS.line}`, cursor: "pointer" }}>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ ...styles.recipeName, display: "block" }}>{label}</span>
+        <span style={{ ...styles.recipeMeta, whiteSpace: "normal", display: "block", marginTop: 2 }}>{sub}</span>
+      </span>
+      <input type="checkbox" role="switch" checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ position: "absolute", opacity: 0, width: 1, height: 1 }} />
+      <span aria-hidden="true" style={{ width: 42, height: 24, borderRadius: 12, background: checked ? COLORS.primary : COLORS.line, position: "relative", flexShrink: 0, transition: "background .15s" }}>
+        <span style={{ position: "absolute", top: 3, insetInlineStart: checked ? 21 : 3, width: 18, height: 18, borderRadius: 9, background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,0.25)", transition: "inset-inline-start .15s" }} />
+      </span>
+    </label>
+  );
+}
+
+function SegmentRow({ label, options, value, onChange }) {
+  return (
+    <div style={{ padding: "12px 0", borderTop: `1px solid ${COLORS.line}` }}>
+      <div style={{ ...styles.recipeName, marginBottom: 8 }}>{label}</div>
+      <div role="radiogroup" aria-label={label} style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {options.map((o) => (
+          <button key={o.id} role="radio" aria-checked={value === o.id} onClick={() => onChange(o.id)}
+            style={{ ...styles.equipChip, ...(value === o.id ? styles.equipChipActive : {}), gap: 6, ...(o.style || {}) }}>
+            {o.icon}{o.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AppearanceCard({ appearance: a, onChange }) {
+  const { t } = useContext(LanguageContext);
+  return (
+    <>
+      <div style={{ ...styles.sectionLabel, marginTop: 24 }}>{t("appearanceLabel")}</div>
+      <div style={{ ...styles.historyCard, paddingTop: 2, paddingBottom: 2 }}>
+        <SegmentRow label={t("themeLabel")} value={a.theme} onChange={(v) => onChange({ theme: v })} options={[
+          { id: "light", label: t("themeLight"), icon: <Sun size={14} color={COLORS.inkMuted} /> },
+          { id: "dark", label: t("themeDark"), icon: <Moon size={14} color={COLORS.inkMuted} /> },
+          { id: "system", label: t("themeSystem"), icon: <Monitor size={14} color={COLORS.inkMuted} /> },
+        ]} />
+        <SegmentRow label={t("textSizeLabel")} value={a.textSize} onChange={(v) => onChange({ textSize: v })} options={[
+          { id: "small", label: t("textSmall"), style: { fontSize: 12 } },
+          { id: "default", label: t("textDefault"), style: { fontSize: 13 } },
+          { id: "large", label: t("textLarge"), style: { fontSize: 15 } },
+          { id: "xl", label: t("textXL"), style: { fontSize: 17 } },
+        ]} />
+        <SwitchRow label={t("readableFontLabel")} sub={t("readableFontSub")} checked={a.readableFont} onChange={(v) => onChange({ readableFont: v })} />
+        <SwitchRow label={t("contrastLabel")} sub={t("contrastSub")} checked={a.highContrast} onChange={(v) => onChange({ highContrast: v })} />
+        <SwitchRow label={t("reduceMotionLabel")} sub={t("reduceMotionSub")} checked={a.reduceMotion} onChange={(v) => onChange({ reduceMotion: v })} />
+        <SwitchRow label={t("photoBgLabel")} sub={t("photoBgSub")} checked={a.photoBackground} onChange={(v) => onChange({ photoBackground: v })} />
+      </div>
+    </>
+  );
+}
+
 function PrivacyCard() {
   const { t } = useContext(LanguageContext);
   const cloud = typeof window !== "undefined" ? window.mysousCloud : null;
@@ -7697,7 +7806,7 @@ function AccountCard() {
   );
 }
 
-function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCategories, toggleCategory, onResetKitchen }) {
+function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCategories, toggleCategory, onResetKitchen, appearance, onAppearance }) {
   const { t: tr, language } = useContext(LanguageContext);
   const [name, setName] = useState(profile.name);
   const [age, setAge] = useState(profile.age);
@@ -7777,6 +7886,7 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
       </button>
 
       <button onClick={handleSaveProfile} style={styles.primaryButton}>{tr("saveProfile")}</button>
+      {appearance && <AppearanceCard appearance={appearance} onChange={onAppearance} />}
       <PrivacyCard />
     </div>
   );
@@ -8631,8 +8741,10 @@ function HomeScreen({ profile, ingredients, equipment, recipes, matchInfo, histo
   );
 }
 
-function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount }) {
+function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount, recipes = [], onOpenRecipe }) {
   const { t, language } = useContext(LanguageContext);
+  const [inspireIds, setInspireIds] = useState(() => pickRecipeIds(8));
+  const inspire = inspireIds.map((id) => recipes.find((r) => r.id === id)).filter(Boolean);
   const rows = [
     { icon: Clock, label: t("historyLabel"), sub: t("historySub"), action: () => onOpen("history") },
     { icon: BookOpen, label: t("cookbookLabel"), sub: favoritesCount > 0 ? `${favoritesCount} ${pl(favoritesCount, PL.savedRecipe, language)}` : t("cookbookSub"), action: () => onOpen("cookbook") },
@@ -8657,6 +8769,28 @@ function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount }) {
           </button>
         ))}
       </div>
+
+      {onOpenRecipe && inspire.length > 0 && (
+        <section style={{ marginTop: 26 }} aria-labelledby="ms-inspire">
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
+            <div>
+              <h2 id="ms-inspire" style={{ ...styles.h1, fontSize: 20, margin: 0 }}>{t("getInspired")}</h2>
+              <p style={{ ...styles.subtext, marginTop: 2 }}>{t("getInspiredSub")}</p>
+            </div>
+            <button onClick={() => setInspireIds(pickRecipeIds(8))} style={{ ...styles.linkButton, fontWeight: 600, display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+              <RotateCcw size={13} color={COLORS.primaryText} /> {t("shuffleLabel")}
+            </button>
+          </div>
+          <div className="ms-inspire-grid">
+            {inspire.map((r) => (
+              <button key={r.id} onClick={() => onOpenRecipe(r)} className="ms-inspire-tile" aria-label={recipeName(r, language)}
+                style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,0.65)), url(${RECIPE_IMAGES[r.remixOf || r.id]})` }}>
+                <span>{recipeName(r, language)}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -9449,9 +9583,9 @@ function CommunityScreen({ community, recipes, onOpenRecipe, onSaveSharedRecipe,
 }
 
 const styles = {
-  outer: { width: "100%", minHeight: "100vh", background: COLORS.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "28px 12px", fontFamily: "'Inter', sans-serif", boxSizing: "border-box" },
-  phone: { width: 390, maxWidth: "100%", height: 780, background: COLORS.card, borderRadius: 28, boxShadow: "0 1px 2px rgba(51,53,47,0.04), 0 20px 40px rgba(51,53,47,0.10)", border: `1px solid ${COLORS.line}`, overflow: "hidden", display: "flex", flexDirection: "column", position: "relative" },
-  statusRow: { padding: "18px 20px 12px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${COLORS.line}` },
+  outer: { position: "relative", width: "100%", minHeight: "100vh", background: COLORS.paper, color: COLORS.ink, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: "28px 12px", fontFamily: "'Inter', sans-serif", boxSizing: "border-box" },
+  phone: { width: 390, maxWidth: "100%", height: 780, background: COLORS.card, borderRadius: 28, boxShadow: "0 1px 2px rgba(51,53,47,0.04), 0 20px 40px var(--ms-shadow)", zIndex: 1, border: `1px solid ${COLORS.line}`, overflow: "hidden", display: "flex", flexDirection: "column", position: "relative" },
+  statusRow: { padding: "18px 20px 12px", display: "flex", alignItems: "center", gap: 8, borderBottom: `1px solid ${COLORS.line}`, background: COLORS.card, position: "relative", zIndex: 1 },
   desktopFrame: { width: "100%", maxWidth: 1280, height: "calc(100vh - 40px)", minHeight: 560, borderRadius: 18 },
   tabBarDesktop: { padding: "10px max(24px, calc(50% - 300px)) 14px" },
   desktopNav: { display: "flex", gap: 4, marginInlineEnd: 12 },
@@ -9464,7 +9598,7 @@ const styles = {
   brand: { fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 18, color: COLORS.ink },
   brandSub: { marginInlineStart: 8, fontSize: 11, color: COLORS.inkMuted, letterSpacing: "0.03em", flex: 1 },
   settingsButton: { background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 10, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" },
-  screenArea: { flex: 1, overflowY: "auto" },
+  screenArea: { flex: 1, overflowY: "auto", position: "relative", zIndex: 1 },
   screenPad: { padding: "20px 20px 24px", height: "100%", boxSizing: "border-box" },
   h1: { fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 26, color: COLORS.ink, margin: 0 },
   subtext: { fontSize: 13, color: COLORS.inkMuted, marginTop: 4, marginBottom: 0 },
@@ -9546,10 +9680,10 @@ const styles = {
   quickChip: { flexShrink: 0, padding: "7px 12px", borderRadius: 20, border: `1px solid ${COLORS.line}`, background: COLORS.paper, fontSize: 12, color: COLORS.ink, cursor: "pointer", whiteSpace: "nowrap", fontFamily: "'Inter', sans-serif" },
   historyCard: { background: COLORS.card, border: `1px solid ${COLORS.line}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10 },
   starButton: { background: "none", border: "none", cursor: "pointer", padding: 2 },
-  tabBar: { display: "flex", borderTop: `1px solid ${COLORS.line}`, padding: "10px 6px 14px" },
+  tabBar: { display: "flex", borderTop: `1px solid ${COLORS.line}`, padding: "10px 6px 14px", background: COLORS.card, position: "relative", zIndex: 1 },
   tabButton: { flex: 1, background: "none", border: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 3, cursor: "pointer", padding: "4px 0" },
   tabLabel: { fontSize: 10.5 },
-  toast: { position: "absolute", bottom: 90, left: "50%", transform: "translateX(-50%)", background: COLORS.ink, color: "#fff", padding: "10px 16px", borderRadius: 10, fontSize: 12.5, whiteSpace: "nowrap", boxShadow: "0 8px 20px rgba(0,0,0,0.2)" },
+  toast: { position: "absolute", bottom: 90, left: "50%", transform: "translateX(-50%)", background: COLORS.ink, color: COLORS.onInk, padding: "10px 16px", borderRadius: 10, fontSize: 12.5, whiteSpace: "nowrap", boxShadow: "0 8px 20px rgba(0,0,0,0.2)" },
   homeSnapshotRow: { display: "flex", gap: 8, marginTop: 16 },
   homeSnapshotCard: { flex: 1, background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 12, padding: "10px 4px", textAlign: "center", cursor: "pointer", fontFamily: "'Inter', sans-serif" },
   homeSnapshotValue: { fontSize: 18, fontWeight: 600, color: COLORS.ink },
