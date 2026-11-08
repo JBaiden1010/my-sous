@@ -58,6 +58,9 @@ const FONT_IMPORT = `[dir="rtl"] .ms-flip { transform: scaleX(-1); }
 .ms-desktop .ms-screen > div { max-width: 1120px; margin: 0 auto; padding-left: 32px; padding-right: 32px; }
 .ms-desktop div:has(> .ms-recipe-card) { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 12px; }
 .ms-desktop div:has(> .ms-recipe-card) > .ms-recipe-card { margin-bottom: 0 !important; }
+.ms-desktop .ms-more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-width: 980px; }
+.ms-desktop .ms-more-grid > button { border: 1px solid #E4E0D6 !important; border-radius: 14px; padding: 16px !important; background: #FFFFFF !important; transition: border-color .15s, box-shadow .15s; }
+.ms-desktop .ms-more-grid > button:hover { border-color: #71866A !important; box-shadow: 0 2px 10px rgba(51,53,47,0.06); }
 @media (max-width: 700px) { .ms-desktop .ms-screen > div { padding-left: 16px; padding-right: 16px; } }
 .ms-desktop .ms-header { flex-wrap: wrap; row-gap: 8px; }
 @media (max-width: 820px) { .ms-desktop .ms-nav { order: 3; width: 100%; overflow-x: auto; margin-inline-end: 0 !important; } }
@@ -7915,7 +7918,7 @@ function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, togg
         <RecipeImage recipe={recipe} height={64} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={styles.recipeCardTop}>
-            <span style={styles.recipeName}>{recipeName(recipe, language)}</span>
+            <span style={{ ...styles.recipeName, minWidth: 0, overflowWrap: "anywhere", lineHeight: 1.3 }}>{recipeName(recipe, language)}</span>
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
               {onEdit && (
                 <button onClick={(e) => { e.stopPropagation(); onEdit(recipe); }} style={styles.favButton}>
@@ -7937,18 +7940,18 @@ function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, togg
           <div style={styles.recipeMetaRow}>
             <RatingBadge recipeId={recipe.id} compact />
             {recipe.isUserRecipe && (
-              <span style={{ ...styles.mealTimeBadge, marginInlineEnd: 6, background: COLORS.paper, color: COLORS.inkMuted }}>
+              <span style={{ ...styles.mealTimeBadge, background: COLORS.paper, color: COLORS.inkMuted }}>
                 {recipe.remixOf ? `✎ ${t("yourTwistOnLabel")}` : "✎ " + t("myRecipesLabel")}
               </span>
             )}
             {recipe.mealTime && recipe.mealTime[0] && (
-              <span style={{ ...styles.mealTimeBadge, marginInlineEnd: 6 }}>
+              <span style={styles.mealTimeBadge}>
                 {MEAL_TIMES.find((m) => m.id === recipe.mealTime[0])?.emoji} {labelFor(MEAL_TIMES_TR, recipe.mealTime[0], language)}
               </span>
             )}
             <span style={styles.recipeMeta}>{recipeTime(recipe, language)}</span>
-            {cuisineLabel && (<><span style={styles.recipeDot}>·</span><span style={styles.recipeMeta}>{cuisineLabel}</span></>)}
-            {showIngredientCount && (<><span style={styles.recipeDot}>·</span><span style={styles.recipeMeta}>{recipe.ingredients.length} {pl(recipe.ingredients.length, PL.ingredient, language)}</span></>)}
+            {cuisineLabel && <span style={styles.recipeMeta}>{cuisineLabel}</span>}
+            {showIngredientCount && <span style={styles.recipeMeta}>{recipe.ingredients.length} {pl(recipe.ingredients.length, PL.ingredient, language)}</span>}
           </div>
         </div>
       </div>
@@ -8642,13 +8645,13 @@ function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount }) {
     <div style={styles.screenPad}>
       <h1 style={styles.h1}>{t("moreTitle")}</h1>
       <p style={styles.subtext}>{t("moreSubtitle")}</p>
-      <div style={{ marginTop: 16 }}>
+      <div className="ms-more-grid" style={{ marginTop: 16 }}>
         {rows.map((r) => (
           <button key={r.label} onClick={r.action} style={styles.moreRow}>
             <div style={styles.moreRowIcon}><r.icon size={17} color={COLORS.primaryText} /></div>
-            <div style={{ flex: 1, textAlign: "start" }}>
+            <div style={{ flex: 1, minWidth: 0, textAlign: "start" }}>
               <div style={styles.recipeName}>{r.label}</div>
-              <div style={styles.recipeMeta}>{r.sub}</div>
+              <div style={{ ...styles.recipeMeta, whiteSpace: "normal" }}>{r.sub}</div>
             </div>
             <ChevronRight className="ms-flip" size={16} color={COLORS.inkMuted} />
           </button>
@@ -9504,22 +9507,22 @@ const styles = {
   emptyText: { fontSize: 13, color: COLORS.inkMuted, fontStyle: "italic" },
   recipeImage: { width: 64, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
   recipeCard: { background: COLORS.card, border: `1px solid ${COLORS.line}`, borderRadius: 14, padding: "14px 16px", marginBottom: 10, cursor: "pointer" },
-  recipeCardTop: { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 },
+  recipeCardTop: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 },
   recipeName: { fontSize: 15, fontWeight: 600, color: COLORS.ink },
-  recipeMetaRow: { marginTop: 4, display: "flex", alignItems: "center" },
-  recipeMeta: { fontSize: 12, color: COLORS.inkMuted },
+  recipeMetaRow: { marginTop: 5, display: "flex", alignItems: "center", flexWrap: "wrap", rowGap: 4, columnGap: 10 },
+  recipeMeta: { fontSize: 12, color: COLORS.inkMuted, whiteSpace: "nowrap" },
   recipeDot: { margin: "0 6px", color: COLORS.line },
   dietPill: { fontSize: 10.5, color: COLORS.inkMuted, background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 20, padding: "2px 8px" },
   mealTimeRow: { display: "flex", gap: 8, marginTop: 14 },
   mealTimeChip: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "10px 4px", borderRadius: 12, border: `1px solid ${COLORS.line}`, background: COLORS.card, cursor: "pointer", color: COLORS.inkMuted, fontFamily: "'Inter', sans-serif" },
   mealTimeChipActive: { background: COLORS.sage, border: `1px solid ${COLORS.primary}`, color: COLORS.ink, fontWeight: 600 },
-  mealTimeBadge: { fontSize: 10.5, fontWeight: 600, color: COLORS.accentText, background: COLORS.accentSofter, borderRadius: 20, padding: "2px 8px", display: "inline-flex", alignItems: "center", gap: 3 },
+  mealTimeBadge: { fontSize: 10.5, fontWeight: 600, color: COLORS.accentText, background: COLORS.accentSofter, borderRadius: 20, padding: "2px 8px", display: "inline-flex", alignItems: "center", gap: 3, whiteSpace: "nowrap" },
   modeRow: { display: "flex", background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 12, padding: 3, marginTop: 14 },
   modeButton: { flex: 1, padding: "8px 0", border: "none", background: "transparent", borderRadius: 9, fontSize: 12.5, fontWeight: 500, color: COLORS.inkMuted, cursor: "pointer", fontFamily: "'Inter', sans-serif" },
   modeButtonActive: { background: COLORS.card, color: COLORS.ink, fontWeight: 600, boxShadow: "0 1px 2px rgba(51,53,47,0.08)" },
   searchIcon: { position: "absolute", insetInlineStart: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" },
-  readyBadge: { display: "flex", alignItems: "center", fontSize: 11, fontWeight: 600, color: COLORS.primaryText, background: COLORS.sage, padding: "3px 9px", borderRadius: 20, flexShrink: 0 },
-  missingBadge: { fontSize: 11, fontWeight: 600, color: COLORS.accentText, background: COLORS.accentSofter, padding: "3px 9px", borderRadius: 20, flexShrink: 0 },
+  readyBadge: { display: "flex", alignItems: "center", fontSize: 11, fontWeight: 600, color: COLORS.primaryText, background: COLORS.sage, padding: "3px 9px", borderRadius: 20, flexShrink: 0, whiteSpace: "nowrap" },
+  missingBadge: { fontSize: 11, fontWeight: 600, color: COLORS.accentText, background: COLORS.accentSofter, padding: "3px 9px", borderRadius: 20, flexShrink: 0, whiteSpace: "nowrap" },
   missingText: { marginTop: 8, fontSize: 12, color: COLORS.inkMuted },
   backRow: { display: "flex", alignItems: "center", background: "none", border: "none", cursor: "pointer", padding: 0, marginBottom: 4 },
   progressTrack: { height: 4, background: COLORS.line, borderRadius: 2, marginTop: 16, overflow: "hidden" },

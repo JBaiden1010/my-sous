@@ -156,7 +156,8 @@ export function AuthScreen({ sb, onGuest }) {
           </div>
         </div>
       )}
-      <div style={{ fontSize: 64, lineHeight: 1, margin: "18px 0 18px" }} aria-hidden="true">{INTRO[slide].emoji}</div>
+      {!desktop && <div style={{ fontSize: 64, lineHeight: 1, margin: "18px 0 18px" }} aria-hidden="true">{INTRO[slide].emoji}</div>}
+      {desktop && <div style={{ height: 14 }} />}
       <h1 style={{ fontFamily: "Georgia, serif", fontSize: 28, margin: "0 0 10px", lineHeight: 1.2 }}>{INTRO[slide].title[lang] || INTRO[slide].title.en}</h1>
       <p style={{ color: C.muted, fontSize: 15, lineHeight: 1.55, margin: 0 }}>{INTRO[slide].body[lang] || INTRO[slide].body.en}</p>
 
@@ -201,21 +202,30 @@ export function AuthScreen({ sb, onGuest }) {
   return (
     <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className={desktop ? "ms-desktop" : "ms-phone"}
       style={{ minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
+      <style>{"@media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split > div:first-child > div:first-child { font-size: 64px !important; } }"}</style>
       <div style={{
-        width: desktop ? "100%" : 390, maxWidth: desktop ? 1280 : "100%", minHeight: desktop ? "calc(100vh - 40px)" : 780,
+        width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,
         background: C.card, borderRadius: desktop ? 18 : 28, border: `1px solid ${C.line}`,
         boxShadow: "0 1px 2px rgba(51,53,47,0.04), 0 20px 40px rgba(51,53,47,0.10)", display: "flex", flexDirection: "column", overflow: "hidden", boxSizing: "border-box",
       }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px max(24px, calc(50% - 300px))" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px 24px" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
           <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</div>
           <div role="group" aria-label="View" style={{ display: "flex", background: C.paper, border: `1px solid ${C.line}`, borderRadius: 10, padding: 2 }}>
             <button onClick={() => changeView("phone")} aria-pressed={!desktop} style={toggleBtn(!desktop)}><PhoneIcon />{t("phone")}</button>
             <button onClick={() => changeView("desktop")} aria-pressed={desktop} style={toggleBtn(desktop)}><MonitorIcon />{t("desktop")}</button>
           </div>
         </div>
-        <div style={{ flex: 1, padding: desktop ? "48px 24px" : "28px 22px", display: "flex", alignItems: desktop ? "center" : "flex-start" }}>
-          {content}
-        </div>
+        {desktop ? (
+          <div style={{ flex: 1, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }} className="ms-auth-split">
+            <div aria-hidden="true" style={{ background: "#EBF0E6", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 18, padding: 32 }}>
+              <div style={{ fontSize: 120, lineHeight: 1 }}>{slide < INTRO.length ? INTRO[slide].emoji : "🍳"}</div>
+              <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: "#4F6449", textAlign: "center", maxWidth: 320, lineHeight: 1.35 }}>My Sous</div>
+            </div>
+            <div style={{ padding: "48px 40px", display: "flex", alignItems: "center" }}>{content}</div>
+          </div>
+        ) : (
+          <div style={{ flex: 1, padding: "28px 22px", display: "flex", alignItems: "flex-start" }}>{content}</div>
+        )}
       </div>
     </div>
   );
