@@ -231,13 +231,20 @@ export async function startCloud() {
       if (!upErr) for (const k of APP_KEYS) lsDel("mysous:" + k); // now saved to the account
     }
     const timers = {};
+    let lastName = null;
     storage = {
       get: async (k) => { if (cache[k] == null) throw new Error("missing"); return { key: k, value: cache[k] }; },
       set: async (k, v) => {
         cache[k] = v;
         clearTimeout(timers[k]);
         timers[k] = setTimeout(async () => {
-          try { await sb.from("user_store").upsert({ user_id: myId, key: k, value: JSON.parse(v) }); } catch { /* retried on next change */ }
+          try {
+            const value = JSON.parse(v);
+            await sb.from("user_store").upsert({ user_id: myId, key: k, value });
+            // The name in your profile is the name other cooks see on your Community posts.
+            const name = k === "sous_profile" && value && value.profile && String(value.profile.name || "").trim().slice(0, 60);
+            if (name && name !== lastName) { lastName = name; await sb.from("profiles").update({ display_name: name }).eq("id", myId); }
+          } catch { /* retried on next change */ }
         }, 600);
         return { key: k, value: v };
       },
