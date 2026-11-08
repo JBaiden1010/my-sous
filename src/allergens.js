@@ -40,5 +40,25 @@ export function recipeAllergensCached(recipe) {
   return cache.get(recipe);
 }
 
-// The allergens in this recipe that this person told us about.
-export const allergensFor = (recipe, mine) => (mine && mine.length ? recipeAllergensCached(recipe).filter((a) => mine.includes(a)) : []);
+export const isBuiltInAllergen = (id) => ALLERGENS.some((a) => a.id === id);
+
+// Allergies the cook typed themselves (anything that isn't a built-in id), matched as words in the
+// recipe's ingredients and step text: "kiwi" also finds "kiwis".
+const escapeRe = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function recipeText(recipe) {
+  return [...(recipe.ingredients || []), ...(recipe.steps || []).map((s) => `${s?.instruction || ""} ${s?.measure || ""}`)].join(" | ").toLowerCase();
+}
+function hasCustom(recipe, word) {
+  const w = String(word || "").trim().toLowerCase();
+  if (w.length < 2) return false;
+  const stem = w.replace(/(es|s)$/, "");
+  return new RegExp(`(^|[^a-z])${escapeRe(stem.length >= 3 ? stem : w)}`).test(recipeText(recipe));
+}
+
+// The allergens in this recipe that this person told us about (built-in ids and their own words).
+export const allergensFor = (recipe, mine) => {
+  if (!recipe || !mine || !mine.length) return [];
+  const built = recipeAllergensCached(recipe).filter((a) => mine.includes(a));
+  const custom = mine.filter((a) => !isBuiltInAllergen(a) && hasCustom(recipe, a));
+  return [...built, ...custom];
+};

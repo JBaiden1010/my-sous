@@ -10,7 +10,7 @@
 // the app behaves exactly as before.
 import React, { useState, useEffect, useRef } from "react";
 import { loadAppearance, saveAppearance, resolvedTheme } from "./appearance.js";
-import { LOGO_96, LOGO_256, COPYRIGHT } from "./brand.js";
+import { LOGO_HEADER, LOGO_LARGE, COPYRIGHT } from "./brand.js";
 import { pickRecipeIds } from "./photos.jsx";
 import { RECIPE_IMAGES } from "./recipe-images.js";
 
@@ -205,7 +205,7 @@ export function AuthScreen({ sb, onGuest }) {
   return (
     <div dir={lang === "ar" ? "rtl" : "ltr"} lang={lang} className="ms-root ms-desktop ms-auth"
       style={{ position: "relative", minHeight: "100vh", background: C.paper, display: "flex", justifyContent: "center", alignItems: "flex-start", padding: desktop ? 20 : "28px 12px", boxSizing: "border-box", fontFamily: "'Inter', system-ui, sans-serif", color: C.ink }}>
-      <style>{"@keyframes msMealIn { from { opacity: 0; transform: scale(0.94); } } .ms-meal-in { animation: msMealIn .35s ease-out both; } @media (prefers-reduced-motion: reduce) { .ms-meal-in { animation: none; } } html[data-ms-motion=\"reduce\"] .ms-meal-in { animation: none; } @media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split .ms-auth-logo { width: 120px !important; height: 120px !important; border-radius: 28px !important; } .ms-auth-split .ms-auth-meals { max-width: 260px !important; gap: 8px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
+      <style>{"@keyframes msMealIn { from { opacity: 0; transform: scale(0.94); } } .ms-meal-in { animation: msMealIn .35s ease-out both; } @media (prefers-reduced-motion: reduce) { .ms-meal-in { animation: none; } } html[data-ms-motion=\"reduce\"] .ms-meal-in { animation: none; } @media (max-width: 720px) { .ms-auth-split { grid-template-columns: 1fr !important; } .ms-auth-split > div:first-child { padding: 20px !important; } .ms-auth-split .ms-auth-logo { width: 170px !important; height: 170px !important; border-radius: 38px !important; } .ms-auth-split .ms-auth-meals { max-width: 260px !important; gap: 8px !important; } .ms-auth-split > div:last-child { padding: 24px 20px !important; } } @media (max-width: 640px) { .ms-auth { padding: 0 !important; } .ms-auth > .ms-auth-frame { border-radius: 0 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; min-height: 100vh !important; min-height: 100dvh !important; } }"}</style>
       <div className="ms-auth-frame" style={{
         position: "relative", zIndex: 1,
         width: desktop ? "100%" : 390, maxWidth: desktop ? 1040 : "100%", minHeight: desktop ? 600 : 780, marginTop: desktop ? "max(0px, calc((100vh - 680px) / 2))" : 0,
@@ -214,7 +214,7 @@ export function AuthScreen({ sb, onGuest }) {
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px 24px" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src={LOGO_96} alt="" width={44} height={44} style={{ borderRadius: 11, display: "block" }} />
+            <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={{ borderRadius: 12, display: "block", boxShadow: "0 1px 3px rgba(31,58,14,0.25)" }} />
             <span style={{ fontFamily: "Georgia, serif", fontSize: 22, fontWeight: 700 }}>My Sous</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -232,7 +232,7 @@ export function AuthScreen({ sb, onGuest }) {
                   ))}
                 </div>
               ) : (
-                <img className="ms-auth-logo" src={LOGO_256} alt="" width={180} height={180} style={{ borderRadius: 40, display: "block", boxShadow: "0 12px 30px rgba(31,58,14,0.25)" }} />
+                <img className="ms-auth-logo" src={LOGO_LARGE} alt="" width={280} height={280} style={{ borderRadius: 62, maxWidth: "100%", height: "auto", display: "block", boxShadow: "0 12px 30px rgba(31,58,14,0.25)" }} />
               )}
               <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: C.sageText, textAlign: "center", maxWidth: 320, lineHeight: 1.35 }}>My Sous</div>
             </div>

@@ -33,9 +33,9 @@ import {
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
-import { LOGO_96, LOGO_256, COPYRIGHT } from "./brand.js";
+import { LOGO_256, LOGO_HEADER, COPYRIGHT } from "./brand.js";
 import { convertUnits } from "./units.js";
-import { ALLERGENS, allergensFor } from "./allergens.js";
+import { ALLERGENS, allergensFor, isBuiltInAllergen } from "./allergens.js";
 
 const AllergyContext = createContext([]);
 
@@ -377,6 +377,9 @@ const TRANSLATIONS = {
   allergyShowing: { en: "Showing {n} recipes that contain your allergens.", es: "Mostrando {n} recetas con tus alérgenos.", fr: "{n} recettes contenant vos allergènes sont affichées.", pt: "Mostrando {n} receitas com seus alérgenos.", hi: "आपके एलर्जन वाली {n} रेसिपी दिखाई जा रही हैं।", zh: "正在显示 {n} 道含有你过敏原的菜。", ar: "يتم عرض {n} وصفة تحتوي على مسببات حساسيتك." },
   allergyShowThem: { en: "Show them", es: "Mostrarlas", fr: "Les afficher", pt: "Mostrar", hi: "दिखाएं", zh: "显示", ar: "عرضها" },
   allergyHideAgain: { en: "Hide them", es: "Ocultarlas", fr: "Les masquer", pt: "Esconder", hi: "छिपाएं", zh: "隐藏", ar: "إخفاؤها" },
+  unitsSetupHint: { en: "How recipes show amounts and oven temperatures. You can change this later in Settings.", es: "Cómo se muestran las cantidades y la temperatura del horno. Puedes cambiarlo luego en Ajustes.", fr: "Comment les recettes affichent les quantités et la température du four. Modifiable plus tard dans Réglages.", pt: "Como as receitas mostram quantidades e temperatura do forno. Você pode mudar depois em Configurações.", hi: "रेसिपी में मात्रा और ओवन का तापमान कैसे दिखे। इसे बाद में सेटिंग्स में बदल सकते हैं।", zh: "食谱中用量和烤箱温度的显示方式，之后可在设置中更改。", ar: "طريقة عرض المقادير وحرارة الفرن في الوصفات. يمكنك تغييرها لاحقًا من الإعدادات." },
+  customAllergyPlaceholder: { en: "Add your own (like kiwi, mustard)", es: "Añade otras (ej. kiwi, mostaza)", fr: "Ajoutez les vôtres (ex. kiwi, moutarde)", pt: "Adicione outras (ex. kiwi, mostarda)", hi: "अपनी जोड़ें (जैसे कीवी, सरसों)", zh: "添加其他（如猕猴桃、芥末）", ar: "أضف غيرها (مثل الكيوي، الخردل)" },
+  customAllergyHint: { en: "Type in English, as it would appear in an ingredient list. Separate several with commas.", es: "Escríbelo en inglés, como aparecería en la lista de ingredientes. Separa varias con comas.", fr: "Écrivez en anglais, comme dans une liste d'ingrédients. Séparez-en plusieurs par des virgules.", pt: "Escreva em inglês, como apareceria na lista de ingredientes. Separe várias com vírgulas.", hi: "अंग्रेज़ी में लिखें, जैसे सामग्री सूची में होता है। कई हों तो कॉमा से अलग करें।", zh: "请用英文填写，与配料表中的写法一致，多个用逗号分隔。", ar: "اكتبها بالإنجليزية كما تظهر في قائمة المكونات، وافصل بين أكثر من واحدة بفواصل." },
   unitsLabel: { en: "Measurements", es: "Medidas", fr: "Mesures", pt: "Medidas", hi: "माप", zh: "计量单位", ar: "وحدات القياس" },
   unitsUS: { en: "Cups & °F", es: "Tazas y °F", fr: "Tasses et °F", pt: "Xícaras e °F", hi: "कप और °F", zh: "杯和°F", ar: "أكواب و°F" },
   unitsMetric: { en: "Metric (ml, g, °C)", es: "Métrico (ml, g, °C)", fr: "Métrique (ml, g, °C)", pt: "Métrico (ml, g, °C)", hi: "मीट्रिक (ml, g, °C)", zh: "公制（毫升、克、°C）", ar: "متري (مل، غ، °C)" },
@@ -418,6 +421,8 @@ const TRANSLATIONS = {
   changePhoto: { en: "Change photo", es: "Cambiar foto", fr: "Changer la photo", pt: "Trocar foto", hi: "फ़ोटो बदलें", zh: "更换照片", ar: "تغيير الصورة" },
   photoError: { en: "That file isn't a photo we can use. Try a JPG or PNG.", es: "Ese archivo no es una foto válida. Prueba con JPG o PNG.", fr: "Ce fichier n'est pas une photo utilisable. Essayez un JPG ou un PNG.", pt: "Esse arquivo não é uma foto válida. Tente JPG ou PNG.", hi: "यह फ़ाइल इस्तेमाल लायक फ़ोटो नहीं है। JPG या PNG आज़माएं।", zh: "无法使用这个文件，请试试 JPG 或 PNG 图片。", ar: "هذا الملف ليس صورة صالحة. جرّب JPG أو PNG." },
   timerWillShow: { en: "A {t} timer button will show on this step.", es: "Este paso mostrará un temporizador de {t}.", fr: "Une minuterie de {t} apparaîtra à cette étape.", pt: "Esta etapa terá um timer de {t}.", hi: "इस स्टेप पर {t} का टाइमर बटन दिखेगा।", zh: "这一步会显示 {t} 的计时器按钮。", ar: "سيظهر زر مؤقت {t} في هذه الخطوة." },
+  timerBlankHint: { en: "Type minutes for a timer button, or leave it blank. A time in Time / measurement is used automatically.", es: "Escribe los minutos para un temporizador o déjalo vacío. Si hay un tiempo en Tiempo / medida, se usa automáticamente.", fr: "Indiquez les minutes pour une minuterie, ou laissez vide. Une durée dans Temps / mesure est utilisée automatiquement.", pt: "Digite os minutos para um timer ou deixe em branco. Um tempo em Tempo / medida é usado automaticamente.", hi: "टाइमर बटन के लिए मिनट लिखें, या खाली छोड़ दें। समय / माप में लिखा समय अपने आप इस्तेमाल होगा।", zh: "输入分钟数即可添加计时器按钮，也可留空。“时间／用量”里的时间会自动使用。", ar: "اكتب الدقائق لإضافة زر مؤقت أو اتركه فارغًا. يُستخدم الوقت المكتوب في الوقت / المقدار تلقائيًا." },
+  timerMinutesLabel: { en: "Timer minutes", es: "Minutos del temporizador", fr: "Minutes de la minuterie", pt: "Minutos do timer", hi: "टाइमर के मिनट", zh: "计时分钟数", ar: "دقائق المؤقت" },
   timerHint: { en: "Include a time (like 10 min) and this step gets a timer button.", es: "Incluye un tiempo (ej. 10 min) y este paso tendrá temporizador.", fr: "Indiquez une durée (ex. 10 min) et cette étape aura une minuterie.", pt: "Inclua um tempo (ex. 10 min) e esta etapa terá um timer.", hi: "समय लिखें (जैसे 10 min), तो इस स्टेप पर टाइमर बटन आएगा।", zh: "写上时间（如 10 min），这一步就会有计时器按钮。", ar: "اكتب وقتًا (مثل 10 min) وستحصل هذه الخطوة على زر مؤقت." },
   alsoPlaceholder: { en: "Anything else to check? (like a smell or sound)", es: "¿Algo más que revisar? (un olor o sonido)", fr: "Autre chose à vérifier ? (une odeur, un son)", pt: "Mais algo para conferir? (um cheiro ou som)", hi: "और कुछ जांचना है? (जैसे खुशबू या आवाज़)", zh: "还有什么要注意？（比如气味或声音）", ar: "شيء آخر للتحقق؟ (مثل رائحة أو صوت)" },
   feedbackLabel: { en: "Feedback", es: "Comentarios", fr: "Avis", pt: "Feedback", hi: "फ़ीडबैक", zh: "意见反馈", ar: "الملاحظات" },
@@ -7568,7 +7573,7 @@ export default function App() {
         <style>{FONT_IMPORT}</style>
         <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
-            <img src={LOGO_96} alt="" width={44} height={44} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
+            <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
             <span style={styles.brandSub}>prototype</span>
           </div>
           <div style={{ ...styles.screenArea, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -7590,11 +7595,11 @@ export default function App() {
         <style>{FONT_IMPORT}</style>
         <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
-            <img src={LOGO_96} alt="" width={44} height={44} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
+            <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
             <span style={styles.brandSub}>prototype</span>
           </div>
           <div style={styles.screenArea}>
-            <OnboardingScreen onComplete={finishOnboarding} onChangeLanguage={setLanguage} />
+            <OnboardingScreen onComplete={finishOnboarding} onChangeLanguage={setLanguage} units={appearance.units} onUnits={(u) => updateAppearance({ units: u })} />
           </div>
         </div>
       </div>
@@ -7616,7 +7621,7 @@ export default function App() {
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
       <div style={frameStyle} className="ms-frame">
         <div className="ms-header" style={styles.statusRow}>
-          <img src={LOGO_96} alt="" width={44} height={44} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
+          <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
           <span style={styles.brandSub}>prototype</span>
           <button onClick={() => updateAppearance({ theme: isDark ? "light" : "dark" })} aria-label={t(isDark ? "themeLight" : "themeDark")} title={t(isDark ? "themeLight" : "themeDark")} style={styles.settingsButton}>
             {isDark ? <Sun size={17} color={COLORS.inkMuted} /> : <Moon size={17} color={COLORS.inkMuted} />}
@@ -7901,14 +7906,49 @@ function ProfileFields({
                 </button>
               );
             })}
+            {(allergies || []).filter((a) => !isBuiltInAllergen(a)).map((a) => (
+              <span key={a} style={{ ...styles.equipChip, border: `1px solid ${COLORS.accentText}`, background: COLORS.accentSofter, color: COLORS.accentText, fontWeight: 600, gap: 6 }}>
+                ⚠ {a}
+                <button onClick={() => setAllergies(allergies.filter((x) => x !== a))} aria-label={`${t("aRemove")}: ${a}`} style={{ ...styles.chipX, marginInlineStart: 2 }}><X size={12} color={COLORS.accentText} /></button>
+              </span>
+            ))}
           </div>
+          <CustomAllergyInput allergies={allergies || []} setAllergies={setAllergies} />
         </>
       )}
     </>
   );
 }
 
-function OnboardingScreen({ onComplete, onChangeLanguage }) {
+function CustomAllergyInput({ allergies, setAllergies }) {
+  const { t } = useContext(LanguageContext);
+  const [draft, setDraft] = useState("");
+  function add() {
+    const words = draft.split(",").map((w) => w.trim().toLowerCase().replace(/\s+/g, " ")).filter((w) => w.length >= 2 && w.length <= 40);
+    if (!words.length) return;
+    const next = [...allergies];
+    for (const w of words) {
+      // Typing a built-in one ("eggs", "Sesame") turns that one on instead of adding a duplicate.
+      const built = ALLERGENS.find((a) => a.id === w || t("allergen_" + a.id).toLowerCase() === w);
+      const id = built ? built.id : w;
+      if (!next.includes(id)) next.push(id);
+    }
+    setAllergies(next);
+    setDraft("");
+  }
+  return (
+    <>
+      <div style={{ ...styles.inputRow, marginTop: 10 }}>
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()}
+          placeholder={t("customAllergyPlaceholder")} aria-label={t("customAllergyPlaceholder")} style={styles.textInput} />
+        <button onClick={add} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
+      </div>
+      <p style={{ ...styles.basicsHint, marginTop: 6 }}>{t("customAllergyHint")}</p>
+    </>
+  );
+}
+
+function OnboardingScreen({ onComplete, onChangeLanguage, units, onUnits }) {
   const { t, language } = useContext(LanguageContext);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -7941,6 +7981,17 @@ function OnboardingScreen({ onComplete, onChangeLanguage }) {
         cookingGoal={cookingGoal} setCookingGoal={setCookingGoal}
         allergies={allergies} setAllergies={setAllergies}
       />
+      {onUnits && (
+        <>
+          <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("unitsLabel")}</div>
+          <p style={{ ...styles.basicsHint, marginTop: 0 }}>{t("unitsSetupHint")}</p>
+          <div role="radiogroup" aria-label={t("unitsLabel")} style={styles.chipWrap}>
+            {[["us", t("unitsUS")], ["metric", t("unitsMetric")]].map(([id, label]) => (
+              <button key={id} role="radio" aria-checked={units === id} onClick={() => onUnits(id)} style={{ ...styles.equipChip, ...(units === id ? styles.equipChipActive : {}) }}>{label}</button>
+            ))}
+          </div>
+        </>
+      )}
       <button onClick={() => onComplete({ ...profileData, language })} style={styles.primaryButton}>
         {t("letsCook")}
       </button>
@@ -8403,7 +8454,7 @@ function AllergyWarning({ recipe, compact }) {
   const mine = useContext(AllergyContext);
   const hits = allergensFor(recipe, mine);
   if (!hits.length) return null;
-  const names = hits.map((a) => t("allergen_" + a)).join(", ");
+  const names = hits.map((a) => (isBuiltInAllergen(a) ? t("allergen_" + a) : a)).join(", ");
   return (
     <div role="note" style={compact ? styles.allergyChip : styles.allergyBanner}>
       <span aria-hidden="true">⚠</span> {t("containsLabel")} {names}{compact ? "" : `. ${t("checkLabels")}`}
@@ -8744,6 +8795,15 @@ function stepTimerSeconds(measure) {
   const secs = unit.startsWith("s") ? n : unit.startsWith("h") ? n * 3600 : n * 60;
   return secs >= 10 && secs <= 6 * 3600 ? Math.round(secs) : 0;
 }
+// A step's timer: the minutes the cook typed (0 = no timer), otherwise a time found in "Time / measurement".
+function stepTimerSecondsFor(step) {
+  const typed = step && step.timerMin;
+  if (typed !== undefined && typed !== null && String(typed).trim() !== "") {
+    const n = Number(typed);
+    return n > 0 ? Math.min(6 * 3600, Math.round(n * 60)) : 0;
+  }
+  return stepTimerSeconds(step && step.measure);
+}
 const fmtClock = (secs) => {
   const s = Math.max(0, Math.ceil(secs));
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60;
@@ -8852,7 +8912,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   const cv = (x) => convertUnits(x, units, language);
   const measureText = cv(scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio));
   const alsoCheck = secondarySignal(recipe, stepIndex, language);
-  const timerSecs = stepTimerSeconds(recipe.steps[stepIndex]?.measure || step.measure);
+  const timerSecs = recipe.steps[stepIndex] && String(recipe.steps[stepIndex].timerMin ?? "").trim() !== "" ? stepTimerSecondsFor(recipe.steps[stepIndex]) : stepTimerSeconds(recipe.steps[stepIndex]?.measure || step.measure);
 
   return (
     <div style={styles.screenPad}>
@@ -9178,28 +9238,57 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
       </div>
 
       <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("stepsLabel")}</div>
-      {stepsList.map((s, i) => (
-        <div key={i} style={{ ...styles.milestoneCard, marginTop: i === 0 ? 8 : 10 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={styles.milestoneLabel}>{t("stepOfLabel")} {i + 1}</span>
+      {stepsList.map((s, i) => {
+        const auto = stepTimerSeconds(s.measure);
+        const secs = stepTimerSecondsFor(s);
+        const [pre, post] = t("timerStart").split("{t}");
+        return (
+        <div key={i} className="ms-step-editor" style={{ marginTop: i === 0 ? 8 : 16, background: COLORS.card, border: `1px solid ${COLORS.line}`, borderRadius: 16, padding: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ ...styles.stepCounter, marginTop: 0 }}>{t("stepOfLabel")} {i + 1} / {stepsList.length}</span>
             {stepsList.length > 1 && (
               <button onClick={() => removeStepRow(i)} aria-label={`${t("aRemove")}: ${t("stepOfLabel")} ${i + 1}`} style={styles.chipX}><X size={13} color={COLORS.inkMuted} /></button>
             )}
           </div>
-          <input value={s.instruction} onChange={(e) => updateStep(i, "instruction", e.target.value)} placeholder={t("instructionPlaceholder")} aria-label={t("instructionPlaceholder")} style={{ ...styles.textInput, marginBottom: 8 }} />
-          <label style={styles.stepFieldLabel}><Clock size={13} color={COLORS.accent} /> {t("timeMeasureLabel")}</label>
-          <input value={s.measure} onChange={(e) => updateStep(i, "measure", e.target.value)} placeholder={t("measurePlaceholder")} style={{ ...styles.textInput, fontSize: 13, marginBottom: 4 }} />
-          {stepTimerSeconds(s.measure) > 0 ? (
-            <div style={{ ...styles.recipeMeta, color: COLORS.primaryText, marginBottom: 8, whiteSpace: "normal" }}>⏱ {t("timerWillShow").replace("{t}", stepTimerSeconds(s.measure) >= 60 ? `${Math.round(stepTimerSeconds(s.measure) / 60)} min` : `${stepTimerSeconds(s.measure)} s`)}</div>
-          ) : (
-            <div style={{ ...styles.recipeMeta, marginBottom: 8, whiteSpace: "normal" }}>{t("timerHint")}</div>
-          )}
-          <label style={styles.stepFieldLabel}><Utensils size={13} color={COLORS.accent} /> {t("visualCueLabel")}</label>
-          <input value={s.visual} onChange={(e) => updateStep(i, "visual", e.target.value)} placeholder={t("visualPlaceholder")} style={{ ...styles.textInput, fontSize: 13, marginBottom: 8 }} />
-          <label style={styles.stepFieldLabel}><Eye size={13} color={COLORS.accent} /> {t("alsoCheckLabel")} ({t("optionalTag")})</label>
-          <input value={s.also || ""} onChange={(e) => updateStep(i, "also", e.target.value)} placeholder={t("alsoPlaceholder")} style={{ ...styles.textInput, fontSize: 13 }} />
+          <textarea value={s.instruction} onChange={(e) => updateStep(i, "instruction", e.target.value)} placeholder={t("instructionPlaceholder")} aria-label={t("instructionPlaceholder")} rows={2}
+            style={{ ...styles.stepInstruction, marginTop: 10, width: "100%", boxSizing: "border-box", resize: "vertical", border: "none", borderBottom: `1.5px dashed ${COLORS.line}`, background: "transparent", fontFamily: "inherit", padding: "4px 0", outline: "none" }} />
+
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginTop: 12 }}>
+            <label style={{ ...styles.cookToolButton, cursor: "text", opacity: secs ? 1 : 0.75 }}>
+              <Clock size={15} color={COLORS.primaryText} />
+              <span>{pre.trim()}</span>
+              <input type="number" min="0" max="360" inputMode="numeric" value={s.timerMin ?? ""} onChange={(e) => updateStep(i, "timerMin", e.target.value)}
+                placeholder={auto ? String(Math.max(1, Math.round(auto / 60))) : "–"} aria-label={t("timerMinutesLabel")}
+                style={{ width: 46, padding: "2px 4px", border: `1px solid ${COLORS.line}`, borderRadius: 8, background: COLORS.card, color: COLORS.ink, fontFamily: "inherit", fontSize: 13, fontWeight: 600, textAlign: "center" }} />
+              <span>min{post.trim() ? ` ${post.trim()}` : ""}</span>
+            </label>
+            <span style={{ ...styles.recipeMeta, whiteSpace: "normal", flex: "1 1 180px" }}>
+              {secs ? t("timerWillShow").replace("{t}", secs >= 60 ? `${Math.round(secs / 60)} min` : `${secs} s`) : t("timerBlankHint")}
+            </span>
+          </div>
+
+          <div style={{ ...styles.milestoneCard, marginTop: 14 }}>
+            {[
+              ["measure", Clock, t("timeMeasureLabel"), t("measurePlaceholder")],
+              ["visual", Utensils, t("visualCueLabel"), t("visualPlaceholder")],
+              ["also", Eye, `${t("alsoCheckLabel")} (${t("optionalTag")})`, t("alsoPlaceholder")],
+            ].map(([field, Icon, label, ph], k) => (
+              <React.Fragment key={field}>
+                {k > 0 && <div style={styles.milestoneDivider} />}
+                <div style={styles.milestoneRow}>
+                  <Icon size={16} color={COLORS.accent} style={{ marginTop: 2, flexShrink: 0 }} />
+                  <label style={{ marginInlineStart: 10, flex: 1, minWidth: 0 }}>
+                    <div style={styles.milestoneLabel}>{label}</div>
+                    <input value={s[field] || ""} onChange={(e) => updateStep(i, field, e.target.value)} placeholder={ph}
+                      style={{ ...styles.milestoneValue, width: "100%", boxSizing: "border-box", border: "none", borderBottom: `1px dashed ${COLORS.line}`, background: "transparent", fontFamily: "inherit", padding: "3px 0", outline: "none" }} />
+                  </label>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         </div>
-      ))}
+        );
+      })}
       <button onClick={addStepRow} style={{ ...styles.resetButton, marginTop: 10 }}>{t("addStepLabel")}</button>
 
       <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("flavorBoostsLabel")}</div>
@@ -10238,7 +10327,7 @@ const styles = {
   viewToggleBtnActive: { background: COLORS.card, color: COLORS.ink, fontWeight: 600, boxShadow: "0 1px 2px rgba(51,53,47,0.08)" },
   viewToggleLabel: { lineHeight: 1 },
   brand: { fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 21, color: COLORS.ink },
-  brandLogo: { borderRadius: 11, flexShrink: 0, display: "block" },
+  brandLogo: { borderRadius: 12, flexShrink: 0, display: "block", boxShadow: "0 1px 3px rgba(31,58,14,0.25)" },
   brandSub: { marginInlineStart: 8, fontSize: 11, color: COLORS.inkMuted, letterSpacing: "0.03em", flex: 1 },
   settingsButton: { background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 10, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" },
   screenArea: { flex: 1, overflowY: "auto", position: "relative", zIndex: 1 },
