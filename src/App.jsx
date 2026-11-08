@@ -289,6 +289,13 @@ const TRANSLATIONS = {
   cancelLabel: { en: "Cancel", es: "Cancelar", fr: "Annuler", pt: "Cancelar", hi: "रद्द करें", zh: "取消", ar: "إلغاء" },
   deletingLabel: { en: "Deleting…", es: "Eliminando…", fr: "Suppression…", pt: "Excluindo…", hi: "हटाया जा रहा है…", zh: "正在删除…", ar: "جارٍ الحذف…" },
   deleteAccountFailed: { en: "Couldn't delete your account. Check your connection and try again.", es: "No se pudo eliminar tu cuenta. Revisa tu conexión e inténtalo de nuevo.", fr: "Impossible de supprimer votre compte. Vérifiez votre connexion et réessayez.", pt: "Não foi possível excluir sua conta. Verifique a conexão e tente de novo.", hi: "खाता नहीं हटाया जा सका। अपना कनेक्शन जांचें और फिर कोशिश करें।", zh: "无法删除账户，请检查网络后重试。", ar: "تعذّر حذف حسابك. تحقق من الاتصال وحاول مرة أخرى." },
+  matchLabel: { en: "How to combine", es: "Cómo combinar", fr: "Comment combiner", pt: "Como combinar", hi: "कैसे मिलाएं", zh: "组合方式", ar: "طريقة الجمع" },
+  matchAny: { en: "Any of these", es: "Cualquiera", fr: "N'importe lequel", pt: "Qualquer um", hi: "इनमें से कोई", zh: "任一", ar: "أيٌّ منها" },
+  matchAll: { en: "All of these", es: "Todos", fr: "Tous", pt: "Todos", hi: "ये सभी", zh: "全部", ar: "جميعها" },
+  cuisineAllHint: { en: "Each recipe has one cuisine, so \"All of these\" with two or more cuisines won't find anything. Switch to \"Any of these\" to see them all.", es: "Cada receta tiene una sola cocina, así que \"Todos\" con dos o más cocinas no encontrará nada. Cambia a \"Cualquiera\" para verlas todas.", fr: "Chaque recette a une seule cuisine : « Tous » avec deux cuisines ou plus ne trouvera rien. Choisissez « N'importe lequel » pour tout voir.", pt: "Cada receita tem uma só culinária, então \"Todos\" com duas ou mais não vai encontrar nada. Mude para \"Qualquer um\" para ver todas.", hi: "हर रेसिपी की एक ही क्यूज़ीन होती है, इसलिए दो या ज़्यादा क्यूज़ीन के साथ \"ये सभी\" कुछ नहीं ढूंढेगा। सब देखने के लिए \"इनमें से कोई\" चुनें।", zh: "每道菜只属于一个菜系，所以选了两个以上菜系时“全部”不会有结果。改选“任一”即可全部显示。", ar: "لكل وصفة مطبخ واحد، لذا لن يجد خيار \"جميعها\" شيئًا مع مطبخين أو أكثر. اختر \"أيٌّ منها\" لرؤيتها كلها." },
+  clearFilters: { en: "Clear filters", es: "Quitar filtros", fr: "Effacer les filtres", pt: "Limpar filtros", hi: "फ़िल्टर हटाएं", zh: "清除筛选", ar: "مسح عوامل التصفية" },
+  recipesWord: { en: "recipes", es: "recetas", fr: "recettes", pt: "receitas", hi: "रेसिपी", zh: "道菜", ar: "وصفات" },
+  filtersLabel: { en: "Filters", es: "Filtros", fr: "Filtres", pt: "Filtros", hi: "फ़िल्टर", zh: "筛选", ar: "عوامل التصفية" },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -6899,6 +6906,7 @@ export default function App() {
   const [selectedMealTimes, setSelectedMealTimes] = useState([]);
   const [cuisines, setCuisines] = useState(CUISINES);
   const [selectedCuisines, setSelectedCuisines] = useState([]);
+  const [filterMatch, setFilterMatch] = useState({ categories: "any", cuisines: "any" });
   const [cuisineInput, setCuisineInput] = useState("");
   const [activeRecipe, setActiveRecipe] = useState(null);
   const [stepIndex, setStepIndex] = useState(0);
@@ -6957,6 +6965,7 @@ export default function App() {
           setHistory(recipeData.history.filter((h) => !isOldSample(h)).map((h, i) => (h.uid ? h : { ...h, uid: `${h.id}-legacy-${i}` })));
         }
         if (recipeData.selectedCategories) setSelectedCategories(recipeData.selectedCategories);
+        if (recipeData.filterMatch) setFilterMatch((f) => ({ ...f, ...recipeData.filterMatch }));
       }
       if (shoppingData?.shoppingList) setShoppingList(shoppingData.shoppingList);
       setStorageLoaded(true);
@@ -6985,8 +6994,8 @@ export default function App() {
 
   useEffect(() => {
     if (!storageLoaded) return;
-    window.storage.set("sous_recipes", JSON.stringify({ userRecipes, favorites, history, selectedCategories })).catch(() => {});
-  }, [storageLoaded, userRecipes, favorites, history, selectedCategories]);
+    window.storage.set("sous_recipes", JSON.stringify({ userRecipes, favorites, history, selectedCategories, filterMatch })).catch(() => {});
+  }, [storageLoaded, userRecipes, favorites, history, selectedCategories, filterMatch]);
 
   useEffect(() => {
     if (!storageLoaded) return;
@@ -7392,6 +7401,9 @@ export default function App() {
               cuisines={cuisines}
               selectedCuisines={selectedCuisines}
               toggleCuisine={toggleCuisine}
+              filterMatch={filterMatch}
+              setFilterMatch={setFilterMatch}
+              clearFilters={() => { setSelectedMealTimes([]); setSelectedCategories([]); setSelectedCuisines([]); }}
               cuisineInput={cuisineInput}
               setCuisineInput={setCuisineInput}
               addCuisine={addCuisine}
@@ -7951,18 +7963,45 @@ function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, togg
   );
 }
 
-function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdit, selectedMealTimes, toggleMealTime, selectedCategories, toggleCategory, cuisines, selectedCuisines, toggleCuisine, cuisineInput, setCuisineInput, addCuisine, favorites, toggleFavorite }) {
+// "any" = a recipe needs at least one of the picked options (union);
+// "all" = it needs every picked option (intersection).
+function matchesPicked(values, picked, how) {
+  if (!picked.length) return true;
+  return how === "all" ? picked.every((x) => values.includes(x)) : picked.some((x) => values.includes(x));
+}
+
+function MatchToggle({ value, onChange, count }) {
+  const { t } = useContext(LanguageContext);
+  if (count < 2) return null;
+  return (
+    <div role="radiogroup" aria-label={t("matchLabel")} style={{ display: "inline-flex", border: `1px solid ${COLORS.line}`, borderRadius: 20, overflow: "hidden", marginInlineStart: 8 }}>
+      {["any", "all"].map((k) => (
+        <button key={k} role="radio" aria-checked={value === k} onClick={() => onChange(k)}
+          style={{ border: "none", padding: "4px 11px", fontSize: 12, cursor: "pointer", fontFamily: "'Inter', sans-serif", background: value === k ? COLORS.sage : COLORS.card, color: value === k ? COLORS.primaryText : COLORS.inkMuted, fontWeight: value === k ? 700 : 500 }}>
+          {t(k === "any" ? "matchAny" : "matchAll")}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdit, selectedMealTimes, toggleMealTime, selectedCategories, toggleCategory, cuisines, selectedCuisines, toggleCuisine, filterMatch = { categories: "any", cuisines: "any" }, setFilterMatch = () => {}, clearFilters = () => {}, cuisineInput, setCuisineInput, addCuisine, favorites, toggleFavorite }) {
   const { t, language } = useContext(LanguageContext);
   const [mode, setMode] = useState("kitchen");
   const [query, setQuery] = useState("");
   const [ingredientQuery, setIngredientQuery] = useState("");
+  // Filters start open on "From my kitchen" and folded away in the two search modes.
+  const [filtersOpenByMode, setFiltersOpenByMode] = useState({ kitchen: true, search: false, ingredient: false });
+  const filtersOpen = filtersOpenByMode[mode];
+  const setFiltersOpen = (fn) => setFiltersOpenByMode((m) => ({ ...m, [mode]: fn(m[mode]) }));
 
-  const filtered = recipes.filter((r) => {
-    const mealOk = selectedMealTimes.length === 0 || (r.mealTime || []).some((m) => selectedMealTimes.includes(m));
-    const catOk = selectedCategories.length === 0 || r.categories.some((c) => selectedCategories.includes(c));
-    const cuisineOk = selectedCuisines.length === 0 || selectedCuisines.includes(r.cuisine);
-    return mealOk && catOk && cuisineOk;
-  });
+  // The same filters apply in all three modes (kitchen, search, by ingredient).
+  const passesFilters = (r) =>
+    matchesPicked(r.mealTime || [], selectedMealTimes, "any") &&
+    matchesPicked(r.categories || [], selectedCategories, filterMatch.categories) &&
+    matchesPicked([].concat(r.cuisine || []), selectedCuisines, filterMatch.cuisines);
+  const filtered = recipes.filter(passesFilters);
+  const setMatch = (group, how) => setFilterMatch((f) => ({ ...f, [group]: how }));
 
   const withInfo = filtered.map((r) => ({ recipe: r, info: matchInfo(r) }));
   const ready = withInfo.filter((x) => x.info.makeable);
@@ -7970,6 +8009,7 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
   const anyFilterActive = selectedMealTimes.length > 0 || selectedCategories.length > 0 || selectedCuisines.length > 0;
 
   const searchResults = recipes
+    .filter(passesFilters)
     .filter((r) => {
       const q = query.trim().toLowerCase();
       return r.name.toLowerCase().includes(q) || recipeName(r, language).toLowerCase().includes(q);
@@ -7980,6 +8020,7 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
   // Ready-to-cook recipes first, then the ones you're closest to making.
   const ingredientResults = ingredientQuery.trim()
     ? recipes
+        .filter(passesFilters)
         .filter((r) => r.ingredients.some((i) => ingredientMatchesQuery(i, ingredientQuery)))
         .map((r) => ({ recipe: r, info: matchInfo(r) }))
         .sort((a, b) =>
@@ -8011,11 +8052,16 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
         <button onClick={() => setMode("ingredient")} style={{ ...styles.modeButton, ...(mode === "ingredient" ? styles.modeButtonActive : {}) }}>{t("byIngredient")}</button>
       </div>
 
-      {mode === "kitchen" && (
-        <>
-          <p style={styles.subtext}>{t("cookSubtitleKitchen")}</p>
-
-          <div style={{ ...styles.sectionLabel, marginTop: 18 }}>{t("mealType")}</div>
+      <button onClick={() => setFiltersOpen((v) => !v)} aria-expanded={filtersOpen} style={{ ...styles.linkButton, fontWeight: 700, marginTop: 6, display: "flex", alignItems: "center", gap: 6 }}>
+        {t("filtersLabel")}{anyFilterActive ? ` (${selectedMealTimes.length + selectedCategories.length + selectedCuisines.length})` : ""}
+        <span aria-hidden="true" className={filtersOpen ? undefined : "ms-flip"}>{filtersOpen ? "▾" : "▸"}</span>
+      </button>
+      {filtersOpen && (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6, marginTop: 18, marginBottom: 8 }}>
+            <div style={{ ...styles.sectionLabel, margin: 0 }}>{t("mealType")}</div>
+            <MatchToggle value={filterMatch.categories} onChange={(v) => setMatch("categories", v)} count={selectedCategories.length} />
+          </div>
           <div style={styles.chipWrap}>
             {CATEGORIES.map((c) => {
               const active = selectedCategories.includes(c.id);
@@ -8027,7 +8073,10 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
             })}
           </div>
 
-          <div style={{ ...styles.sectionLabel, marginTop: 16 }}>{t("cuisineLabel")}</div>
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 6, marginTop: 16, marginBottom: 8 }}>
+            <div style={{ ...styles.sectionLabel, margin: 0 }}>{t("cuisineLabel")}</div>
+            <MatchToggle value={filterMatch.cuisines} onChange={(v) => setMatch("cuisines", v)} count={selectedCuisines.length} />
+          </div>
           <div style={styles.chipWrap}>
             {cuisines.map((c) => {
               const active = selectedCuisines.includes(c.id);
@@ -8038,6 +8087,9 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
               );
             })}
           </div>
+          {filterMatch.cuisines === "all" && selectedCuisines.length > 1 && (
+            <p style={{ ...styles.basicsHint, marginTop: 6 }}>{t("cuisineAllHint")}</p>
+          )}
           <div style={{ ...styles.inputRow, marginTop: 8 }}>
             <input
               value={cuisineInput}
@@ -8048,6 +8100,16 @@ function CookScreen({ recipes, kitchenIngredients = [], matchInfo, onOpen, onEdi
             />
             <button onClick={addCuisine} style={styles.addButton}><Plus size={18} color="#fff" /></button>
           </div>
+
+          {anyFilterActive && (
+            <button onClick={clearFilters} style={{ ...styles.linkButton, marginTop: 10, fontWeight: 600 }}>✕ {t("clearFilters")} · {filtered.length} {t("recipesWord")}</button>
+          )}
+        </div>
+      )}
+
+      {mode === "kitchen" && (
+        <>
+          <p style={styles.subtext}>{t("cookSubtitleKitchen")}</p>
 
           <div style={{ ...styles.sectionLabel, marginTop: 20 }}>{t("readyToCookSection")} ({ready.length})</div>
           {ready.length === 0 && (
