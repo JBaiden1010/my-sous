@@ -29,6 +29,7 @@ const ICONS = {
   Pencil: [["path", { d: "M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" }], ["path", { d: "m15 5 4 4" }]],
   Eye: [["path", { d: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" }], ["circle", { cx: 12, cy: 12, r: 3 }]],
   Smartphone: [["rect", { x: 5, y: 2, width: 14, height: 20, rx: 2, ry: 2 }], ["path", { d: "M12 18h.01" }]],
+  MessageSquare: [["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" }]],
   Sun: [["circle", { cx: 12, cy: 12, r: 4 }], ["path", { d: "M12 2v2" }], ["path", { d: "M12 20v2" }], ["path", { d: "m4.93 4.93 1.41 1.41" }], ["path", { d: "m17.66 17.66 1.41 1.41" }], ["path", { d: "M2 12h2" }], ["path", { d: "M20 12h2" }], ["path", { d: "m6.34 17.66-1.41 1.41" }], ["path", { d: "m19.07 4.93-1.41 1.41" }]],
   Moon: [["path", { d: "M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" }]],
   Monitor: [["rect", { x: 2, y: 3, width: 20, height: 14, rx: 2 }], ["path", { d: "M8 21h8" }], ["path", { d: "M12 17v4" }]],
@@ -84,4 +85,5 @@ export const Eye = mk("Eye");
 export const Smartphone = mk("Smartphone");
 export const Monitor = mk("Monitor");
 export const Sun = mk("Sun");
+export const MessageSquare = mk("MessageSquare");
 export const Moon = mk("Moon");

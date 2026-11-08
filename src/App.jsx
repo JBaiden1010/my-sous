@@ -28,6 +28,7 @@ import {
   Monitor,
   Sun,
   Moon,
+  MessageSquare,
 } from "./lucide-shim.js";
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
@@ -36,6 +37,9 @@ import { convertUnits } from "./units.js";
 import { ALLERGENS, allergensFor } from "./allergens.js";
 
 const AllergyContext = createContext([]);
+
+// The one address for feedback, used everywhere in the app.
+export const FEEDBACK_EMAIL = "mysous.feedback@gmail.com";
 import { build } from "./world/build.js";
 import { AFRICAN } from "./world/african.js";
 import { BRAZILIAN } from "./world/brazilian.js";
@@ -415,6 +419,29 @@ const TRANSLATIONS = {
   timerWillShow: { en: "A {t} timer button will show on this step.", es: "Este paso mostrará un temporizador de {t}.", fr: "Une minuterie de {t} apparaîtra à cette étape.", pt: "Esta etapa terá um timer de {t}.", hi: "इस स्टेप पर {t} का टाइमर बटन दिखेगा।", zh: "这一步会显示 {t} 的计时器按钮。", ar: "سيظهر زر مؤقت {t} في هذه الخطوة." },
   timerHint: { en: "Include a time (like 10 min) and this step gets a timer button.", es: "Incluye un tiempo (ej. 10 min) y este paso tendrá temporizador.", fr: "Indiquez une durée (ex. 10 min) et cette étape aura une minuterie.", pt: "Inclua um tempo (ex. 10 min) e esta etapa terá um timer.", hi: "समय लिखें (जैसे 10 min), तो इस स्टेप पर टाइमर बटन आएगा।", zh: "写上时间（如 10 min），这一步就会有计时器按钮。", ar: "اكتب وقتًا (مثل 10 min) وستحصل هذه الخطوة على زر مؤقت." },
   alsoPlaceholder: { en: "Anything else to check? (like a smell or sound)", es: "¿Algo más que revisar? (un olor o sonido)", fr: "Autre chose à vérifier ? (une odeur, un son)", pt: "Mais algo para conferir? (um cheiro ou som)", hi: "और कुछ जांचना है? (जैसे खुशबू या आवाज़)", zh: "还有什么要注意？（比如气味或声音）", ar: "شيء آخر للتحقق؟ (مثل رائحة أو صوت)" },
+  feedbackLabel: { en: "Feedback", es: "Comentarios", fr: "Avis", pt: "Feedback", hi: "फ़ीडबैक", zh: "意见反馈", ar: "الملاحظات" },
+  feedbackSub: { en: "Tell us what to fix or add", es: "Dinos qué arreglar o añadir", fr: "Dites-nous quoi corriger ou ajouter", pt: "Diga o que corrigir ou adicionar", hi: "बताएं क्या ठीक करें या जोड़ें", zh: "告诉我们要修复或添加什么", ar: "أخبرنا بما يجب إصلاحه أو إضافته" },
+  sendFeedback: { en: "Send feedback", es: "Enviar comentarios", fr: "Envoyer un avis", pt: "Enviar feedback", hi: "फ़ीडबैक भेजें", zh: "发送反馈", ar: "أرسل ملاحظاتك" },
+  feedbackIntro: { en: "Ideas, bugs, recipe requests or just a hello: every message is read. Sending opens your email app with everything filled in.", es: "Ideas, errores, recetas que quieras o un simple hola: leemos todos los mensajes. Al enviar se abre tu app de correo con todo listo.", fr: "Idées, bugs, recettes souhaitées ou un simple bonjour : chaque message est lu. L'envoi ouvre votre messagerie avec tout prérempli.", pt: "Ideias, erros, pedidos de receitas ou só um oi: lemos todas as mensagens. Ao enviar, seu app de e-mail abre já preenchido.", hi: "सुझाव, गड़बड़ी, रेसिपी की मांग या बस नमस्ते: हर संदेश पढ़ा जाता है। भेजने पर आपका ईमेल ऐप सब भरकर खुलेगा।", zh: "想法、问题、想要的食谱，或者打个招呼——每条消息都会被阅读。发送时会打开你的邮件应用并自动填好内容。", ar: "أفكار أو أخطاء أو طلب وصفات أو مجرد تحية: نقرأ كل رسالة. عند الإرسال يفتح تطبيق البريد وكل شيء جاهز." },
+  fbKindLabel: { en: "What's it about?", es: "¿De qué se trata?", fr: "De quoi s'agit-il ?", pt: "Sobre o que é?", hi: "किस बारे में है?", zh: "关于什么？", ar: "عن ماذا؟" },
+  fb_idea: { en: "Idea", es: "Idea", fr: "Idée", pt: "Ideia", hi: "सुझाव", zh: "建议", ar: "فكرة" },
+  fb_bug: { en: "Something's broken", es: "Algo no funciona", fr: "Quelque chose ne marche pas", pt: "Algo não funciona", hi: "कुछ ठीक नहीं चल रहा", zh: "有东西坏了", ar: "هناك خلل" },
+  fb_recipe: { en: "Recipe request", es: "Pedir una receta", fr: "Demande de recette", pt: "Pedido de receita", hi: "रेसिपी की मांग", zh: "想要的食谱", ar: "طلب وصفة" },
+  fb_praise: { en: "I love it", es: "Me encanta", fr: "J'adore", pt: "Adorei", hi: "बहुत पसंद आया", zh: "很喜欢", ar: "أحببته" },
+  fb_other: { en: "Other", es: "Otro", fr: "Autre", pt: "Outro", hi: "अन्य", zh: "其他", ar: "أخرى" },
+  fbRatingLabel: { en: "How's My Sous so far?", es: "¿Qué tal My Sous hasta ahora?", fr: "Comment trouvez-vous My Sous ?", pt: "O que está achando do My Sous?", hi: "अब तक My Sous कैसा लगा?", zh: "目前觉得 My Sous 怎么样？", ar: "ما رأيك في My Sous حتى الآن؟" },
+  fbMessageLabel: { en: "Your message", es: "Tu mensaje", fr: "Votre message", pt: "Sua mensagem", hi: "आपका संदेश", zh: "你的留言", ar: "رسالتك" },
+  fbPlaceholder_idea: { en: "What would make My Sous better for you?", es: "¿Qué haría My Sous mejor para ti?", fr: "Qu'est-ce qui rendrait My Sous meilleur pour vous ?", pt: "O que deixaria o My Sous melhor para você?", hi: "My Sous को आपके लिए बेहतर क्या बनाएगा?", zh: "怎样能让 My Sous 更好用？", ar: "ما الذي يجعل My Sous أفضل لك؟" },
+  fbPlaceholder_bug: { en: "What happened, and what were you doing just before?", es: "¿Qué pasó y qué hacías justo antes?", fr: "Que s'est-il passé, et que faisiez-vous juste avant ?", pt: "O que aconteceu e o que você fazia logo antes?", hi: "क्या हुआ, और उससे ठीक पहले आप क्या कर रहे थे?", zh: "发生了什么？之前你在做什么？", ar: "ماذا حدث، وماذا كنت تفعل قبله مباشرة؟" },
+  fbPlaceholder_recipe: { en: "Which dish would you like to learn to make?", es: "¿Qué plato te gustaría aprender a hacer?", fr: "Quel plat aimeriez-vous apprendre à faire ?", pt: "Que prato você gostaria de aprender a fazer?", hi: "आप कौन-सी डिश बनाना सीखना चाहेंगे?", zh: "你想学做哪道菜？", ar: "ما الطبق الذي تود تعلّم تحضيره؟" },
+  fbPlaceholder_praise: { en: "What do you like most?", es: "¿Qué es lo que más te gusta?", fr: "Qu'est-ce que vous aimez le plus ?", pt: "Do que você mais gosta?", hi: "आपको सबसे ज़्यादा क्या पसंद है?", zh: "你最喜欢哪一点？", ar: "ما أكثر ما يعجبك؟" },
+  fbPlaceholder_other: { en: "Write anything you'd like to share.", es: "Escribe lo que quieras contarnos.", fr: "Écrivez ce que vous voulez partager.", pt: "Escreva o que quiser compartilhar.", hi: "जो भी बताना चाहें, लिखें।", zh: "写下你想说的任何话。", ar: "اكتب أي شيء تود مشاركته." },
+  fbDetails: { en: "Include app details (language, screen size, browser) to help fix problems", es: "Incluir datos de la app (idioma, pantalla, navegador) para ayudar a resolver problemas", fr: "Inclure les infos de l'app (langue, écran, navigateur) pour aider à corriger les problèmes", pt: "Incluir dados do app (idioma, tela, navegador) para ajudar a corrigir problemas", hi: "समस्या ठीक करने में मदद के लिए ऐप की जानकारी (भाषा, स्क्रीन, ब्राउज़र) शामिल करें", zh: "附上应用信息（语言、屏幕尺寸、浏览器），方便排查问题", ar: "تضمين معلومات التطبيق (اللغة، حجم الشاشة، المتصفح) للمساعدة في حل المشكلات" },
+  fbNeedMessage: { en: "Write a short message first.", es: "Escribe un mensaje corto primero.", fr: "Écrivez d'abord un court message.", pt: "Escreva uma mensagem curta primeiro.", hi: "पहले एक छोटा संदेश लिखें।", zh: "请先写几句话。", ar: "اكتب رسالة قصيرة أولًا." },
+  fbOpened: { en: "Your email app should open now. If it didn't, send your message to", es: "Tu app de correo debería abrirse. Si no, envía tu mensaje a", fr: "Votre messagerie devrait s'ouvrir. Sinon, envoyez votre message à", pt: "Seu app de e-mail deve abrir agora. Se não abrir, envie para", hi: "अब आपका ईमेल ऐप खुलना चाहिए। अगर नहीं खुला, तो संदेश भेजें:", zh: "你的邮件应用应该已经打开。如果没有，请发送到", ar: "يُفترض أن يفتح تطبيق البريد الآن. إن لم يفتح، أرسل رسالتك إلى" },
+  fbCopy: { en: "Copy address", es: "Copiar dirección", fr: "Copier l'adresse", pt: "Copiar endereço", hi: "पता कॉपी करें", zh: "复制地址", ar: "نسخ العنوان" },
+  fbCopied: { en: "Copied", es: "Copiada", fr: "Copiée", pt: "Copiado", hi: "कॉपी हो गया", zh: "已复制", ar: "تم النسخ" },
+  fbOrEmail: { en: "You can also email us directly:", es: "También puedes escribirnos directamente:", fr: "Vous pouvez aussi nous écrire directement :", pt: "Você também pode nos escrever diretamente:", hi: "आप सीधे ईमेल भी कर सकते हैं:", zh: "也可以直接发邮件：", ar: "يمكنك أيضًا مراسلتنا مباشرة:" },
   kind_tip: { en: "Tip", es: "Consejo", fr: "Astuce", pt: "Dica", hi: "टिप", zh: "小贴士", ar: "نصيحة" },
   kind_feedback: { en: "Feedback", es: "Opinión", fr: "Avis", pt: "Opinião", hi: "प्रतिक्रिया", zh: "反馈", ar: "رأي" },
   kind_suggestion: { en: "Improvement", es: "Mejora", fr: "Amélioration", pt: "Melhoria", hi: "सुधार", zh: "改进建议", ar: "تحسين" },
@@ -7744,6 +7771,9 @@ export default function App() {
               onBack={() => setScreen(prevScreen)}
             />
           )}
+          {screen === "feedback" && (
+            <FeedbackScreen onBack={() => setScreen(prevScreen === "feedback" ? "more" : prevScreen)} />
+          )}
           {screen === "glossary" && (
             <NutritionGlossaryScreen onBack={() => setScreen(prevScreen)} />
           )}
@@ -7758,6 +7788,7 @@ export default function App() {
               onResetKitchen={resetKitchen}
               appearance={appearance}
               onAppearance={updateAppearance}
+              onFeedback={() => { setPrevScreen("settings"); setScreen("feedback"); }}
             />
           )}
           </ScreenErrorBoundary>
@@ -8016,6 +8047,88 @@ function PrivacyCard() {
   );
 }
 
+function FeedbackScreen({ onBack }) {
+  const { t, language } = useContext(LanguageContext);
+  const [kind, setKind] = useState("idea");
+  const [rating, setRating] = useState(0);
+  const [message, setMessage] = useState("");
+  const [details, setDetails] = useState(true);
+  const [state, setState] = useState("idle"); // idle | opened | copied | empty
+  const kinds = [
+    { id: "idea", emoji: "💡" }, { id: "bug", emoji: "🐞" }, { id: "recipe", emoji: "🍲" }, { id: "praise", emoji: "❤️" }, { id: "other", emoji: "💬" },
+  ];
+  const kindLabel = (k) => t("fb_" + k);
+
+  function buildMail() {
+    const lines = [message.trim(), ""];
+    if (rating) lines.push(`Rating: ${"★".repeat(rating)}${"☆".repeat(5 - rating)} (${rating}/5)`);
+    if (details) {
+      lines.push("", "—", `Language: ${language}`, `Screen: ${window.innerWidth}×${window.innerHeight}`, `Browser: ${navigator.userAgent}`, `Page: ${window.location.origin}${window.location.pathname}`);
+    }
+    const subject = `My Sous feedback: ${kindLabel(kind)}${rating ? ` (${rating}/5)` : ""}`;
+    return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n").trim())}`;
+  }
+  // A real mailto: link (so it works with any email app); empty messages are stopped first.
+  function send(e) {
+    if (!message.trim()) { e.preventDefault(); setState("empty"); return; }
+    setState("opened");
+  }
+  async function copy() {
+    try { await navigator.clipboard.writeText(FEEDBACK_EMAIL); setState("copied"); } catch { setState("opened"); }
+  }
+
+  return (
+    <div style={styles.screenPad}>
+      <button onClick={onBack} style={styles.backRow}>
+        <ArrowLeft className="ms-flip" size={16} color={COLORS.inkMuted} />
+        <span style={{ marginInlineStart: 6, color: COLORS.inkMuted, fontSize: 13 }}>{t("backLabel")}</span>
+      </button>
+      <h1 style={{ ...styles.h1, marginTop: 6 }}>{t("feedbackLabel")}</h1>
+      <p style={styles.subtext}>{t("feedbackIntro")}</p>
+
+      <div style={{ ...styles.historyCard, marginTop: 16 }}>
+        <div style={styles.sectionLabelTight}>{t("fbKindLabel")}</div>
+        <div style={styles.chipWrap} role="radiogroup" aria-label={t("fbKindLabel")}>
+          {kinds.map((k) => (
+            <button key={k.id} role="radio" aria-checked={kind === k.id} onClick={() => setKind(k.id)} style={{ ...styles.equipChip, ...(kind === k.id ? styles.equipChipActive : {}) }}>
+              {k.emoji} {kindLabel(k.id)}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ ...styles.sectionLabelTight, marginTop: 14 }}>{t("fbRatingLabel")} ({t("optionalTag")})</div>
+        <StarPicker value={rating} onChange={setRating} size={26} label={t("fbRatingLabel")} />
+
+        <label style={{ display: "block", marginTop: 14 }}>
+          <span style={styles.sectionLabelTight}>{t("fbMessageLabel")}</span>
+          <textarea value={message} onChange={(e) => { setMessage(e.target.value); if (state === "empty") setState("idle"); }} rows={5} maxLength={3000}
+            placeholder={t("fbPlaceholder_" + kind)} style={{ ...styles.textInput, resize: "vertical", minHeight: 110, marginTop: 6 }} />
+        </label>
+
+        <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginTop: 10, fontSize: 13, color: COLORS.inkMuted, cursor: "pointer" }}>
+          <input type="checkbox" checked={details} onChange={(e) => setDetails(e.target.checked)} style={{ width: 18, height: 18, marginTop: 1, accentColor: "var(--ms-primary)" }} />
+          <span>{t("fbDetails")}</span>
+        </label>
+
+        {state === "empty" && <div style={{ ...styles.recipeMeta, color: COLORS.accentText, marginTop: 8 }}>{t("fbNeedMessage")}</div>}
+        <a href={buildMail()} onClick={send} role="button" style={{ ...styles.primaryButton, marginTop: 14, display: "block", textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}>{t("sendFeedback")}</a>
+
+        {(state === "opened" || state === "copied") && (
+          <div role="status" style={{ ...styles.communityNote, marginTop: 12 }}>
+            {t("fbOpened")}{" "}
+            <span dir="ltr" style={{ fontWeight: 700 }}>{FEEDBACK_EMAIL}</span>{" "}
+            <button onClick={copy} style={{ ...styles.linkButton, fontWeight: 700, textDecoration: "underline" }}>{state === "copied" ? `✓ ${t("fbCopied")}` : t("fbCopy")}</button>
+          </div>
+        )}
+      </div>
+
+      <p style={{ ...styles.basicsHint, marginTop: 12 }}>
+        {t("fbOrEmail")} <a href={`mailto:${FEEDBACK_EMAIL}`} dir="ltr" style={{ color: COLORS.primaryText, fontWeight: 600 }}>{FEEDBACK_EMAIL}</a>
+      </p>
+    </div>
+  );
+}
+
 function AccountCard() {
   const { t } = useContext(LanguageContext);
   const cloud = typeof window !== "undefined" ? window.mysousCloud : null;
@@ -8036,7 +8149,7 @@ function AccountCard() {
   );
 }
 
-function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCategories, toggleCategory, onResetKitchen, appearance, onAppearance }) {
+function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCategories, toggleCategory, onResetKitchen, appearance, onAppearance, onFeedback = () => {} }) {
   const { t: tr, language } = useContext(LanguageContext);
   const [name, setName] = useState(profile.name);
   const [age, setAge] = useState(profile.age);
@@ -8120,6 +8233,14 @@ function SettingsScreen({ profile, onSave, onChangeLanguage, onBack, selectedCat
       <button onClick={handleSaveProfile} style={styles.primaryButton}>{tr("saveProfile")}</button>
       {appearance && <AppearanceCard appearance={appearance} onChange={onAppearance} />}
       <PrivacyCard />
+      <div style={{ ...styles.sectionLabel, marginTop: 24 }}>{tr("feedbackLabel")}</div>
+      <div style={{ ...styles.historyCard, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 200px", minWidth: 0 }}>
+          <div style={styles.recipeName}>{tr("feedbackSub")}</div>
+          <a href={`mailto:${FEEDBACK_EMAIL}`} dir="ltr" style={{ ...styles.recipeMeta, color: COLORS.primaryText }}>{FEEDBACK_EMAIL}</a>
+        </div>
+        <button onClick={onFeedback} style={{ ...styles.resetButton, marginTop: 0 }}><MessageSquare size={14} color={COLORS.primaryText} style={{ marginInlineEnd: 6 }} />{tr("sendFeedback")}</button>
+      </div>
     </div>
   );
 }
@@ -9223,6 +9344,7 @@ function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount, rec
     { icon: Users, label: t("communityLabel"), sub: t("communitySub"), action: () => onOpen("community") },
     { icon: ShoppingCart, label: t("shoppingLabel"), sub: shoppingCount > 0 ? `${shoppingCount} ${pl(shoppingCount, PL.listItem, language)}` : t("shoppingSub"), action: () => onOpen("shopping") },
     { icon: BookOpen, label: t("glossaryLabel"), sub: t("glossarySub"), action: () => onOpen("glossary") },
+    { icon: MessageSquare, label: t("feedbackLabel"), sub: t("feedbackSub"), action: () => onOpen("feedback") },
     { icon: SettingsIcon, label: t("settingsTitle"), sub: t("settingsSub"), action: onOpenSettings },
   ];
   return (
