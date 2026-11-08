@@ -33,6 +33,7 @@ import {
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
+import { LOGO_96, LOGO_256 } from "./brand.js";
 import { convertUnits } from "./units.js";
 import { ALLERGENS, allergensFor } from "./allergens.js";
 
@@ -7567,11 +7568,14 @@ export default function App() {
         <style>{FONT_IMPORT}</style>
         <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
-            <span style={styles.brand}>My&nbsp;Sous</span>
+            <img src={LOGO_96} alt="" width={30} height={30} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
             <span style={styles.brandSub}>prototype</span>
           </div>
           <div style={{ ...styles.screenArea, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ color: COLORS.inkMuted, fontSize: 13 }}>{t("loadingKitchen")}</span>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+              <img src={LOGO_256} alt="My Sous" width={96} height={96} style={{ borderRadius: 22 }} />
+              <span style={{ color: COLORS.inkMuted, fontSize: 13 }}>{t("loadingKitchen")}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -7586,7 +7590,7 @@ export default function App() {
         <style>{FONT_IMPORT}</style>
         <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
-            <span style={styles.brand}>My&nbsp;Sous</span>
+            <img src={LOGO_96} alt="" width={30} height={30} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
             <span style={styles.brandSub}>prototype</span>
           </div>
           <div style={styles.screenArea}>
@@ -7612,7 +7616,7 @@ export default function App() {
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
       <div style={frameStyle} className="ms-frame">
         <div className="ms-header" style={styles.statusRow}>
-          <span style={styles.brand}>My&nbsp;Sous</span>
+          <img src={LOGO_96} alt="" width={30} height={30} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
           <span style={styles.brandSub}>prototype</span>
           <button onClick={() => updateAppearance({ theme: isDark ? "light" : "dark" })} aria-label={t(isDark ? "themeLight" : "themeDark")} title={t(isDark ? "themeLight" : "themeDark")} style={styles.settingsButton}>
             {isDark ? <Sun size={17} color={COLORS.inkMuted} /> : <Moon size={17} color={COLORS.inkMuted} />}
@@ -10233,6 +10237,7 @@ const styles = {
   viewToggleBtnActive: { background: COLORS.card, color: COLORS.ink, fontWeight: 600, boxShadow: "0 1px 2px rgba(51,53,47,0.08)" },
   viewToggleLabel: { lineHeight: 1 },
   brand: { fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 18, color: COLORS.ink },
+  brandLogo: { borderRadius: 8, flexShrink: 0, display: "block" },
   brandSub: { marginInlineStart: 8, fontSize: 11, color: COLORS.inkMuted, letterSpacing: "0.03em", flex: 1 },
   settingsButton: { background: COLORS.paper, border: `1px solid ${COLORS.line}`, borderRadius: 10, width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" },
   screenArea: { flex: 1, overflowY: "auto", position: "relative", zIndex: 1 },

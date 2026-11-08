@@ -10,6 +10,7 @@
 // the app behaves exactly as before.
 import React, { useState } from "react";
 import { loadAppearance, saveAppearance, resolvedTheme } from "./appearance.js";
+import { LOGO_96, LOGO_256 } from "./brand.js";
 
 export const SUPABASE_URL = "https://kgfijzevpcbcbdrcmszo.supabase.co";
 // Publishable (anon) key: safe to ship in the page; row-level security in the
@@ -200,7 +201,10 @@ export function AuthScreen({ sb, onGuest }) {
         boxShadow: "0 1px 2px rgba(51,53,47,0.04), 0 20px 40px rgba(51,53,47,0.10)", display: "flex", flexDirection: "column", overflow: "hidden", boxSizing: "border-box",
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: desktop ? "14px 24px" : "16px 20px", borderBottom: `1px solid ${C.line}`, flexWrap: "wrap" }}>
-          <div style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src={LOGO_96} alt="" width={32} height={32} style={{ borderRadius: 8, display: "block" }} />
+            <span style={{ fontFamily: "Georgia, serif", fontSize: 20, fontWeight: 700 }}>My Sous</span>
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button onClick={toggleTheme} aria-label={dark ? "Light mode" : "Dark mode"} title={dark ? "Light mode" : "Dark mode"} style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${C.line}`, background: C.paper, color: C.muted, cursor: "pointer", fontSize: 15, lineHeight: 1 }}>{dark ? "☀" : "☾"}</button>
 
@@ -209,7 +213,11 @@ export function AuthScreen({ sb, onGuest }) {
         {desktop ? (
           <div style={{ flex: 1, display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)" }} className="ms-auth-split">
             <div aria-hidden="true" style={{ background: C.sageSofter, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 18, padding: 32 }}>
-              <div style={{ fontSize: 120, lineHeight: 1 }}>{slide < INTRO.length ? INTRO[slide].emoji : "🍳"}</div>
+              {slide < INTRO.length ? (
+                <div style={{ fontSize: 120, lineHeight: 1 }}>{INTRO[slide].emoji}</div>
+              ) : (
+                <img src={LOGO_256} alt="" width={180} height={180} style={{ borderRadius: 40, display: "block", boxShadow: "0 12px 30px rgba(31,58,14,0.25)" }} />
+              )}
               <div style={{ fontFamily: "Georgia, serif", fontSize: 22, color: C.sageText, textAlign: "center", maxWidth: 320, lineHeight: 1.35 }}>My Sous</div>
             </div>
             <div className="ms-auth-body" style={{ padding: "48px 40px", display: "flex", alignItems: "center" }}>{content}</div>
