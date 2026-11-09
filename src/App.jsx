@@ -30,9 +30,11 @@ import {
   Moon,
   MessageSquare,
   Target,
+  Compass,
 } from "./lucide-shim.js";
 import { ACTIVITY as NUTRI_ACTIVITY, GOALS as NUTRI_GOALS, SEXES as NUTRI_SEXES, estimateGoals, bodyFromProfile, SOURCES as NUTRI_SOURCES } from "./nutrition.js";
 import { NUTRI_TR } from "./nutrition-tr.js";
+import { TourCard, TOUR_STEPS, TOUR_UI } from "./tour.jsx";
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
@@ -7181,6 +7183,8 @@ export default function App() {
     setProfile((prev) => ({ ...prev, language: lang }));
   }
   const [screen, setScreen] = useState("kitchen");
+  // App tour: index of the step showing, or null. Starts by itself right after setup.
+  const [tourStep, setTourStep] = useState(null);
   const [prevScreen, setPrevScreen] = useState("kitchen");
   const [ingredients, setIngredients] = useState([
     { name: "eggs", quantity: "", expiration: "" },
@@ -7531,6 +7535,22 @@ export default function App() {
     const presets = { "cant-cook": ["beginner-friendly"], "just-ideas": ["quick-easy"] };
     setSelectedCategories(presets[data.cookingGoal] || []);
     setOnboarded(true);
+    setTourStep(0);
+  }
+
+  useEffect(() => {
+    if (tourStep === null) return;
+    const target = TOUR_STEPS[tourStep] && TOUR_STEPS[tourStep].screen;
+    if (target) setScreen(target);
+  }, [tourStep]);
+  const tourNext = () => setTourStep((i) => (i === null ? null : i + 1 >= TOUR_STEPS.length ? (endTour(), null) : i + 1));
+  const tourBack = () => setTourStep((i) => (i ? i - 1 : 0));
+  function endTour() {
+    setTourStep(null);
+    setScreen("kitchen");
+    setProfile((prev) => ({ ...prev, tourDone: true }));
+    const main = document.getElementById("ms-main");
+    if (main) main.scrollTop = 0;
   }
 
   function updateProfile(data) {
@@ -7552,6 +7572,7 @@ export default function App() {
   }
 
   function openSub(name) {
+    if (name === "tour") { setTourStep(0); return; }
     setPrevScreen("more");
     setScreen(name);
   }
@@ -7579,7 +7600,7 @@ export default function App() {
         <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
             <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
-            <span style={styles.brandSub}>prototype</span>
+            <span style={{ flex: 1 }} />
           </div>
           <div style={{ ...styles.screenArea, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
@@ -7601,7 +7622,7 @@ export default function App() {
         <div style={frameStyle} className="ms-frame">
           <div className="ms-header" style={styles.statusRow}>
             <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
-            <span style={styles.brandSub}>prototype</span>
+            <span style={{ flex: 1 }} />
           </div>
           <div style={styles.screenArea}>
             <OnboardingScreen onComplete={finishOnboarding} onChangeLanguage={setLanguage} units={appearance.units} onUnits={(u) => updateAppearance({ units: u })} />
@@ -7623,11 +7644,15 @@ export default function App() {
     <AllergyContext.Provider value={profile.allergies || []}><GoalsContext.Provider value={profile.nutritionGoals || null}>
     <div style={outerStyle} className="ms-root ms-desktop" dir={language === "ar" ? "rtl" : "ltr"} lang={language}>
       <style>{FONT_IMPORT}</style>
+      {tourStep !== null && TOUR_STEPS[tourStep] && (
+        <TourCard step={tourStep} total={TOUR_STEPS.length} data={TOUR_STEPS[tourStep]} lang={language} colors={COLORS}
+          onNext={tourNext} onBack={tourBack} onSkip={endTour} />
+      )}
       <a href="#ms-main" className="ms-skip" onClick={(e) => { e.preventDefault(); const m = document.getElementById("ms-main"); if (m) { m.setAttribute("tabindex", "-1"); m.focus(); } }}>{t("skipToContent")}</a>
       <div style={frameStyle} className="ms-frame">
         <div className="ms-header" style={styles.statusRow}>
           <img src={LOGO_HEADER} alt="My Sous logo" width={52} height={52} style={styles.brandLogo} /><span style={styles.brand}>My&nbsp;Sous</span>
-          <span style={styles.brandSub}>prototype</span>
+          <span style={{ flex: 1 }} />
           <button onClick={() => updateAppearance({ theme: isDark ? "light" : "dark" })} aria-label={t(isDark ? "themeLight" : "themeDark")} title={t(isDark ? "themeLight" : "themeDark")} style={styles.settingsButton}>
             {isDark ? <Sun size={17} color={COLORS.inkMuted} /> : <Moon size={17} color={COLORS.inkMuted} />}
           </button>
@@ -9459,6 +9484,7 @@ function MoreScreen({ onOpen, onOpenSettings, favoritesCount, shoppingCount, rec
     { icon: Users, label: t("communityLabel"), sub: t("communitySub"), action: () => onOpen("community") },
     { icon: ShoppingCart, label: t("shoppingLabel"), sub: shoppingCount > 0 ? `${shoppingCount} ${pl(shoppingCount, PL.listItem, language)}` : t("shoppingSub"), action: () => onOpen("shopping") },
     { icon: Target, label: nt("navLabel", language), sub: nt("navSub", language), action: () => onOpen("nutrition") },
+    { icon: Compass, label: TOUR_UI.label[language] || TOUR_UI.label.en, sub: TOUR_UI.sub[language] || TOUR_UI.sub.en, action: () => onOpen("tour") },
     { icon: BookOpen, label: t("glossaryLabel"), sub: t("glossarySub"), action: () => onOpen("glossary") },
     { icon: MessageSquare, label: t("feedbackLabel"), sub: t("feedbackSub"), action: () => onOpen("feedback") },
     { icon: SettingsIcon, label: t("settingsTitle"), sub: t("settingsSub"), action: onOpenSettings },
