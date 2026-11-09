@@ -7462,7 +7462,12 @@ export default function App() {
     setScreen("guided");
     tourEmit("recipe");
   }
-  useEffect(() => { tourEmit("screen:" + screen); }, [screen]);
+  useEffect(() => {
+    tourEmit("screen:" + screen);
+    // Every screen starts at the top (opening a recipe from a scrolled list used to land halfway down).
+    const main = document.getElementById("ms-main");
+    if (main) main.scrollTop = 0;
+  }, [screen]);
 
   const allRecipes = [...RECIPES, ...userRecipes];
 
