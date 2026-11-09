@@ -34,7 +34,7 @@ import {
 } from "./lucide-shim.js";
 import { ACTIVITY as NUTRI_ACTIVITY, GOALS as NUTRI_GOALS, SEXES as NUTRI_SEXES, estimateGoals, bodyFromProfile, SOURCES as NUTRI_SOURCES } from "./nutrition.js";
 import { NUTRI_TR } from "./nutrition-tr.js";
-import { TourCard, TOUR_STEPS, TOUR_UI } from "./tour.jsx";
+import { TourCard, TOUR_STEPS, TOUR_UI, tourEmit } from "./tour.jsx";
 import { RECIPE_IMAGES } from "./recipe-images.js";
 import { loadAppearance, saveAppearance, resolvedTheme, watchSystemTheme, injectAppearanceCss, applyAppearance } from "./appearance.js";
 import { pickRecipeIds } from "./photos.jsx";
@@ -82,6 +82,10 @@ const FONT_IMPORT = `[dir="rtl"] .ms-flip { transform: scaleX(-1); }
 .ms-desktop .ms-more-grid > button { border: 1px solid var(--ms-line) !important; border-radius: 14px; padding: 16px !important; background: var(--ms-card) !important; transition: border-color .15s, box-shadow .15s; }
 .ms-inspire-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
 .ms-desktop .ms-inspire-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; max-width: 980px; }
+@keyframes msTourPulse { 0%, 100% { box-shadow: 0 0 0 3px var(--ms-primary), 0 0 0 7px rgba(79,100,73,0.25); } 50% { box-shadow: 0 0 0 3px var(--ms-primary), 0 0 0 12px rgba(79,100,73,0.08); } }
+.ms-tour-target { position: relative; z-index: 5; border-radius: 12px; animation: msTourPulse 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ms-tour-target { animation: none; box-shadow: 0 0 0 3px var(--ms-primary); } }
+html[data-ms-motion="reduce"] .ms-tour-target { animation: none; box-shadow: 0 0 0 3px var(--ms-primary); }
 .ms-inspire-tile { position: relative; aspect-ratio: 4 / 3; border: none; border-radius: 14px; background-size: cover; background-position: center; cursor: pointer; overflow: hidden; display: flex; align-items: flex-end; padding: 10px 12px; text-align: start; transition: transform .15s; }
 .ms-inspire-tile:hover { transform: translateY(-2px); }
 .ms-inspire-tile span { color: #fff; font-weight: 600; font-size: 14px; line-height: 1.25; text-shadow: 0 1px 3px rgba(0,0,0,0.5); font-family: 'Inter', sans-serif; }
@@ -7129,9 +7133,9 @@ const NUTRITION_FACTS = {
 };
 
 // Cooking terms explained in plain language when someone asks "what is X" or "what does X mean".
-function TabButton({ active, onClick, icon: Icon, label }) {
+function TabButton({ active, onClick, icon: Icon, label, tour }) {
   return (
-    <button onClick={onClick} style={styles.tabButton}>
+    <button onClick={onClick} data-tour={tour} style={styles.tabButton}>
       <Icon size={20} color={active ? COLORS.primary : COLORS.inkMuted} strokeWidth={active ? 2.4 : 2} />
       <span style={{ ...styles.tabLabel, color: active ? COLORS.primaryText : COLORS.inkMuted, fontWeight: active ? 600 : 500 }}>{label}</span>
     </button>
@@ -7307,12 +7311,17 @@ export default function App() {
 
 
   function addIngredient() {
-    const typed = ingredientInput.trim().toLowerCase();
-    const val = resolveIngredientCanonical(typed) || typed;
-    const alreadyHave = ingredients.some((i) => normalizeIngredient(i.name) === normalizeIngredient(val));
-    if (val && !alreadyHave) {
-      setIngredients([...ingredients, { name: val, quantity: quantityInput.trim(), expiration: expirationInput, brand: brandInput.trim() }]);
+    // Several at once: "rice, eggs, spinach" adds three. Quantity, expiry and brand only apply to a single item.
+    const parts = ingredientInput.split(/[,;\n]+/).map((x) => x.trim().toLowerCase()).filter(Boolean);
+    const single = parts.length === 1;
+    const next = [...ingredients];
+    for (const typed of parts) {
+      const val = resolveIngredientCanonical(typed) || typed;
+      if (!next.some((i) => normalizeIngredient(i.name) === normalizeIngredient(val))) {
+        next.push({ name: val, quantity: single ? quantityInput.trim() : "", expiration: single ? expirationInput : "", brand: single ? brandInput.trim() : "" });
+      }
     }
+    if (next.length !== ingredients.length) { setIngredients(next); tourEmit("ingredient"); }
     setIngredientInput("");
     setQuantityInput("");
     setExpirationInput("");
@@ -7325,6 +7334,7 @@ export default function App() {
 
   function toggleEquipment(id) {
     setEquipment({ ...equipment, [id]: !equipment[id] });
+    tourEmit("tool");
   }
 
   function addCustomEquipment() {
@@ -7375,6 +7385,7 @@ export default function App() {
   }
 
   function toggleFavorite(id) {
+    if (!favorites[id]) tourEmit("favorite");
     setFavorites((prev) => {
       const next = { ...prev };
       if (next[id]) delete next[id];
@@ -7449,7 +7460,9 @@ export default function App() {
     setStepIndex(0);
     setServings(2);
     setScreen("guided");
+    tourEmit("recipe");
   }
+  useEffect(() => { tourEmit("screen:" + screen); }, [screen]);
 
   const allRecipes = [...RECIPES, ...userRecipes];
 
@@ -7502,6 +7515,7 @@ export default function App() {
   }
 
   function nextStep() {
+    tourEmit("next");
     if (stepIndex < activeRecipe.steps.length - 1) {
       setStepIndex(stepIndex + 1);
     } else {
@@ -7842,7 +7856,7 @@ export default function App() {
           <div className="ms-tabbar" style={isDesktop ? { ...styles.tabBar, ...styles.tabBarDesktop } : styles.tabBar}>
             <TabButton active={screen === "home"} onClick={() => setScreen("home")} icon={HomeIcon} label={t("home")} />
             <TabButton active={screen === "kitchen"} onClick={() => setScreen("kitchen")} icon={Refrigerator} label={t("kitchen")} />
-            <TabButton active={screen === "cook"} onClick={() => setScreen("cook")} icon={ChefHat} label={t("cook")} />
+            <TabButton active={screen === "cook"} onClick={() => setScreen("cook")} icon={ChefHat} label={t("cook")} tour="tab-cook" />
             <TabButton active={screen === "more"} onClick={() => setScreen("more")} icon={Users} label={t("more")} />
           </div>
         )}
@@ -8351,7 +8365,7 @@ function KitchenScreen({
       <p style={styles.subtext}>{t("kitchenSubtitle")}</p>
 
       <div style={{ ...styles.sectionLabel, marginTop: 14 }}>{t("equipmentLabel")}</div>
-      <div style={styles.chipWrap}>
+      <div style={styles.chipWrap} data-tour="tools">
         {equipmentList.map((eq) => {
           const active = equipment[eq.id];
           return (
@@ -8394,6 +8408,7 @@ function KitchenScreen({
           onChange={(e) => setIngredientInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && addIngredient()}
           placeholder={t("addIngredientPlaceholder")}
+          data-tour="ingredient-input"
           style={styles.textInput}
         />
         <button onClick={addIngredient} aria-label={t("aAdd")} style={styles.addButton}><Plus size={18} color="#fff" /></button>
@@ -8519,7 +8534,7 @@ function RecipeCard({ recipe, info, onOpen, showIngredientCount, favorites, togg
                 </button>
               )}
               {toggleFavorite && (
-                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }} aria-label={t(isFav ? "aUnsave" : "aSave")} aria-pressed={!!isFav} style={styles.favButton}>
+                <button onClick={(e) => { e.stopPropagation(); toggleFavorite(recipe.id); }} data-tour="fav" aria-label={t(isFav ? "aUnsave" : "aSave")} aria-pressed={!!isFav} style={styles.favButton}>
                   <Heart size={15} color={isFav ? COLORS.accent : COLORS.inkMuted} fill={isFav ? COLORS.accent : "none"} />
                 </button>
               )}
@@ -8891,7 +8906,7 @@ function StepTimer({ seconds, label, timer, setTimer }) {
   const mins = seconds >= 60 ? `${Math.round(seconds / 60)} min` : `${seconds} s`;
   if (!mine) {
     return (
-      <button onClick={() => setTimer({ label, total: seconds, endsAt: Date.now() + seconds * 1000, paused: null, done: false })} style={styles.cookToolButton}>
+      <button onClick={() => { setTimer({ label, total: seconds, endsAt: Date.now() + seconds * 1000, paused: null, done: false }); tourEmit("timer"); }} data-tour="timer" style={styles.cookToolButton}>
         <Clock size={15} color={COLORS.primaryText} /> {t("timerStart").replace("{t}", mins)}
       </button>
     );
@@ -8960,7 +8975,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   return (
     <div style={styles.screenPad}>
       <TimerBar timer={timer} setTimer={setTimer} />
-      <button onClick={onBack} style={styles.exitButton}>
+      <button onClick={onBack} data-tour="exit" style={styles.exitButton}>
         <ArrowLeft className="ms-flip" size={20} color={COLORS.ink} />
         <span>{t("exitLabel")}</span>
       </button>
@@ -9000,11 +9015,11 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
         {showIngredients ? "▾" : "▸"} {t("ingredientsSectionLabel")} ({recipe.ingredients.length})
       </button>
       {showIngredients && (
-        <ul className="ms-step-ingredients" style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "grid", gap: 6 }}>
+        <ul className="ms-step-ingredients" data-tour="checklist" style={{ listStyle: "none", padding: 0, margin: "8px 0 0", display: "grid", gap: 6 }}>
           {recipe.ingredients.map((ing) => (
             <li key={ing}>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, cursor: "pointer", color: gotIt[ing] ? COLORS.inkMuted : COLORS.ink, textDecoration: gotIt[ing] ? "line-through" : "none" }}>
-                <input type="checkbox" checked={!!gotIt[ing]} onChange={() => setGotIt((g) => ({ ...g, [ing]: !g[ing] }))} style={{ width: 18, height: 18, accentColor: "var(--ms-primary)" }} />
+                <input type="checkbox" checked={!!gotIt[ing]} onChange={() => { if (!gotIt[ing]) tourEmit("check"); setGotIt((g) => ({ ...g, [ing]: !g[ing] })); }} style={{ width: 18, height: 18, accentColor: "var(--ms-primary)" }} />
                 {ingredientLabel(ing, language)}
               </label>
             </li>
@@ -9052,7 +9067,7 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
         {!isFirst && (
           <button onClick={onPrev} style={styles.prevStepButton}>{t("previousStepLabel")}</button>
         )}
-        <button onClick={onNext} style={{ ...styles.primaryButton, marginTop: 0, flex: 1 }}>{isLast ? t("finishCookingLabel") : t("nextStepLabel")}</button>
+        <button onClick={onNext} data-tour="next-step" style={{ ...styles.primaryButton, marginTop: 0, flex: 1 }}>{isLast ? t("finishCookingLabel") : t("nextStepLabel")}</button>
       </div>
       {screenOn && <p style={{ ...styles.basicsHint, textAlign: "center", marginTop: 12 }}>☀ {t("screenOnNote")}</p>}
     </div>
@@ -9143,9 +9158,12 @@ function CreateRecipeScreen({ editingRecipe, cuisines, equipmentList, onSave, on
   }
 
   function addIngredientDraft() {
-    const typed = ingredientDraft.trim().toLowerCase();
-    const val = resolveIngredientCanonical(typed) || typed;
-    if (val && !ingredientsList.includes(val)) setIngredientsList([...ingredientsList, val]);
+    const next = [...ingredientsList];
+    for (const typed of ingredientDraft.split(/[,;\n]+/).map((x) => x.trim().toLowerCase()).filter(Boolean)) {
+      const val = resolveIngredientCanonical(typed) || typed;
+      if (!next.includes(val)) next.push(val);
+    }
+    if (next.length !== ingredientsList.length) setIngredientsList(next);
     setIngredientDraft("");
   }
 
