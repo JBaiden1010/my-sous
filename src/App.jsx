@@ -8456,9 +8456,12 @@ function photoToDataUrl(file, max = 640) {
       const scale = Math.min(1, max / Math.max(img.width, img.height));
       const c = document.createElement("canvas");
       c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
-      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      const ctx = c.getContext("2d");
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, c.width, c.height);
       URL.revokeObjectURL(url);
-      resolve(c.toDataURL("image/jpeg", 0.72));
+      resolve(c.toDataURL("image/jpeg", 0.82));
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("bad_image")); };
     img.src = url;
@@ -8946,8 +8949,9 @@ function GuidedScreen({ recipe, stepIndex, onNext, onPrev, servings, setServings
   }
   const isLast = stepIndex === steps.length - 1;
   const isFirst = stepIndex === 0;
-  const ratio = servings / 2;
-  const scale = (v) => Math.round(v * ratio);
+  const ratio = servings / 2; // ingredient amounts are written for 2 servings
+  // Nutrition is stored per serving; the whole meal is that times the servings.
+  const scale = (v) => Math.round(v * servings);
   const cv = (x) => convertUnits(x, units, language);
   const measureText = cv(scaleTranslatedMeasure(step.measure, recipe.steps[stepIndex]?.measure, ratio));
   const alsoCheck = secondarySignal(recipe, stepIndex, language);
@@ -9059,8 +9063,9 @@ function CompleteScreen({ recipe, servings, onDone }) {
   const { t, language } = useContext(LanguageContext);
   const { myRating } = useContext(CommunityContext);
   const [stars, setStars] = useState(() => myRating(recipe.id));
-  const ratio = servings / 2;
-  const scale = (v) => Math.round(v * ratio);
+  const ratio = servings / 2; // ingredient amounts are written for 2 servings
+  // Nutrition is stored per serving; the whole meal is that times the servings.
+  const scale = (v) => Math.round(v * servings);
   return (
     <div style={styles.screenPad}>
       <h1 style={styles.h1}>{t("niceWorkTitle")}</h1>
